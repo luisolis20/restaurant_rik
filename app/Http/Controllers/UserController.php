@@ -108,7 +108,28 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-       
+        $res = User::find($id);
+        if (isset($res)) {
+            $res->nombre = $request->nombre;
+            $res->email = $request->email;
+            $res->password = md5($request->password);
+            if ($res->save()) {
+                return response()->json([
+                    'data' => $res,
+                    'mensaje' => "Actualizado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "Error al Actualizar",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El Usuario con id: $id no Existe",
+            ]);
+        }
     }
 
     /**
