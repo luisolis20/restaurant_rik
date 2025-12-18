@@ -19,6 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::prefix('restrik')->group(function () {
-    Route::apiResource("users", UserController::class);
     Route::post('login', [AuthController::class, 'login']);
+    Route::middleware('auth:api')->group(function () {
+        //Colocar aquí las rutas que necesiten autenticación
+        Route::apiResource("users", UserController::class);
+    });
 });
