@@ -1,9 +1,8 @@
 <template>
   
 
-  <div class="content" v-if="!selectedCell">
+  <div class="content" v-if="!selectedCell" :style="{ opacity: (100 - distance) / 100 }">
     <img src="@/assets/img/logo.png" alt="Logo" class="content-logo" />
-    
     <div class="button" @click="toggleFocus">Realizar Pedido</div>
   </div>
 

@@ -1,150 +1,212 @@
 <template>
-  
+  <div id="contenedor">
+    <div class="login">
+      <div class="contenido">
+        <img src="@/assets/img/logo.png" alt="Logo" class="content-logo" />
+        <div v-if="!manualMode">
+          <p class="qr-subtitle">Escanee el código QR de su mesa para realizar el pedido</p>
+          <div class="qr-wrapper">
+            <div class="qr-scanner">
+              <div id="reader"></div>
+              <div v-if="isScanning" class="scanner-line"></div>
+              <div class="corner top-left"></div>
+              <div class="corner top-right"></div>
+              <div class="corner bottom-left"></div>
+              <div class="corner bottom-right"></div>
+            </div>
+          </div>
+          <button class="botonl secondary" @click="stopScanner" v-if="isScanning">Detener scanner</button>
+          <button class="botonl secondary" @click="startScanner" v-else>Iniciar scanner</button>
 
-  <div id="container">
-		<div class="login">
-			<div class="content">
-				<h1>Log In</h1>
-				<form>
-					<input type="email" placeholder="email">
-					<input type="password" placeholder="password">
-					<span class="remember">Remember me</span>
-					<span class="forget">Forgot password?</span>
-					<span class="clearfix"></span>
-					<button onclick="return false;">Log In</button>
-				</form>
-				<span class="loginwith">Or Connect with</span>
-				<a href="https://www.facebook.com/emin.qasimovdia"><svg xmlns="http://www.w3.org/2000/svg" width="24"
-						height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook">
-						<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-					</svg></a>
-				<a href="https://www.twitter.com/webkoder"><svg class="feather feather-twitter sc-dnqmqq jxshSx"
-						xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-						stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-						aria-hidden="true">
-						<path
-							d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-						</path>
-					</svg></a>
-				<a href="https://www.github.com/eminqasimov"><svg class="feather feather-github sc-dnqmqq jxshSx"
-						xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-						stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-						aria-hidden="true">
-						<path
-							d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
-						</path>
-					</svg></a>
-				<a href="#"> <svg class="feather feather-linkedin sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
-						width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-						<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-						<rect x="2" y="9" width="4" height="12"></rect>
-						<circle cx="4" cy="4" r="2"></circle>
-					</svg></a>
-				<span class="copy">&copy 2019</span>
-			</div>
-		</div>
-		<div class="page front">
-			<div class="content">
-				<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none"
-					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-					class="feather feather-user-plus">
-					<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-					<circle cx="8.5" cy="7" r="4" />
-					<line x1="20" y1="8" x2="20" y2="14" />
-					<line x1="23" y1="11" x2="17" y2="11" />
-				</svg>
-				<h1>Hello, friend!</h1>
-				<p>Enter your personal details and start journey with us</p>
-				<button type="" id="register">Register <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-						viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-						stroke-linejoin="round" class="feather feather-arrow-right-circle">
-						<circle cx="12" cy="12" r="10" />
-						<polyline points="12 16 16 12 12 8" />
-						<line x1="8" y1="12" x2="16" y2="12" />
-					</svg></button>
-			</div>
-		</div>
-		<div class="page back">
-			<div class="content">
-				<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none"
-					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-					class="feather feather-log-in">
-					<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-					<polyline points="10 17 15 12 10 7" />
-					<line x1="15" y1="12" x2="3" y2="12" />
-				</svg>
-				<h1>Welcome Back!</h1>
-				<p>To keep connected with us please login with your personal info</p>
-				<button type="" id="login"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-						viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-						stroke-linejoin="round" class="feather feather-arrow-left-circle">
-						<circle cx="12" cy="12" r="10" />
-						<polyline points="12 8 8 12 12 16" />
-						<line x1="16" y1="12" x2="8" y2="12" />
-					</svg> Log In</button>
-			</div>
-		</div>
-		<div class="register">
-			<div class="content">
-				<h1>Sign Up</h1>
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-					class="feather feather-facebook">
-					<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-				</svg>
-				<svg class="feather feather-twitter sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24"
-					height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-					stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path
-						d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-					</path>
-				</svg>
-				<svg class="feather feather-github sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24"
-					height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-					stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path
-						d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
-					</path>
-				</svg>
-				<svg class="feather feather-linkedin sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg" width="24"
-					height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-					stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-					<rect x="2" y="9" width="4" height="12"></rect>
-					<circle cx="4" cy="4" r="2"></circle>
-				</svg>
+          <p class="manual-link">
+            ¿Problemas con el scanner?
+            <span @click="toggleManual(true)">clic aquí para ingresar datos manualmente</span>
+          </p>
+        </div>
 
-				<span class="loginwith">Or</span>
+        <div v-else class="manual-form">
+          <h2>Ingreso Manual</h2>
+          <p class="qr-subtitle">Seleccione su mesa para continuar</p>
 
-				<form>
-					<input type="text" placeholder="name">
-					<input type="email" placeholder="email">
-					<input type="password" placeholder="password">
-					<span class="remember">I accept terms</span>
-					<span class="clearfix"></span>
-					<button onclick="return false;">Register</button>
-				</form>
-			</div>
-		</div>
-	</div>
+          <form class="formulario" @submit.prevent="verifyTable">
+            <select v-model="selectedTable" class="manual-input">
+              <option value="" disabled selected>Seleccione una mesa</option>
+              <option v-for="n in 20" :key="n" :value="n">Mesa {{ n }}</option>
+            </select>
+
+            <input type="text" v-model="waiterCode" placeholder="Código de validación (opcional)" class="manual-input">
+
+            <button type="submit" class="botonl">Verificar Mesa</button>
+            <button type="button" class="botonl secondary" @click="toggleManual(false)">Volver al Scanner</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="page front">
+      <div class="contenido">
+
+        <h1>¡Hey, Amigos!</h1>
+        <p>Da clic en el siguiente botón para ingresar con un usuario dado por el administrador del sitio</p>
+        <button id="register" class="botonl" @click="setActive">Ingresar datos de usuario</button>
+      </div>
+    </div>
+
+    <div class="page back">
+      <div class="contenido">
+        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="feather feather-qr-code">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <path d="M7 7h.01M17 7h.01M7 17h.01" />
+          <path d="M14 14h3m3 0h.01M14 17h.01M17 17h3M14 21h7M21 14v7" />
+        </svg>
+        <h1>¿Eres cliente?</h1>
+        <p>Da clic en el botón de abajo para scanear el código QR de tu mesa</p>
+        <button id="login" class="botonl" @click="setClose">Scanear código QR</button>
+      </div>
+    </div>
+
+    <div class="register">
+      <div class="contenido">
+        <img src="@/assets/img/logo.png" alt="Logo" class="content-logo" />
+        <h1>Iniciar Sesión</h1>
+        <p class="qr-subtitle">Ingrese el usuario y clave proporcionados por el administrador del sitio</p>
+        <form class="formulario">
+          <input type="email" placeholder="email">
+          <div class="password-wrapper">
+            <input type="password" id="reg-pass" placeholder="password">
+            <span class="toggle-password" @click="togglePassword('reg-pass')">
+              <svg id="icon-reg-pass" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather feather-eye">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </span>
+          </div>
+          <button class="botonl" @click.prevent="">Acceder</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useBienvenidoLogic } from '@/assets/js/bienvenido.js';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { Html5Qrcode } from "html5-qrcode";
+let html5QrCode = null;
+const qrResult = ref("");
+const isScanning = ref(false);
+const manualMode = ref(false); // Nueva variable
+const selectedTable = ref(""); // Datos de la mesa
+const waiterCode = ref("");
 
-// Extraemos las variables y funciones para que estén disponibles en el template
-const {
-  density, distance, selectedCell, directions, gridData, totalCells,
-  selectImage, resumeInterval, toggleFocus
-} = useBienvenidoLogic();
+
+const startScanner = async () => {
+  html5QrCode = new Html5Qrcode("reader");
+
+  const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+    // Aquí manejas el éxito del escaneo
+    console.log(`Código escaneado: ${decodedText}`);
+    qrResult.value = decodedText;
+
+    // Ejemplo: Redirigir o hacer login
+    alert("Acceso concedido para: " + decodedText);
+    stopScanner();
+  };
+
+  const config = {
+    fps: 10,
+    qrbox: { width: 250, height: 250 },
+    // Esto ayuda a que se vea bien en el contenedor pequeño
+    aspectRatio: 1.0
+  };
+
+  try {
+    await html5QrCode.start(
+      { facingMode: "environment" },
+      config,
+      qrCodeSuccessCallback
+    );
+    isScanning.value = true; // Actualizamos estado al tener éxito
+  } catch (err) {
+    console.error("Error al iniciar cámara:", err);
+    isScanning.value = false;
+  }
+};
+
+const stopScanner = async () => {
+  if (html5QrCode && html5QrCode.isScanning) {
+    try {
+      await html5QrCode.stop();
+      html5QrCode.clear();
+      isScanning.value = false; // Actualizamos estado al detener
+    } catch (err) {
+      console.error("Error al detener:", err);
+    }
+  }
+};
+const toggleManual = (value) => {
+  manualMode.value = value;
+  if (value) {
+    stopScanner(); // Detenemos la cámara si pasamos a modo manual
+  } else {
+    // Si volvemos a modo scanner, esperamos un tick de Vue y reiniciamos
+    setTimeout(() => startScanner(), 100);
+  }
+};
+const verifyTable = () => {
+  if (!selectedTable.value) {
+    alert("Por favor seleccione una mesa");
+    return;
+  }
+  alert(`Verificando Mesa ${selectedTable.value}...`);
+  // Aquí iría tu lógica de API para validar la mesa
+};
+const setActive = () => {
+  const container = document.getElementById('contenedor');
+  container.className = 'active';
+};
+
+const setClose = () => {
+  const container = document.getElementById('contenedor');
+  container.className = 'close';
+};
+
+const togglePassword = (inputId) => {
+  const input = document.getElementById(inputId);
+  const iconSpan = document.getElementById(`icon-${inputId}`);
+
+  if (input.type === 'password') {
+    input.type = 'text';
+    // SVG Ojo tachado
+    iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+  } else {
+    input.type = 'password';
+    // SVG Ojo abierto
+    iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+};
+
+onMounted(() => {
+  startScanner();
+  // Inicializar en modo close para que se vea el login en móviles
+  if (window.innerWidth <= 768) {
+    document.getElementById('contenedor').classList.add('close');
+  }
+});
+onUnmounted(() => {
+  stopScanner();
+});
 </script>
 
 <script>
 export default {
-  name: 'Bienvenido'
+  name: 'Login'
 }
 </script>
 
-<style src="@/assets/styles/bienvenido.css"></style>
+<style src="@/assets/styles/login.css"></style>

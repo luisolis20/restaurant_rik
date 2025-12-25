@@ -11,9 +11,10 @@
   position: relative;
   --sz: 1800px;
 
-  > div {
+  >div {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     transform-style: preserve-3d;
     display: grid;
     grid-template-columns: repeat(var(--grid-sz), 1fr);
@@ -22,15 +23,18 @@
     z-index: 1;
 
     &::after {
-      content: ''; display: block;
-      position: absolute; inset: 0;
+      content: '';
+      display: block;
+      position: absolute;
+      inset: 0;
       background: var(--theme-clr);
       pointer-events: none;
       z-index: 3;
     }
 
     .cell {
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       background-size: cover !important;
       background-position: center !important;
       background: repeating-linear-gradient(45deg, #94a4c211 0%, #94a4c211 5%, transparent 5%, transparent 10%);
@@ -51,97 +55,238 @@
   }
 
   .top {
-    top: 0; transform-origin: top center; transform: rotateX(-90deg); height: var(--sz);
-    &::after { background: linear-gradient(180deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis)))); }
-    .cell { transform: translate3d(0, 0, -100vh); }
+    top: 0;
+    transform-origin: top center;
+    transform: rotateX(-90deg);
+    height: var(--sz);
+
+    &::after {
+      background: linear-gradient(180deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis))));
+    }
+
+    .cell {
+      transform: translate3d(0, 0, -100vh);
+    }
   }
+
   .left {
-    left: 0; transform-origin: center left; transform: rotateY(90deg); width: var(--sz);
-    &::after { background: linear-gradient(90deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis)))); }
-    .cell { transform: translate3d(0, 0, -50vw); }
+    left: 0;
+    transform-origin: center left;
+    transform: rotateY(90deg);
+    width: var(--sz);
+
+    &::after {
+      background: linear-gradient(90deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis))));
+    }
+
+    .cell {
+      transform: translate3d(0, 0, -50vw);
+    }
   }
+
   .bottom {
-    bottom: 0; transform-origin: bottom center; transform: rotateX(90deg); height: var(--sz);
-    &::after { background: linear-gradient(0deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis)))); }
-    .cell { transform: translate3d(0, 0, -50vh); }
+    bottom: 0;
+    transform-origin: bottom center;
+    transform: rotateX(90deg);
+    height: var(--sz);
+
+    &::after {
+      background: linear-gradient(0deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis))));
+    }
+
+    .cell {
+      transform: translate3d(0, 0, -50vh);
+    }
   }
+
   .right {
-    right: 0; transform-origin: center right; transform: rotateY(-90deg); width: var(--sz);
-    &::after { background: linear-gradient(270deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis)))); }
-    .cell { transform: translate3d(0, 0, -50vw); }
+    right: 0;
+    transform-origin: center right;
+    transform: rotateY(-90deg);
+    width: var(--sz);
+
+    &::after {
+      background: linear-gradient(270deg, transparent, var(--theme-clr) calc(1% * (100 - var(--rev-dis))));
+    }
+
+    .cell {
+      transform: translate3d(0, 0, -50vw);
+    }
   }
 }
 
 .content {
   position: absolute;
-  inset: 0; margin: auto;
-  width: 34%; height: 34%;
+  inset: 0;
+  margin: auto;
+  width: 34%;
+  height: 34%;
   backdrop-filter: blur(3px);
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
+  transition: opacity 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   z-index: 5;
-  h2 { font-size: 3em; font-weight: 600; margin: 0; color: #000; }
-  p { color: #333; font-weight: 500; }
-  span { color: orangered; }
+
+  h2 {
+    font-size: 3em;
+    font-weight: 600;
+    margin: 0;
+    color: #000;
+  }
+
+  p {
+    color: #333;
+    font-weight: 500;
+  }
+
+  span {
+    color: orangered;
+  }
+
   .button {
-    background: #1e1e1e; padding: 6px 42px 8px;
-    border-radius: 12px; color: #fff;
-    cursor: pointer; transition: box-shadow 0.2s;
-    &:hover { box-shadow: inset 0 0 8px 1px #fff, inset 0 0 0 1px #fff; }
+    background: #1e1e1e;
+    padding: 10px 30px;
+    /* Padding más equilibrado */
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    /* Evita que el texto se rompa en dos líneas */
+
+    &:hover {
+      box-shadow: inset 0 0 8px 1px #fff, inset 0 0 0 1px #fff;
+    }
   }
 }
+
 /* Estilos específicos para la nueva imagen */
 .content-logo {
-  max-width: 250px;    /* Ajusta este valor según el tamaño de tu logo */
-  width: 80%;          /* Se adapta a pantallas pequeñas */
-  height: auto;        /* Mantiene la proporción */
-  margin-bottom: 1rem; /* Espacio entre el logo y el párrafo */
-  
+  max-width: 250px;
+  /* Ajusta este valor según el tamaño de tu logo */
+  width: 80%;
+  /* Se adapta a pantallas pequeñas */
+  height: auto;
+  /* Mantiene la proporción */
+  margin-bottom: 1rem;
+  /* Espacio entre el logo y el párrafo */
+
   object-fit: contain;
 }
-.content p { 
-  color: #333; 
-  font-weight: 500; 
-  margin-top: 0; 
+
+.content p {
+  color: #333;
+  font-weight: 500;
+  margin-top: 0;
 }
 
-.content span { 
-  color: orangered; 
+.content span {
+  color: orangered;
 }
+
 .selectedPane {
   transform: rotateX(0deg) !important;
   transform: rotateY(0deg) !important;
-  width: 100vw !important; height: 100vh !important;
-  top: 0 !important; left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: 0 !important;
   z-index: 100 !important;
   transition: all 1s ease-in-out;
-  &::after { display: none; }
-  
-  .cell { opacity: 0; }
+
+  &::after {
+    display: none;
+  }
+
+  .cell {
+    opacity: 0;
+  }
+
   .cell.selected {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 1;
     z-index: 100;
     background-repeat: no-repeat !important;
     cursor: default;
     animation: fadeIn 1s forwards;
-    &:hover { border: none; }
+
+    &:hover {
+      border: none;
+    }
   }
 }
 
 #back-btn {
-  position: absolute; left: 1em; top: 1em;
-  z-index: 101; background: #1e1e1e;
-  padding: 6px 42px 8px; border-radius: 12px;
-  color: #fff; cursor: pointer;
-  opacity: 0; pointer-events: none;
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  z-index: 101;
+  background: #1e1e1e;
+  padding: 6px 42px 8px;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.4s;
-  &.show-back { opacity: 1; pointer-events: all; }
+
+  &.show-back {
+    opacity: 1;
+    pointer-events: all;
+  }
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
 
+  to {
+    opacity: 1;
+  }
+}
+/* --- AJUSTES PARA MÓVIL (Media Queries) --- */
+
+@media (max-width: 768px) {
+  .content {
+    width: 80%; /* Más ancho en móvil para que el contenido no se amontone */
+  }
+
+  .content-logo {
+    max-width: 180px; /* Logo un poco más pequeño en móvil */
+  }
+
+  .button {
+    padding: 12px 24px; /* Padding más cómodo para dedos (touch) */
+    font-size: 0.9rem;   /* Fuente un poco más pequeña */
+    width: auto;         /* No ocupa todo el ancho */
+    max-width: 200px;
+  }
+
+  /* Ajuste de la grilla para que no sea tan pesada en móvil si es necesario */
+  .inf-grid-hero-container {
+    --sz: 1200px; /* Reducimos el tamaño virtual del cubo en móvil */
+  }
+}
+
+/* Ajuste para pantallas muy pequeñas (iPhone SE, etc) */
+@media (max-width: 400px) {
+  .content-logo {
+    max-width: 140px;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+}
 /* Reactividad del panel Tweakpane con Vue 
 .tp-dfwv {
   display: block;

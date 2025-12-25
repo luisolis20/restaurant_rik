@@ -1,7 +1,9 @@
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { Pane } from 'tweakpane';
 
 export function useBienvenidoLogic() {
+    const router = useRouter();
   // --- ESTADO ---
   const density = ref(5);
   const distance = ref(0);
@@ -60,7 +62,7 @@ export function useBienvenidoLogic() {
   };
 
   // --- NUEVA FUNCIÓN DE ANIMACIÓN ---
-  const animateDistance = (toValue, duration = 1000) => {
+  const animateDistance = (toValue, duration = 1000, onComplete = null) => {
     const fromValue = distance.value;
     const startTime = performance.now();
 
@@ -75,10 +77,11 @@ export function useBienvenidoLogic() {
       distance.value = fromValue + (toValue - fromValue) * eased;
       
       // Sincronizamos Tweakpane si existe
-      if (pane) pane.refresh();
-
       if (progress < 1) {
         requestAnimationFrame(update);
+      } else if (onComplete) {
+        // Cuando llega al final (progress === 1), ejecutamos la navegación
+        onComplete();
       }
     };
 
@@ -87,8 +90,14 @@ export function useBienvenidoLogic() {
 
   // --- MÉTODOS ACTUALIZADOS ---
   const toggleFocus = () => {
-    const newValue = distance.value >= 50 ? 0 : 100; // Umbral simple para alternar
-    animateDistance(newValue, 1000);
+    if (distance.value < 50) {
+      animateDistance(100, 1200, () => {
+        // CAMBIA '/pedido' por la ruta de tu componente de destino
+        router.push('/login'); 
+      });
+    } else {
+      animateDistance(0, 1000);
+    }
   };
 
   // --- LIFECYCLE ---

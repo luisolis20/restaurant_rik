@@ -12,6 +12,7 @@
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "core-js": "^3.8.3",
+    "html5-qrcode": "^2.3.8",
     "sweetalert2": "^11.26.17",
     "tweakpane": "^4.0.5",
     "vue": "^3.2.13",
