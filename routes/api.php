@@ -5,6 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\CalificacionesController;
+use App\Http\Controllers\PedidosController;
+use App\Http\Controllers\MesaController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +31,11 @@ Route::prefix('restrik')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::apiResource("users", UserController::class);
     Route::apiResource("roles", RoleController::class);
+    Route::apiResource("categorias", CategoriaController::class);
+    Route::apiResource("productos", ProductoController::class);
+    Route::apiResource("calificaciones", CalificacionesController::class);
+    Route::apiResource("pedidos", PedidosController::class);
+    Route::apiResource("mesas", MesaController::class);
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);
     Route::middleware('auth:api')->group(function () {
