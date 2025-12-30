@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('restrik')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::apiResource("users", UserController::class);
+    Route::apiResource("roles", RoleController::class);
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);
     Route::middleware('auth:api')->group(function () {
