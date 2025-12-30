@@ -20,8 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::prefix('restrik')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::apiResource("users", UserController::class);
+    Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
+    Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);
     Route::middleware('auth:api')->group(function () {
         //Colocar aquí las rutas que necesiten autenticación
-        Route::apiResource("users", UserController::class);
     });
 });
