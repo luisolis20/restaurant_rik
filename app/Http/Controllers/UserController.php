@@ -67,7 +67,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
+        $inputs["password"] = md5($request->password);
         $res = User::create($inputs);
         return response()->json([
             'data' => $res,
