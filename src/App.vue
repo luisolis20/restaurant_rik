@@ -1,8 +1,12 @@
 <template>
-  
-  <router-view/>
+  <ThemeProvider>
+    <SidebarProvider>
+      <RouterView />
+    </SidebarProvider>
+  </ThemeProvider>
 </template>
 
-<style>
-
-</style>
+<script setup>
+import ThemeProvider from '@/components/layout/ThemeProvider.vue'
+import SidebarProvider from '@/components/layout/SidebarProvider.vue'
+</script>

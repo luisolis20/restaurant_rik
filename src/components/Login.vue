@@ -2,7 +2,7 @@
   <div id="contenedor">
     <div class="login">
       <div class="contenido">
-        <img src="@/assets/img/logo.png" alt="Logo" class="content-logo" />
+        <img src="@/assets/img/logo.png" alt="Logo" class="contenti-logo" />
         <div v-if="!manualMode">
           <p class="qr-subtitle">Escanee el código QR de su mesa para realizar el pedido</p>
           <div class="qr-wrapper">
@@ -54,15 +54,7 @@
 
     <div class="page back">
       <div class="contenido">
-        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="feather feather-qr-code">
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-          <path d="M7 7h.01M17 7h.01M7 17h.01" />
-          <path d="M14 14h3m3 0h.01M14 17h.01M17 17h3M14 21h7M21 14v7" />
-        </svg>
+        
         <h1>¿Eres cliente?</h1>
         <p>Da clic en el botón de abajo para scanear el código QR de tu mesa</p>
         <button id="login" class="botonl" @click="setClose">Scanear código QR</button>
@@ -209,4 +201,3 @@ export default {
 }
 </script>
 
-<style src="@/assets/styles/login.css"></style>

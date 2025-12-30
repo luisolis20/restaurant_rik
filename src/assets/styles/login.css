@@ -1,10 +1,17 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-*, *::after, *::before {
-  margin: 0;
-  padding: 0;
-  box-sizing: inherit;
+#contenedor {
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
-.version {
+
+#contenedor *, 
+#contenedor *::after, 
+#contenedor *::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+#contenedor .version {
   position: absolute;
   bottom: 1em;
   right: 2em;
@@ -17,7 +24,7 @@
   letter-spacing: 1px;
   transition: transform 80ms ease-in;
 }
-.formulario input {
+#contenedor .formulario input {
   background: #eee;
   border: none;
   padding: 12px 15px;
@@ -25,7 +32,7 @@
   width: 100%;
   font-size: 1.4em;
 }
-span {
+#contenedor span {
   color: #333;
   font-size: 1.4em;
   display: inline-block;
@@ -33,10 +40,10 @@ span {
   font-weight: 100;
 }
 
-span.remember {
+#contenedor span.remember {
   float: left;
 }
-span.remember::before {
+#contenedor span.remember::before {
   content: "";
   display: inline-block;
   width: 1em;
@@ -46,16 +53,16 @@ span.remember::before {
   margin-right: 4px;
 }
 
-span.forget {
+#contenedor span.forget {
   float: right;
 }
 
-span.clearfix {
+#contenedor span.clearfix {
   clear: both;
   display: table;
 }
 
-span.loginwith {
+#contenedor span.loginwith {
   display: block;
   width: 100%;
   margin-top: 1em;
@@ -65,7 +72,7 @@ span.loginwith {
   justify-content: center;
   align-items: center;
 }
-span.loginwith::before {
+#contenedor span.loginwith::before {
   content: "";
   display: inline-block;
   width: 42%;
@@ -74,7 +81,7 @@ span.loginwith::before {
   vertical-align: middle;
   margin-right: 5%;
 }
-span.loginwith::after {
+#contenedor span.loginwith::after {
   content: "";
   display: inline-block;
   width: 45%;
@@ -84,13 +91,13 @@ span.loginwith::after {
   margin-left: 5%;
 }
 
-span.copy {
+#contenedor span.copy {
   display: block;
   position: absolute;
   bottom: 0;
   font-size: 1em;
 }
-.botonl {
+#contenedor .botonl {
   display: block;
   margin: 1em auto;
   border-radius: 40px;
@@ -104,19 +111,19 @@ span.copy {
   text-transform: uppercase;
   transition: transform 80ms ease-in;
 }
-.botonl svg {
+#contenedor .botonl svg {
   vertical-align: middle;
 }
 
-.botonl:hover {
+#contenedor .botonl:hover {
   cursor: pointer;
 }
 
-.botonl:active {
+#contenedor .botonl:active {
   transform: scale(0.95);
 }
 
-.botonl:focus {
+#contenedor .botonl:focus {
   outline: none;
 }
 #contenedor {
@@ -143,18 +150,18 @@ span.copy {
   border-radius: 0 !important;
 }
 /* --- AJUSTE DEL OJO (PASSWORD) --- */
-.password-wrapper {
+#contenedor .password-wrapper {
   position: relative;
   width: 100%;
   display: flex;
   align-items: center;
 }
 
-.password-wrapper input {
+#contenedor .password-wrapper input {
   padding-right: 45px; /* Espacio para que el texto no quede bajo el ojo */
 }
 
-.toggle-password {
+#contenedor .toggle-password {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -169,52 +176,61 @@ span.copy {
   transition: color 0.2s;
 }
 
-.toggle-password:hover {
+#contenedor .toggle-password:hover {
   color: #F5B30F;
 }
 
-.toggle-password svg {
+#contenedor .toggle-password svg {
   margin: 0 !important;
   stroke: currentColor; /* El color lo maneja el padre */
 }
-.contenido {
+#contenedor .contenido {
   max-width: 500px;
   margin: 0 auto;
   padding: 2em 4em;
   text-align: center;
 }
-.contenido p {
+#contenedor .contenido p {
   font-size: 1.4em;
 }
-.login {
+#contenedor .login {
   left: 0;
   background: #FAFAFA;
   border-radius: 20px 0 0 20px;
 }
-.login button {
+#contenedor .login button {
   border-radius: 0px;
   width: 100%;
 }
-.login svg {
+#contenedor .login svg {
   margin: 1em;
   stroke: #999;
 }
+#contenedor .contenti-logo,
+#contenedor .content-logo {
+  display: block;      /* Necesario para que margin: auto funcione */
+  margin: 0 auto 1.5rem auto; /* Centrado horizontal y espacio abajo */
+  max-width: 250px;
+  width: 80%;
+  height: auto;
+  object-fit: contain;
+}
 /* Subtítulo */
-.qr-subtitle {
+#contenedor .qr-subtitle {
   color: #666;
   font-size: 1.1em !important;
   margin-bottom: 20px;
 }
 
 /* Contenedor del Escáner */
-.qr-wrapper {
+#contenedor .qr-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 20px 0;
 }
 
-.qr-scanner {
+#contenedor .qr-scanner {
   width: 260px;
   height: 260px;
   background: #000;
@@ -224,7 +240,7 @@ span.copy {
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
-.video-placeholder {
+#contenedor .video-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
@@ -234,7 +250,7 @@ span.copy {
 }
 
 /* Línea de escaneo animada */
-.scanner-line {
+#contenedor .scanner-line {
   position: absolute;
   width: 100%;
   height: 3px;
@@ -251,7 +267,7 @@ span.copy {
 }
 
 /* Esquinas decorativas */
-.corner {
+#contenedor .corner {
   position: absolute;
   width: 20px;
   height: 20px;
@@ -259,38 +275,38 @@ span.copy {
   z-index: 10;
 }
 
-.top-left { top: 15px; left: 15px; border-right: 0; border-bottom: 0; }
-.top-right { top: 15px; right: 15px; border-left: 0; border-bottom: 0; }
-.bottom-left { bottom: 15px; left: 15px; border-right: 0; border-top: 0; }
-.bottom-right { bottom: 15px; right: 15px; border-left: 0; border-top: 0; }
+#contenedor .top-left { top: 15px; left: 15px; border-right: 0; border-bottom: 0; }
+#contenedor .top-right { top: 15px; right: 15px; border-left: 0; border-bottom: 0; }
+#contenedor .bottom-left { bottom: 15px; left: 15px; border-right: 0; border-top: 0; }
+#contenedor .bottom-right { bottom: 15px; right: 15px; border-left: 0; border-top: 0; }
 
 /* Botón secundario para alternativa */
-.botonl.secondary {
+#contenedor .botonl.secondary {
   background: transparent;
   color: #F5B30F;
   border: 2px solid #F5B30F;
   margin-top: 10px;
   font-size: 0.9em;
 }
-.botonl.secondary:hover {
+#contenedor .botonl.secondary:hover {
   background: #F5B30F;
   color: #fff;
 }
-.register {
+#contenedor .register {
   right: 0;
   z-index: 1;
   border-radius: 0 20px 20px 0;
   background: #FAFAFA;
 }
-.register button {
+#contenedor .register button {
   border-radius: 0px;
   width: 100%;
 }
-.register svg {
+#contenedor .register svg {
   margin: 1em;
   stroke: #999;
 }
-.page {
+#contenedor .page {
   right: 0;
   color: #fff;
   border-radius: 0 20px 20px 0;
@@ -299,21 +315,21 @@ span.copy {
   transition: animation 1s linear;
   transition: animation 1s linear, -webkit-animation 1s linear;
 }
-.page button {
+#contenedor .page button {
   border-color: #fff;
   background: transparent;
 }
-.page p {
+#contenedor .page p {
   margin: 2em auto;
 }
 /* Ajustes para la librería html5-qrcode */
-#reader {
+#contenedor #reader {
   width: 100% !important;
   height: 100% !important;
   border: none !important;
 }
 
-#reader video {
+#contenedor #reader video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover; /* Importante para llenar el cuadrado */
@@ -359,13 +375,13 @@ span.copy {
   -webkit-animation: close-rot-back 0.6s ease-in-out normal forwards;
           animation: close-rot-back 0.6s ease-in-out normal forwards;
 }
-.manual-link {
+#contenedor .manual-link {
   margin-top: 20px;
   font-size: 0.9em !important;
   color: #666;
 }
 
-.manual-link span {
+#contenedor .manual-link span {
   display: inline; /* Para que no sea un bloque */
   color: #F5B30F;
   font-weight: bold;
@@ -375,13 +391,13 @@ span.copy {
   margin: 0;
 }
 
-.manual-form h2 {
+#contenedor .manual-form h2 {
   color: #333;
   margin-bottom: 10px;
 }
 
 /* Estilo para el select (que combine con tus inputs) */
-.manual-input {
+#contenedor .manual-input {
   background: #eee;
   border: none;
   padding: 12px 15px;
@@ -393,7 +409,7 @@ span.copy {
   appearance: none; /* Quita el estilo por defecto del navegador */
 }
 
-.manual-form .botonl {
+#contenedor .manual-form .botonl {
   margin-top: 10px;
   margin-bottom: 5px;
 }
@@ -526,86 +542,70 @@ span.copy {
 /* --- AJUSTES PARA MÓVIL (Login visible + Botones debajo) --- */
 
 @media (max-width: 768px) {
-    
-
     #contenedor {
-        width: 90%;
-        height: auto; /* Altura automática para adaptarse */
-        min-height: 550px;
-        display: flex;
+        width: 90% !important;
+        height: auto !important;
+        min-height: auto !important;
         flex-direction: column;
         box-shadow: none;
         background: #FAFAFA;
         border-radius: 20px;
         overflow: hidden;
+        margin: 20px auto;
+        transform: none !important;
     }
 
-    /* Los formularios ocupan la parte superior */
-    .login, .register {
+    /* Forzamos que el login siempre ocupe el 100% y sea visible */
+    #contenedor .login {
         position: relative !important;
         width: 100% !important;
-        height: auto !important;
-        padding-bottom: 30px;
+        left: 0 !important;
+        display: flex !important;
+        opacity: 1 !important;
+        border-radius: 20px !important;
     }
 
-    /* Las "páginas" naranja ahora actúan como el pie del formulario */
-    .page {
-        position: relative !important;
-        width: 100% !important;
-        height: 200px !important; /* Altura fija para el área del botón */
-        top: auto !important;
-        right: auto !important;
-        border-radius: 0 0 20px 20px !important;
-        transform: none !important; /* Quitamos rotación en móvil para estabilidad */
-        z-index: 5 !important;
+    /* ELIMINAMOS EL REGISTRO Y LAS PÁGINAS NARANJA EN MÓVIL */
+    #contenedor .register, 
+    #contenedor .page,
+    #contenedor .back,
+    #contenedor .front {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
     /* Ajuste de contenidos internos */
-    .contenido {
+    #contenedor .contenido {
         padding: 20px !important;
+        max-width: 100% !important;
     }
 
-    .page .contenido {
-        transform: none !important;
-        padding: 10px 20px !important;
+    #contenedor .contenido h1 {
+        font-size: 1.8em !important;
     }
 
-    .page h1, .page p {
-        display: none; /* Ocultamos texto largo para ahorrar espacio en móvil */
-    }
-
-    .page svg {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 5px;
-    }
-
-    /* Control de visibilidad mediante clases */
-    /* Cuando está en modo Login (clase 'close' o inicial) */
-    #contenedor.close .register, 
-    #contenedor:not(.active) .register,
-    #contenedor.close .page.back,
-    #contenedor:not(.active) .page.back {
-        display: none;
-    }
-
-    /* Cuando está en modo Registro (clase 'active') */
-    #contenedor.active .login,
-    #contenedor.active .page.front {
-        display: none;
-    }
-
-    #contenedor.active .register,
-    #contenedor.active .page.back {
-        display: flex;
+    #contenedor .formulario input {
+        font-size: 1.1em !important;
+        padding: 10px;
     }
 
     /* Botón de la versión más discreto */
-    .version {
+    #contenedor .version {
         position: relative;
         bottom: auto;
         right: auto;
-        margin-top: 20px;
+        margin: 10px auto;
+        display: table;
+        font-size: 0.8em;
+    }
+
+    /* Desactivar cualquier animación de entrada/salida en móvil */
+    .active .login .contenido,
+    .close .login .contenido {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
     }
 }
 /* Ajuste fino para pantallas muy pequeñas */
@@ -614,15 +614,15 @@ span.copy {
         height: 550px;
     }
     
-    .contenido h1 {
+    #contenedor .contenido h1 {
         font-size: 2.2em;
     }
     
-    .contenido p {
+    #contenedor .contenido p {
         font-size: 1.2em;
     }
 
-    .formulario input {
+    #contenedor .formulario input {
         padding: 10px;
         font-size: 1.2em;
     }
