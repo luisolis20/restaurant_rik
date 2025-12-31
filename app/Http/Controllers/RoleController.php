@@ -17,7 +17,6 @@ class RoleController extends Controller
             $perPage = $request->input('per_page', 20);
             $perPage = min($perPage, 50);
             $searchQuery = $request->input('search_query');
-            $status = $request->input('status');
 
             $query = Rol::select('roles.*');
              if (! empty($searchQuery)) {
@@ -63,7 +62,6 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
         $res = Rol::create($inputs);
         return response()->json([
             'data' => $res,
@@ -101,6 +99,8 @@ class RoleController extends Controller
         $res = Rol::find($id);
         if (isset($res)) {
             $res->nombre_rol = $request->nombre_rol;
+            $res->descripcion = $request->descripcion;
+
             
             if ($res->save()) {
                 return response()->json([
@@ -124,6 +124,32 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    public function destroy(string $id)
+    {
+        $res = Rol::find($id);
+        if(isset($res)){
+            $elim = Rol::destroy($id);
+            if($elim){
+                return response()->json([
+                    'data'=>$res,
+                    'mensaje'=>"Eliminado con Éxito!!",
+                ]);
+            }else{
+                return response()->json([
+                    'data'=>$res,
+                    'mensaje'=>"El Rol no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+           
+           
+           
+        }else{
+            return response()->json([
+                'error'=>true,
+                'mensaje'=>"El Rol con id: $id no Existe",
+            ]);
+        }
+    }
    
     
     

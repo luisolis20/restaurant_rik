@@ -20,14 +20,15 @@ class CategoriaController extends Controller
             $status = $request->input('status');
 
             $query = Categoria::select('categorias.*');
-             if (! empty($searchQuery)) {
+            if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('categoria.nombre', 'LIKE', "%{$searchQuery}%");
-                   
-            
+                    $q->where('categorias.nombre', 'LIKE', "%{$searchQuery}%");
                 });
             }
-        
+            if ($status !== null && $status !== '') {
+                $query->where('categorias.estado', '=', $status);
+            }
+
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -51,7 +52,7 @@ class CategoriaController extends Controller
                     'total' => $data->total(),
                     'last_page' => $data->lastPage(),
                 ],
-                
+
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
@@ -103,7 +104,8 @@ class CategoriaController extends Controller
         if (isset($res)) {
             $res->nombre = $request->nombre;
             $res->descripcion = $request->descripcion;
-            
+            $res->estado = $request->estado;
+
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
@@ -126,7 +128,56 @@ class CategoriaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   
-    
-    
+    public function destroy(string $id)
+    {
+        $res = Categoria::find($id);
+        if (isset($res)) {
+            $res->estado = 0;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = Categoria::find($id);
+        if (isset($res)) {
+            $res->estado = 1;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Eliminado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
+            ]);
+        }
+    }
 }

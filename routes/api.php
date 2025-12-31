@@ -37,7 +37,11 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("pedidos", PedidosController::class);
     Route::apiResource("mesas", MesaController::class);
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
+    Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy']);
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);
+    Route::delete('eliminarcategoria/{id}', [CategoriaController::class, 'destroy']);
+    Route::delete('habilitarcategoria/{id}', [CategoriaController::class, 'habilitar']);
+    Route::get('imagenprod/{ci}', [ProductoController::class, 'getFotografia'])->middleware('throttle:5000,1');
     Route::middleware('auth:api')->group(function () {
         //Colocar aquí las rutas que necesiten autenticación
     });

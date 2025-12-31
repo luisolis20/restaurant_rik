@@ -19,16 +19,17 @@ class UserController extends Controller
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
 
-            $query = User::select('usuarios.*');
+            $query = User::select('usuarios.*', 'roles.*')
+                ->join('roles', 'roles.id_rol', '=', 'usuarios.id_rol');
              if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('usuarios.nombre', 'LIKE', "%{$searchQuery}%")
                         ->orWhere('usuarios.apellido', 'LIKE', "%{$searchQuery}%");
                 });
             }
-             if (! empty($status)) {
+            if (! empty($status)) {
                 $query->where(function ($q) use ($status) {
-                    $q->where('usuarios.estado', 'LIKE', "%{$status}%");
+                    $q->where('usuarios.estado', 'LIKE', "{$status}");
                 });
             }
             $data = $query->paginate($perPage);
@@ -105,6 +106,7 @@ class UserController extends Controller
         $res = User::find($id);
         if (isset($res)) {
             $res->nombre = $request->nombre;
+            $res->apellido = $request->apellido;
             $res->email = $request->email;
             $res->password = md5($request->password);
             $res->id_rol = $request->id_rol;
