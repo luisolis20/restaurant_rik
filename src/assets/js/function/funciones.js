@@ -21,28 +21,117 @@ export function mostraralertas2(titulo,icono){
         buttonsStyling:false
     });
 }
-export function confimar(urlconslash,id,titulo,mensaje){
-    var url = urlconslash+id;
+
+export function confimar(urlconslash, id, titulo, mensaje, actualizarTabla) {
+    var url = urlconslash + id;   // 👈 Se construye la URL con el ID
+
     const swalwithboostrapbutton = Swal.mixin({
-        customClass:{confirmButton:'btn btn-success me-3',cancelButton:'btn btn-danger'},
+        customClass: {
+            confirmButton: 'btn btn-success me-3',
+            cancelButton: 'btn btn-danger'
+        },
     });
+
     return swalwithboostrapbutton.fire({
-        title:titulo,
-        text:mensaje,
-        icon:'question',
-        showCancelButton:true,
-        confirmButtonText:'<i class="fa-solid fa-check"></i> Si, Eliminar',
-        cancelButtonText:'<i class="fa-solid fa-ban"></i> Cancelar'}).then((res)=>{
-        if(res.isConfirmed){
-            return enviarsolig('DELETE',{id:id},url,'Eliminado con exito').then(response => {
-                return response; 
-            });
-        }else{
-            mostraralertas('Operacion cancelada','info');
+        title: titulo,
+        text: mensaje,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check"></i> Si, Inhabilitar',
+        cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancelar'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
+                .then((response) => {
+                    mostraralertas(response.data.mensaje ?? 'Eliminado con éxito', 'success');
+                    if (typeof actualizarTabla === "function") {
+                        actualizarTabla(); // 🔄 refrescar tabla
+                    }
+                    return response.data;
+                })
+                .catch(() => {
+                    mostraralertas('Error al eliminar', 'error');
+                    throw new Error('Error al eliminar');
+                });
+        } else {
+            mostraralertas('Operación cancelada', 'info');
             return null;
         }
     });
-   
+}
+export function eliminacion(urlconslash, id, titulo, mensaje, actualizarTabla) {
+    var url = urlconslash + id;   // 👈 Se construye la URL con el ID
+
+    const swalwithboostrapbutton = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success me-3',
+            cancelButton: 'btn btn-danger'
+        },
+    });
+
+    return swalwithboostrapbutton.fire({
+        title: titulo,
+        text: mensaje,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check"></i> Si, Eliminar',
+        cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancelar'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
+                .then((response) => {
+                    mostraralertas(response.data.mensaje ?? 'Eliminado con éxito', 'success');
+                    if (typeof actualizarTabla === "function") {
+                        actualizarTabla(); // 🔄 refrescar tabla
+                    }
+                    return response.data;
+                })
+                .catch(() => {
+                    mostraralertas('Error al eliminar', 'error');
+                    throw new Error('Error al eliminar');
+                });
+        } else {
+            mostraralertas('Operación cancelada', 'info');
+            return null;
+        }
+    });
+}
+export function confimarhabi(urlconslash, id, titulo, mensaje, actualizarTabla) {
+    var url = urlconslash + id;   // 👈 Se construye la URL con el ID
+
+    const swalwithboostrapbutton = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success me-3',
+            cancelButton: 'btn btn-danger'
+        },
+    });
+
+    return swalwithboostrapbutton.fire({
+        title: titulo,
+        text: mensaje,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-check"></i> Si, Habilitar',
+        cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancelar'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
+                .then((response) => {
+                    mostraralertas(response.data.mensaje ?? 'Habilitado con éxito', 'success');
+                    if (typeof actualizarTabla === "function") {
+                        actualizarTabla(); // 🔄 refrescar tabla
+                    }
+                    return response.data;
+                })
+                .catch(() => {
+                    mostraralertas('Error al habilitar', 'error');
+                    throw new Error('Error al habilitar');
+                });
+        } else {
+            mostraralertas('Operación cancelada', 'info');
+            return null;
+        }
+    });
 }
 export function confimar2(urlconslash,id,titulo,mensaje){
     var url = urlconslash+id;

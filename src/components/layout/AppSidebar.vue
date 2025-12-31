@@ -186,8 +186,10 @@ const menuGroups = [
         icon: MantenimientoIcon,
         name: "Matenimiento",
         subItems: [
-          { name: "Usuarios", path: "/usuarios", pro: false },
-          { name: "Categorías", path: "/categorias", pro: false },
+          { name: "Roles", path: "/mantenimiento/roles", pro: false },
+          { name: "Usuarios", path: "/mantenimiento/usuarios", pro: false },
+          { name: "Categorías", path: "/mantenimiento/categorias", pro: false },
+          { name: "Platos", path: "/mantenimiento/platos", pro: false },
         ],
       },
       {

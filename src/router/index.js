@@ -2,9 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import DashUiView from '../views/DashUiView.vue'
-import PlatosAllView from '../views/Op_Plato/PlatosAllView.vue'
-import CategoriaAllView from '../views/Op_Categoria/CategoriaAllView.vue'
-import UsuariosAllView from '../views/Op_Users/UsuariosAllView.vue'
+//import PlatosAllView from '../views/Op_Plato/PlatosAllView.vue'
+import CategoriaAllView from '../views/Mantenimiento/Op_Categoria/CategoriaAllView.vue'
+import UsuariosAllView from '../views/Mantenimiento/Op_Users/UsuariosAllView.vue'
+import RolesAllView from '../views/Mantenimiento/Op_Roles/RolesAllView.vue'
+import PlatosAllView from '../views/Mantenimiento/Op_Plato/PlatosAllView.vue'
 
 
 
@@ -26,19 +28,24 @@ const routes = [
     component: DashUiView
   },
   {
-    path: '/platos',
+    path: '/mantenimiento/platos',
     name: 'platos',
     component: PlatosAllView
   },
   {
-    path: '/categorias',
+    path: '/mantenimiento/categorias',
     name: 'categorias',
     component: CategoriaAllView
   },
   {
-    path: '/usuarios',
+    path: '/mantenimiento/usuarios',
     name: 'usuarios',
     component: UsuariosAllView
+  },
+  {
+    path: '/mantenimiento/roles',
+    name: 'roles',
+    component: RolesAllView
   },
 
 

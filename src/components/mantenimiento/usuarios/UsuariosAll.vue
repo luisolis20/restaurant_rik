@@ -100,12 +100,7 @@
                   <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                     {{ post.nombre }} {{ post.apellido }}
                   </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400"
-                    v-if="post.id_rol == 1">Administrador</span>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400"
-                    v-else-if="post.id_rol == 2">Cajero</span>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400"
-                    v-else-if="post.id_rol == 3">Cocinero</span>
+                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">{{ post.nombre_rol }}</span>
                 </div>
               </div>
             </td>
@@ -139,11 +134,21 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
-                <button @click="eliminarUsuario(post.id_usuario)"
+                <button @click="eliminar(post.id_usuario, post.nombre)" v-if="post.estado === 'activo'"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+                <button @click="habilitar(post.id_usuario, post.nombre)" v-if="post.estado === 'inactivo'"
+                  class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:bg-white/10"
+                  title="Refrescar lista">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                   </svg>
                 </button>
               </div>
@@ -298,8 +303,7 @@
                       class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                       :class="{ 'text-gray-800 dark:text-white/90': usuarios.rol }">
                       <option value="" disabled selected>Seleccione un rol</option>
-                      <option value="1">Administrador</option>
-                      <option value="2">Cajero</option>
+                      <option v-for="obj in objetoList" :key="obj.id_rol" :value="obj.id_rol">{{ obj.nombre_rol }}</option>
                     </select>
                     <span
                       class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
@@ -384,21 +388,22 @@
                       class="dark:bg-dark-900 h-11 w-full rounded-lg border bg-transparent px-4 py-2.5 pr-10 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
 
                     <span class="absolute right-3.5 top-1/2 -translate-y-1/2">
-                      <svg v-if="usuariosEdicion.email !== '' && !isEmailValidEdit" width="16" height="16" viewBox="0 0 16 16"
-                        fill="none">
+                      <svg v-if="usuariosEdicion.email !== '' && !isEmailValidEdit" width="16" height="16"
+                        viewBox="0 0 16 16" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                           d="M2.58325 7.99967C2.58325 5.00813 5.00838 2.58301 7.99992 2.58301C10.9915 2.58301 13.4166 5.00813 13.4166 7.99967C13.4166 10.9912 10.9915 13.4163 7.99992 13.4163C5.00838 13.4163 2.58325 10.9912 2.58325 7.99967ZM7.99992 1.08301C4.17995 1.08301 1.08325 4.17971 1.08325 7.99967C1.08325 11.8196 4.17995 14.9163 7.99992 14.9163C11.8199 14.9163 14.9166 11.8196 14.9166 7.99967C14.9166 4.17971 11.8199 1.08301 7.99992 1.08301ZM7.09932 5.01639C7.09932 5.51345 7.50227 5.91639 7.99932 5.91639H7.99999C8.49705 5.91639 8.89999 5.51345 8.89999 5.01639C8.89999 4.51933 8.49705 4.11639 7.99999 4.11639H7.99932C7.50227 4.11639 7.09932 4.51933 7.09932 5.01639ZM7.99998 11.8306C7.58576 11.8306 7.24998 11.4948 7.24998 11.0806V7.29627C7.24998 6.88206 7.58576 6.54627 7.99998 6.54627C8.41419 6.54627 8.74998 6.88206 8.74998 7.29627V11.0806C8.74998 11.8306 8.41419 11.8306 7.99998 11.8306Z"
                           fill="#F04438" />
                       </svg>
-                      <svg v-if="usuariosEdicion.email !== '' && isEmailValidEdit" width="16" height="16" viewBox="0 0 16 16"
-                        fill="none">
+                      <svg v-if="usuariosEdicion.email !== '' && isEmailValidEdit" width="16" height="16"
+                        viewBox="0 0 16 16" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                           d="M2.61792 8.00034C2.61792 5.02784 5.0276 2.61816 8.00009 2.61816C10.9726 2.61816 13.3823 5.02784 13.3823 8.00034C13.3823 10.9728 10.9726 13.3825 8.00009 13.3825C5.0276 13.3825 2.61792 10.9728 2.61792 8.00034ZM8.00009 1.11816C4.19917 1.11816 1.11792 4.19942 1.11792 8.00034C1.11792 11.8013 4.19917 14.8825 8.00009 14.8825C11.801 14.8825 14.8823 11.8013 14.8823 8.00034C14.8823 4.19942 11.801 1.11816 8.00009 1.11816ZM10.5192 7.266C10.8121 6.97311 10.8121 6.49823 10.5192 6.20534C10.2264 5.91245 9.75148 5.91245 9.45858 6.20534L7.45958 8.20434L6.54162 7.28638C6.24873 6.99349 5.77385 6.99349 5.48096 7.28638C5.18807 7.57927 5.18807 8.05415 5.48096 8.34704L6.92925 9.79533C7.0699 9.93599 7.26067 10.015 7.45958 10.015C7.6585 10.015 7.84926 9.93599 7.98991 9.79533L10.5192 7.266Z"
                           fill="#12B76A" />
                       </svg>
                     </span>
                   </div>
-                  <p v-if="usuariosEdicion.email !== '' && !isEmailValidEdit" class="mt-1.5 text-theme-xs text-error-500">
+                  <p v-if="usuariosEdicion.email !== '' && !isEmailValidEdit"
+                    class="mt-1.5 text-theme-xs text-error-500">
                     El correo ingresado no es válido.
                   </p>
                 </div>
@@ -423,8 +428,8 @@
                           d="M2.58325 7.99967C2.58325 5.00813 5.00838 2.58301 7.99992 2.58301C10.9915 2.58301 13.4166 5.00813 13.4166 7.99967C13.4166 10.9912 10.9915 13.4163 7.99992 13.4163C5.00838 13.4163 2.58325 10.9912 2.58325 7.99967ZM7.99992 1.08301C4.17995 1.08301 1.08325 4.17971 1.08325 7.99967C1.08325 11.8196 4.17995 14.9163 7.99992 14.9163C11.8199 14.9163 14.9166 11.8196 14.9166 7.99967C14.9166 4.17971 11.8199 1.08301 7.99992 1.08301ZM7.09932 5.01639C7.09932 5.51345 7.50227 5.91639 7.99932 5.91639H7.99999C8.49705 5.91639 8.89999 5.51345 8.89999 5.01639C8.89999 4.51933 8.49705 4.11639 7.99999 4.11639H7.99932C7.50227 4.11639 7.09932 4.51933 7.09932 5.01639ZM7.99998 11.8306C7.58576 11.8306 7.24998 11.4948 7.24998 11.0806V7.29627C7.24998 6.88206 7.58576 6.54627 7.99998 6.54627C8.41419 6.54627 8.74998 6.88206 8.74998 7.29627V11.0806C8.74998 11.8306 8.41419 11.8306 7.99998 11.8306Z"
                           fill="#F04438" />
                       </svg>
-                      <svg v-if="usuariosEdicion.password !== '' && isPasswordValidEdit" width="16" height="16" viewBox="0 0 16 16"
-                        fill="none">
+                      <svg v-if="usuariosEdicion.password !== '' && isPasswordValidEdit" width="16" height="16"
+                        viewBox="0 0 16 16" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                           d="M2.61792 8.00034C2.61792 5.02784 5.0276 2.61816 8.00009 2.61816C10.9726 2.61816 13.3823 5.02784 13.3823 8.00034C13.3823 10.9728 10.9726 13.3825 8.00009 13.3825C5.0276 13.3825 2.61792 10.9728 2.61792 8.00034ZM8.00009 1.11816C4.19917 1.11816 1.11792 4.19942 1.11792 8.00034C1.11792 11.8013 4.19917 14.8825 8.00009 14.8825C11.801 14.8825 14.8823 11.8013 14.8823 8.00034C14.8823 4.19942 11.801 1.11816 8.00009 1.11816ZM10.5192 7.266C10.8121 6.97311 10.8121 6.49823 10.5192 6.20534C10.2264 5.91245 9.75148 5.91245 9.45858 6.20534L7.45958 8.20434L6.54162 7.28638C6.24873 6.99349 5.77385 6.99349 5.48096 7.28638C5.18807 7.57927 5.18807 8.05415 5.48096 8.34704L6.92925 9.79533C7.0699 9.93599 7.26067 10.015 7.45958 10.015C7.6585 10.015 7.84926 9.93599 7.98991 9.79533L10.5192 7.266Z"
                           fill="#12B76A" />
@@ -443,7 +448,8 @@
                     </div>
                   </div>
 
-                  <p v-if="usuariosEdicion.password !== '' && !isPasswordValidEdit" class="mt-1.5 text-theme-xs text-error-500">
+                  <p v-if="usuariosEdicion.password !== '' && !isPasswordValidEdit"
+                    class="mt-1.5 text-theme-xs text-error-500">
                     Debe tener 8+ caracteres, Mayús., Minús. y un caracter (@ o *).
                   </p>
                 </div>
@@ -457,8 +463,30 @@
                       class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                       :class="{ 'text-gray-800 dark:text-white/90': usuariosEdicion.rol }">
                       <option value="" disabled selected>Seleccione un rol</option>
-                      <option value="1">Administrador</option>
-                      <option value="2">Cajero</option>
+                     <option v-for="obj in objetoList" :key="obj.id_rol" :value="obj.id_rol">{{ obj.nombre_rol }}</option>
+                    </select>
+                    <span
+                      class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
+                      <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <!-- Select Input -->
+                <div>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Seleccione el estado de usuario
+                  </label>
+                  <div class="relative z-20 bg-transparent">
+                    <select v-model="usuariosEdicion.estado"
+                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                      :class="{ 'text-gray-800 dark:text-white/90': usuariosEdicion.estado }">
+                      <option value="" disabled selected>Seleccione un estado</option>
+                      <option value="activo">Activo</option>
+                      <option value="inactivo">Inactivo</option>
                     </select>
                     <span
                       class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
@@ -515,13 +543,14 @@ import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from 'lodash.debounce';
 import Modal from '@/components/Modal/Modal.vue'
-import { mostraralertas2, enviarsolig, enviarsoliedit, confimar, enviarsoligqr, enviarsoligfoot } from '@/assets/js/function/funciones';
+import { mostraralertas2, enviarsolig, confimar,confimarhabi } from '@/assets/js/function/funciones';
 
 export default {
   data() {
     return {
       idus: 0,
-      baseUrl: "/restrik", // Ajustado para usar la base
+      baseUrl: "/restrik", 
+    
       usersarray: [],
       usuarios: {
         password: "",
@@ -538,7 +567,7 @@ export default {
         email: "",
         nombre: "",
         apellido: "",
-        estado: "activo",
+        estado: "",
       },
       filteredusersarray: [],
       searchQuery: "",
@@ -551,6 +580,7 @@ export default {
       lastPage: 1,
       buscando: false, // Mantenido, pero no se usa en la lógica de paginación actual
       debouncedFilter: null,
+      objetoList: [],
 
     };
   },
@@ -563,6 +593,7 @@ export default {
   async mounted() {
     const ruta = useRoute();
     this.getUsuarios(1, this.searchQuery, this.selectedStatus);
+    this.GetObjetoList();
 
   },
   computed: {
@@ -608,6 +639,7 @@ export default {
         this.usuariosEdicion.nombre !== '' &&
         this.usuariosEdicion.apellido !== '' &&
         this.usuariosEdicion.rol !== '' &&
+        this.usuariosEdicion.estado !== '' &&
         this.isEmailValidEdit &&
         this.isPasswordValidEdit
       );
@@ -618,16 +650,28 @@ export default {
   methods: {
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
-      this.usuariosEdicion = { 
+      this.usuariosEdicion = {
         id_usuario: user.id_usuario,
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
         rol: user.id_rol,
-        password: '', 
+        password: '',
         estado: user.estado,
       };
       this.$.setupState.isEditModalOpen = true;
+    },
+    async GetObjetoList() {
+      this.cargando = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/roles`);
+
+        this.objetoList = response.data?.data || []
+
+      } catch (error) {
+        console.error("❌ Error al obtener carreras:", error);
+        this.objetoList = [];
+      }
     },
     async getUsuarios(page = 1, searchQuery = "", selectedStatus = "") {
       this.cargando = true;
@@ -639,6 +683,7 @@ export default {
           status: selectedStatus, // Parámetro para búsqueda
         };
         const response = await API.get(`${this.baseUrl}/users`, { params });
+
         const data = response.data?.data || [];
         const pagination = response.data?.pagination || {};
 
@@ -680,6 +725,7 @@ export default {
     actualizar() {
       // Simplemente recarga la página actual de datos
       this.getUsuarios(this.currentPage, this.searchQuery, this.selectedStatus);
+      this.GetObjetoList();
     },
 
     async registrar() {
@@ -723,7 +769,7 @@ export default {
           nombre: this.usuariosEdicion.nombre,
           apellido: this.usuariosEdicion.apellido,
           id_rol: this.usuariosEdicion.rol,
-          estado: "activo",
+          estado: this.usuariosEdicion.estado,
         };
         const exito = await enviarsolig('PUT', params, `${this.baseUrl}/users/${this.usuariosEdicion.id_usuario}`, 'Usuario Editado con éxito');
         if (exito) {
@@ -734,7 +780,8 @@ export default {
             rol: "",
             email: "",
             nombre: "",
-            apellido: ""
+            apellido: "",
+            estado: "",
           };
 
 
@@ -746,12 +793,34 @@ export default {
         console.error("❌ Error al registrar usuario:", error.response?.data || error);
       }
     },
-
-
-
-
-
-
+    eliminar(id, nombre) {
+      try {
+        confimar(
+          `${this.baseUrl}/eliminaruser/`,
+          id,
+          'Inhabilitar registro',
+          '¿Realmente desea inhabilitar el usuario  ' + nombre + '?',
+          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+        );
+      } catch (error) {
+        console.error("Error al inhabilitar el usuario:", error);
+        this.cargando = false;
+      }
+    },
+    habilitar(id, nombre) {
+      try {
+        confimarhabi(
+          `${this.baseUrl}/habilitaruser/`,
+          id,
+          'Habilitar registro',
+          '¿Desea habilitar el usuario ' + nombre + '?',
+          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+        );
+      } catch (error) {
+        console.error("Error al eliminar la oferta:", error);
+        this.cargando = false;
+      }
+    },
 
   },
 };

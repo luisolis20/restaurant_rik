@@ -3,7 +3,7 @@
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="space-y-5 sm:space-y-6">
 
-      <UsuariosAll />
+      <PlatosAll />
 
     </div>
   </AdminLayout>
@@ -14,6 +14,6 @@ import { ref } from "vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 //import ComponentCard from "@/components/common/ComponentCard.vue";
-import UsuariosAll from "@/components/usuarios/UsuariosAll.vue";
-const currentPageTitle = ref("Categorías");
+import PlatosAll from "@/components/mantenimiento/platos/PlatosAll.vue";
+const currentPageTitle = ref("Platos");
 </script>
