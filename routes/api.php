@@ -10,6 +10,9 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CalificacionesController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\MesaController;
+use App\Http\Controllers\DetallePedidoController;
+use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\DetalleFacturaController;
 
 
 
@@ -36,6 +39,10 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("calificaciones", CalificacionesController::class);
     Route::apiResource("pedidos", PedidosController::class);
     Route::apiResource("mesas", MesaController::class);
+    Route::apiResource("detalle_pedidos", DetallePedidoController::class);
+    Route::apiResource("facturas", FacturaController::class);
+    Route::apiResource("detalle_facturas", DetalleFacturaController::class);
+    
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
     Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy']);
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);

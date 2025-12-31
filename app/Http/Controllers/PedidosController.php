@@ -21,9 +21,9 @@ class PedidosController extends Controller
 
             $query = Pedido::select(
                 'pedidos.*',
-                'mesas.fecha_pedido as mesas_fecha_pedido',
+                'mesas.codigo_mesa as mesas_codigo_mesa',
             )
-                ->join('mesas', 'mesas.id_mesa', '=', 'mesas.id_mesa');
+                ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa');
              if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('pedidos.fecha_pedido', 'LIKE', "%{$searchQuery}%");

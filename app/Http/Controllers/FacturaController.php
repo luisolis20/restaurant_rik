@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Calificacion;
+use App\Models\Factura;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class CalificacionesController extends Controller
+class FacturaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,14 +19,14 @@ class CalificacionesController extends Controller
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
 
-            $query = Calificacion::select(
-                'calificaciones.*',
+            $query = Factura::select(
+                'facturas.*',
                 'pedidos.fecha_pedido as fecha_pedido',
             )
-                ->join('pedidos', 'pedidos.id_pedido', '=', 'calificaciones.id_pedido');
+                ->join('pedidos', 'pedidos.id_pedido', '=', 'facturas.id_pedido');
              if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('calificaciones.fecha', 'LIKE', "%{$searchQuery}%");
+                    $q->where('facturas.numero_factura', 'LIKE', "%{$searchQuery}%");
                    
             
                 });
@@ -69,7 +69,7 @@ class CalificacionesController extends Controller
     {
         $inputs = $request->input();
         //$inputs["password"] = md5($request->password);
-        $res = Calificacion::create($inputs);
+        $res = Factura::create($inputs);
         return response()->json([
             'data' => $res,
             'mensaje' => "Agregado con Éxito!!",
@@ -81,7 +81,7 @@ class CalificacionesController extends Controller
      */
     public function show(string $id)
     {
-        $res = Calificacion::find($id);
+        $res = Factura::find($id);
         if (isset($res)) {
             // Verificar si la imagen existe y codificarla en base64
             // $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
@@ -93,7 +93,7 @@ class CalificacionesController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "La Calificacion con id: $id no Existe",
+                'mensaje' => "La Factura con id: $id no Existe",
             ]);
         }
     }
@@ -103,13 +103,18 @@ class CalificacionesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = Calificacion::find($id);
+        $res = Factura::find($id);
         if (isset($res)) {
             $res->id_pedido = $request->id_pedido;
-            $res->puntuacion = $request->puntuacion;
+            $res->numero_factura = $request->numero_factura;
             $res->comentario = $request->comentario;
-            $res->fecha = $request->fecha;
-            
+            $res->tipo_comprobante = $request->tipo_comprobante;
+            $res->subtotal = $request->subtotal;
+            $res->iva = $request->iva;
+            $res->total = $request->total;   
+            $res->estado_factura = $request->estado_factura;   
+            $res->fecha_emision = $request->fecha_emision; 
+                
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
@@ -124,7 +129,7 @@ class CalificacionesController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "La Calificacion con id: $id no Existe",
+                'mensaje' => "La Factura con id: $id no Existe",
             ]);
         }
     }
@@ -136,3 +141,9 @@ class CalificacionesController extends Controller
     
     
 }
+
+
+
+
+
+
