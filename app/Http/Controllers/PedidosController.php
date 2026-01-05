@@ -21,7 +21,8 @@ class PedidosController extends Controller
 
             $query = Pedido::select(
                 'pedidos.*',
-                'mesas.codigo_mesa as mesas_codigo_mesa',
+                'mesas.capacidad',
+                'mesas.estado',
             )
                 ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa');
              if (! empty($searchQuery)) {

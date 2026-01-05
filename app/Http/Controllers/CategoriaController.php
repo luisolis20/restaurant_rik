@@ -25,10 +25,12 @@ class CategoriaController extends Controller
                     $q->where('categorias.nombre', 'LIKE', "%{$searchQuery}%");
                 });
             }
-            if ($status !== null && $status !== '') {
-                $query->where('categorias.estado', '=', $status);
+             if (! empty($status)) {
+                $query->where(function ($q) use ($status) {
+                    $q->where('categorias.estado', 'LIKE', "{$status}");
+                });
             }
-
+                   
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -105,6 +107,7 @@ class CategoriaController extends Controller
             $res->nombre = $request->nombre;
             $res->descripcion = $request->descripcion;
             $res->estado = $request->estado;
+            
 
             if ($res->save()) {
                 return response()->json([

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DetallePedido;
+use App\Models\TiempoPreparacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class DetallePedidoController extends Controller
+class TiempoPreparacionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,17 +19,17 @@ class DetallePedidoController extends Controller
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
 
-            $query = DetallePedido::select(
-                'detalle_pedidos.*',
-                'pedidos.total',
-                'productos.nombre',
-
+            $query = TiempoPreparacion::select(
+                'tiempos_preparacion.*',
+                'usuarios.nombre as nombre',
+                'pedidos.fecha_pedido as fecha_pedido',
+                
             )
-                ->join('pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
-                ->join('productos', 'detalle_pedidos.id_producto', '=', 'productos.id_producto');
+                ->join('pedidos', 'pedidos.id_pedido', '=', 'tiempos_preparacion.id_pedido')
+                ->join('usuarios', 'usuarios.id_usuario_chef', '=', 'tiempos_preparacion.id_usuario_chef');
              if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('detalle_pedidos.cantidad', 'LIKE', "%{$searchQuery}%");
+                    $q->where('tiempos_preparacion.fecha_inicio', 'LIKE', "%{$searchQuery}%");
                    
             
                 });
@@ -72,7 +72,7 @@ class DetallePedidoController extends Controller
     {
         $inputs = $request->input();
         //$inputs["password"] = md5($request->password);
-        $res = DetallePedido::create($inputs);
+        $res = TiempoPreparacion::create($inputs);
         return response()->json([
             'data' => $res,
             'mensaje' => "Agregado con Éxito!!",
@@ -84,7 +84,7 @@ class DetallePedidoController extends Controller
      */
     public function show(string $id)
     {
-        $res = DetallePedido::find($id);
+        $res = TiempoPreparacion::find($id);
         if (isset($res)) {
             // Verificar si la imagen existe y codificarla en base64
             // $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
@@ -96,7 +96,7 @@ class DetallePedidoController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El Detalle del pedido con id: $id no Existe",
+                'mensaje' => "El Tiempo de Preparación con id: $id no Existe",
             ]);
         }
     }
@@ -106,13 +106,13 @@ class DetallePedidoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = DetallePedido::find($id);
+        $res = TiempoPreparacion::find($id);
         if (isset($res)) {
             $res->id_pedido = $request->id_pedido;
-            $res->id_producto = $request->id_producto;
-            $res->cantidad = $request->cantidad;
-            $res->precio_unitario = $request->precio_unitario;
-            $res->subtotal = $request->subtotal;
+            $res->id_usuario_chef = $request->id_usuario_chef;
+            $res->tiempo_estimado_minutos = $request->tiempo_estimado_minutos;
+            $res->fecha_inicio = $request->fecha_inicio;
+            $res->fecha_fin = $request->fecha_fin;
             
             if ($res->save()) {
                 return response()->json([
@@ -128,7 +128,7 @@ class DetallePedidoController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El Detalle del pedido con id: $id no Existe",
+                'mensaje' => "La Calificacion con id: $id no Existe",
             ]);
         }
     }

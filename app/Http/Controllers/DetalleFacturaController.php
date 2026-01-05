@@ -21,7 +21,7 @@ class DetalleFacturaController extends Controller
 
             $query = DetalleFactura::select(
                 'detalle_facturas.*',
-                'facturas.numero_factura',
+                'facturas.total',
             )
                 ->join('facturas', 'facturas.id_factura', '=', 'detalle_facturas.id_factura');
              if (! empty($searchQuery)) {

@@ -204,4 +204,56 @@ class ProductoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    public function destroy(string $id)
+    {
+        $res = Producto::find($id);
+        if (isset($res)) {
+            $res->estado = 0;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Inhabilitado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
+            ]);
+        }
+    }
+    public function habilitar(string $id)
+    {
+        $res = Producto::find($id);
+        if (isset($res)) {
+            $res->estado = 1;
+            $res->save();
+            $data = $res->toArray();
+            if ($data) {
+
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "Eliminado con Éxito!!",
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $data,
+                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El usuario con id: $id no Existe",
+            ]);
+        }
+    }           
 }

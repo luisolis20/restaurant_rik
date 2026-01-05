@@ -13,6 +13,12 @@ use App\Http\Controllers\MesaController;
 use App\Http\Controllers\DetallePedidoController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\DetalleFacturaController;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\QrMesaController;
+use App\Http\Controllers\TiempoPreparacionController;
+
+
+
 
 
 
@@ -42,6 +48,13 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("detalle_pedidos", DetallePedidoController::class);
     Route::apiResource("facturas", FacturaController::class);
     Route::apiResource("detalle_facturas", DetalleFacturaController::class);
+    Route::apiResource("inventarios", InventarioController::class);
+    Route::apiResource("qr_mesas", QrMesaController::class);
+    Route::apiResource("tiempos_preparacion", TiempoPreparacionController::class);
+    
+
+    Route::delete('eliminarqrmesa/{id}', [QrMesaController::class, 'destroy']);
+    Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar']);
     
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
     Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy']);
