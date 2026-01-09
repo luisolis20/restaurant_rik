@@ -556,11 +556,11 @@ export default {
           `${this.baseUrl}/eliminarcategoria/`,
           id,
           'Inhabilitar registro',
-          '¿Realmente desea inhabilitar el usuario  ' + nombre + '?',
+          '¿Realmente desea inhabilitar la categoria  ' + nombre + '?',
           this.actualizar   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
-        console.error("Error al inhabilitar el usuario:", error);
+        console.error("Error al inhabilitar:", error);
         this.cargando = false;
       }
     },
@@ -570,11 +570,11 @@ export default {
           `${this.baseUrl}/habilitarcategoria/`,
           id,
           'Habilitar registro',
-          '¿Desea habilitar el usuario ' + nombre + '?',
+          '¿Desea habilitar la categoria ' + nombre + '?',
           this.actualizar   // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
-        console.error("Error al eliminar la oferta:", error);
+        console.error("Error al eliminar:", error);
         this.cargando = false;
       }
     },

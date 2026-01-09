@@ -41,9 +41,9 @@ export function confimar(urlconslash, id, titulo, mensaje, actualizarTabla) {
         cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancelar'
     }).then((res) => {
         if (res.isConfirmed) {
-            return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
+            return API.delete(url)   //  Ya NO mandamos { data: { id } }
                 .then((response) => {
-                    mostraralertas(response.data.mensaje ?? 'Eliminado con éxito', 'success');
+                    mostraralertas(response.data.mensaje ?? 'Habilitado con éxito', 'success');
                     if (typeof actualizarTabla === "function") {
                         actualizarTabla(); // 🔄 refrescar tabla
                     }
@@ -80,7 +80,7 @@ export function eliminacion(urlconslash, id, titulo, mensaje, actualizarTabla) {
         if (res.isConfirmed) {
             return API.delete(url)   // 👈 Ya NO mandamos { data: { id } }
                 .then((response) => {
-                    mostraralertas(response.data.mensaje ?? 'Eliminado con éxito', 'success');
+                    mostraralertas(response.data.mensaje ?? 'Habilitado con éxito', 'success');
                     if (typeof actualizarTabla === "function") {
                         actualizarTabla(); // 🔄 refrescar tabla
                     }

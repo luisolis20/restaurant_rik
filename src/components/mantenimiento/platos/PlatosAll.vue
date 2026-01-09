@@ -37,18 +37,24 @@
                 d="M7.91745 11.525C6.49762 11.525 5.34662 12.676 5.34662 14.0959C5.34661 15.5157 6.49762 16.6667 7.91745 16.6667C9.33728 16.6667 10.4883 15.5157 10.4883 14.0959C10.4883 12.676 9.33728 11.525 7.91745 11.525Z"
                 stroke-width="1.5" />
             </svg>
-            {{ selectedStatus === '' ? 'Filtrar' : 'Estado: ' + selectedStatus }}
+            {{ selectedStatus === "" ? "Filtrar" : "Estado: " + selectedStatus }}
           </button>
 
           <div v-if="isFilterDropdownOpen"
             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
             <div class="py-1">
               <button @click="setStatusFilter('')"
-                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">Todos</button>
+                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                Todos
+              </button>
               <button @click="setStatusFilter('activos')"
-                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">Activos</button>
+                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                Activos
+              </button>
               <button @click="setStatusFilter('inactivos')"
-                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">Inactivos</button>
+                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                Inactivos
+              </button>
             </div>
           </div>
         </div>
@@ -99,14 +105,16 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                    {{ post.name }}
+                    {{ post.nombre }}
                   </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">Descripción {{ post.descripcion }}</span>
+                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">{{ truncateText(post.descripcion, 100) }}</span>
                 </div>
               </div>
             </td>
             <td class="py-3 whitespace-nowrap">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ post.categoria_nombre }}</p>
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
+                {{ post.categoria_nombre }}
+              </p>
             </td>
             <td class="py-3 whitespace-nowrap">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">${{ post.precio }}</p>
@@ -160,7 +168,6 @@
                 </button>
               </div>
             </td>
-
           </tr>
         </tbody>
       </table>
@@ -178,148 +185,103 @@
     &nbsp;&nbsp;&nbsp;&nbsp;
     <div class="d-flex justify-content-center mb-4" v-if="!cargando">
       &nbsp;&nbsp;&nbsp;
-      <button class="btn btn-primary text-white" @click="actualizar">
-        Actualizar
-      </button>
+      <button class="btn btn-primary text-white" @click="actualizar">Actualizar</button>
     </div>
     <!-- Modal de Registro de Usuario -->
     <Modal v-if="isProfileAddressModal" @close="isProfileAddressModal = false">
       <template #body>
         <div
-          class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-          <!-- close btn -->
+          class="relative w-full max-w-[700px] max-h-[90vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 shadow-2xl">
           <button @click="isProfileAddressModal = false"
-            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
-            <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.07]">
+            <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24">
               <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
-                fill="" />
+                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z" />
             </svg>
           </button>
-          <div class="px-2 pr-14">
+
+          <div class="px-6 pt-8 lg:px-11 lg:pt-11">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Agregar Plato
             </h4>
-            <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
               Llene todos los campos para agregar un nuevo plato.
             </p>
           </div>
-          <form class="flex flex-col">
-            <div class="px-2 overflow-y-auto custom-scrollbar">
+
+          <form class="flex flex-col flex-1 overflow-hidden">
+            <div class="px-6 pb-4 overflow-y-auto custom-scrollbar lg:px-11">
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del Plato
-                  </label>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre del
+                    Plato</label>
                   <input type="text" v-model="objetoguardar.nombre"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Seleccione la categoría del plato
-                  </label>
-                  <div class="relative z-20 bg-transparent">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Categoría</label>
+                  <div class="relative z-20">
                     <select v-model="objetoguardar.id_categoria"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                      :class="{ 'text-gray-800 dark:text-white/90': objetoguardar.id_categoria }">
+                      class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white">
                       <option value="" disabled selected>Seleccione una categoría</option>
-                      <option v-for="obj in objetoList" :key="obj.id_categoria" :value="obj.id_categoria">{{ obj.nombre
-                      }}</option>
+                      <option v-for="obj in objetoList" :key="obj.id_categoria" :value="obj.id_categoria">
+                        {{ obj.nombre }}
+                      </option>
                     </select>
-                    <span
-                      class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
-                      <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
                   </div>
                 </div>
+
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Precio
                   </label>
-                  <input type="text" v-model="objetoguardar.precio"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                  <input type="text" v-model="objetoguardar.precio" @input="validarPrecio($event, 'guardar')"
+                    placeholder="0.00"
+                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
                 </div>
+
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Seleccione el estado del plato
-                  </label>
-                  <div class="relative z-20 bg-transparent">
-                    <select v-model="objetoguardar.estado"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                      :class="{ 'text-gray-800 dark:text-white/90': objetoguardar.estado }">
-                      <option value="" disabled selected>Seleccione un estado</option>
-                      <option value="1">Activo</option>
-                      <option value="0">Inactivo</option>
-                    </select>
-                    <span
-                      class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
-                      <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado</label>
+                  <select v-model="objetoguardar.estado"
+                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white">
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Descripción</label>
+                <textarea v-model="objetoguardar.descripcion" rows="4"
+                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white"></textarea>
+              </div>
+
+              <div class="file-uploader mt-5 pb-4">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Imagen del
+                  Plato</label>
+                <div :id="'reg-' + dropzoneId"
+                  class="dropzone border-gray-300 border-dashed rounded-xl bg-gray-50 dark:bg-gray-900 min-h-[150px] flex items-center justify-center hover:border-brand-500 transition-colors">
+                  <div class="dz-message m-0 text-center">
+                    <span class="font-medium underline cursor-pointer text-brand-500 text-sm">Subir imagen</span>
                   </div>
                 </div>
-
-
-
-              </div>
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Descripción
-                </label>
-                <textarea v-model="objetoguardar.descripcion" placeholder="Ingrese la descripción de la categoría..."
-                  rows="6"
-                  class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"></textarea>
-              </div>
-              <div class="file-uploader">
-                <form ref="dropzoneForm" :id="dropzoneId" :action="uploadUrl"
-                  class="border-gray-300 border-dashed dropzone rounded-xl bg-gray-50 p-7 hover:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-brand-500 lg:p-10">
-                  <div class="dz-message m-0!">
-                    <div class="mb-[22px] flex justify-center">
-                      <div
-                        class="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                        <svg class="fill-current" width="29" height="28" viewBox="0 0 29 28" fill="none"
-                          xmlns="http://www.w3.org/2000/svg">
-                          <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M14.5019 3.91699C14.2852 3.91699 14.0899 4.00891 13.953 4.15589L8.57363 9.53186C8.28065 9.82466 8.2805 10.2995 8.5733 10.5925C8.8661 10.8855 9.34097 10.8857 9.63396 10.5929L13.7519 6.47752V18.667C13.7519 19.0812 14.0877 19.417 14.5019 19.417C14.9161 19.417 15.2519 19.0812 15.2519 18.667V6.48234L19.3653 10.5929C19.6583 10.8857 20.1332 10.8855 20.426 10.5925C20.7188 10.2995 20.7186 9.82463 20.4256 9.53184L15.0838 4.19378C14.9463 4.02488 14.7367 3.91699 14.5019 3.91699ZM5.91626 18.667C5.91626 18.2528 5.58047 17.917 5.16626 17.917C4.75205 17.917 4.41626 18.2528 4.41626 18.667V21.8337C4.41626 23.0763 5.42362 24.0837 6.66626 24.0837H22.3339C23.5766 24.0837 24.5839 23.0763 24.5839 21.8337V18.667C24.5839 18.2528 24.2482 17.917 23.8339 17.917C23.4197 17.917 23.0839 18.2528 23.0839 18.667V21.8337C23.0839 22.2479 22.7482 22.5837 22.3339 22.5837H6.66626C6.25205 22.5837 5.91626 22.2479 5.91626 21.8337V18.667Z"
-                            fill="" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <h4 class="mb-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
-                      Drag & Drop File Here
-                    </h4>
-                    <span class="mx-auto mb-5 block w-full max-w-[290px] text-sm text-gray-700 dark:text-gray-400">
-                      Drag and drop your PNG, JPG, WebP, SVG images here or browse
-                    </span>
-
-                    <span class="font-medium underline cursor-pointer text-theme-sm text-brand-500">
-                      Browse File
-                    </span>
-                  </div>
-                </form>
               </div>
             </div>
-            <div class="flex items-center gap-3 mt-6 lg:justify-end">
+
+            <div
+              class="flex items-center gap-3 border-t border-gray-100 bg-gray-50/50 p-6 dark:border-gray-800 dark:bg-white/[0.02] lg:justify-end lg:px-11">
               <button @click="isProfileAddressModal = false" type="button"
-                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
               <button v-if="formIsValid" @click="registrar" type="button"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Agregar Usuario
+                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg">
+                Agregar Plato
               </button>
-              <p v-else class="text-xs text-gray-400 italic">Complete todos los campos correctamente para habilitar el
-                registro.</p>
+              <p v-else class="text-[11px] text-gray-400 italic">
+                Complete todos los campos para registrar.
+              </p>
             </div>
           </form>
         </div>
@@ -329,140 +291,107 @@
     <Modal v-if="isEditModalOpen" @close="isEditModalOpen = false">
       <template #body>
         <div
-          class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-          <!-- close btn -->
+          class="relative w-full max-w-[700px] max-h-[90vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 shadow-2xl">
+
           <button @click="isEditModalOpen = false"
-            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
-            <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.07]">
+            <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24">
               <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
-                fill="" />
+                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z" />
             </svg>
           </button>
-          <div class="px-2 pr-14">
+
+          <div class="px-6 pt-8 lg:px-11 lg:pt-11">
             <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Editar Plato
             </h4>
-            <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-              Los datos mostrados son los actuales del plato. Realice los cambios necesarios y guarde.
+            <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+              Los datos mostrados son los actuales del plato. Realice los cambios necesarios.
             </p>
           </div>
-          <form class="flex flex-col">
-            <div class="px-2 overflow-y-auto custom-scrollbar">
+
+          <form class="flex flex-col flex-1 overflow-hidden">
+            <div class="px-6 pb-4 overflow-y-auto custom-scrollbar lg:px-11">
               <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nombre del Plato
-                  </label>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre del
+                    Plato</label>
                   <input type="text" v-model="objetoeditar.nombre"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Seleccione la categoría del plato
-                  </label>
-                  <div class="relative z-20 bg-transparent">
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Categoría</label>
+                  <div class="relative z-20">
                     <select v-model="objetoeditar.id_categoria"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                      :class="{ 'text-gray-800 dark:text-white/90': objetoeditar.id_categoria }">
+                      class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white">
                       <option value="" disabled selected>Seleccione una categoría</option>
                       <option v-for="obj in objetoList" :key="obj.id_categoria" :value="obj.id_categoria">{{ obj.nombre
                       }}</option>
                     </select>
-                    <span
-                      class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
-                      <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
                   </div>
                 </div>
+
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                     Precio
                   </label>
-                  <input type="text" v-model="objetoeditar.precio"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                  <input type="text" v-model="objetoeditar.precio" @input="validarPrecio($event, 'editar')"
+                    placeholder="0.00"
+                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
                 </div>
+
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Seleccione el estado del plato
-                  </label>
-                  <div class="relative z-20 bg-transparent">
-                    <select v-model="objetoeditar.estado"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                      :class="{ 'text-gray-800 dark:text-white/90': objetoeditar.estado }">
-                      <option value="" disabled selected>Seleccione un estado</option>
-                      <option value="1">Activo</option>
-                      <option value="0">Inactivo</option>
-                    </select>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Estado</label>
+                  <select v-model="objetoeditar.estado"
+                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white">
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Descripción</label>
+                <textarea v-model="objetoeditar.descripcion" rows="4"
+                  class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white"></textarea>
+              </div>
+
+              <div class="file-uploader mt-5 pb-6">
+                <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">Imagen del Plato</label>
+
+                <div v-if="objetoeditar.id_producto && !objetoeditar.imagenNuevaCargada"
+                  class="mb-4 flex justify-center">
+                  <div class="relative">
+                    <img :src="getPhotoUrl(objetoeditar.id_producto)"
+                      class="h-32 w-48 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-700 shadow-md"
+                      @error="handleImageError" />
                     <span
-                      class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400">
-                      <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </span>
+                      class="absolute -top-2 -right-2 bg-brand-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm">Actual</span>
                   </div>
                 </div>
 
-
-
-              </div>
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Descripción
-                </label>
-                <textarea v-model="objetoeditar.descripcion" placeholder="Ingrese la descripción de la categoría..."
-                  rows="6"
-                  class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"></textarea>
-              </div>
-              <div class="file-uploader">
-                <form ref="dropzoneForm" :id="dropzoneId" :action="uploadUrl"
-                  class="border-gray-300 border-dashed dropzone rounded-xl bg-gray-50 p-7 hover:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-brand-500 lg:p-10">
-                  <div class="dz-message m-0!">
-                    <div class="mb-[22px] flex justify-center">
-                      <div
-                        class="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                        <svg class="fill-current" width="29" height="28" viewBox="0 0 29 28" fill="none"
-                          xmlns="http://www.w3.org/2000/svg">
-                          <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M14.5019 3.91699C14.2852 3.91699 14.0899 4.00891 13.953 4.15589L8.57363 9.53186C8.28065 9.82466 8.2805 10.2995 8.5733 10.5925C8.8661 10.8855 9.34097 10.8857 9.63396 10.5929L13.7519 6.47752V18.667C13.7519 19.0812 14.0877 19.417 14.5019 19.417C14.9161 19.417 15.2519 19.0812 15.2519 18.667V6.48234L19.3653 10.5929C19.6583 10.8857 20.1332 10.8855 20.426 10.5925C20.7188 10.2995 20.7186 9.82463 20.4256 9.53184L15.0838 4.19378C14.9463 4.02488 14.7367 3.91699 14.5019 3.91699ZM5.91626 18.667C5.91626 18.2528 5.58047 17.917 5.16626 17.917C4.75205 17.917 4.41626 18.2528 4.41626 18.667V21.8337C4.41626 23.0763 5.42362 24.0837 6.66626 24.0837H22.3339C23.5766 24.0837 24.5839 23.0763 24.5839 21.8337V18.667C24.5839 18.2528 24.2482 17.917 23.8339 17.917C23.4197 17.917 23.0839 18.2528 23.0839 18.667V21.8337C23.0839 22.2479 22.7482 22.5837 22.3339 22.5837H6.66626C6.25205 22.5837 5.91626 22.2479 5.91626 21.8337V18.667Z"
-                            fill="" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <h4 class="mb-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
-                      Drag & Drop File Here
-                    </h4>
-                    <span class="mx-auto mb-5 block w-full max-w-[290px] text-sm text-gray-700 dark:text-gray-400">
-                      Drag and drop your PNG, JPG, WebP, SVG images here or browse
-                    </span>
-
-                    <span class="font-medium underline cursor-pointer text-theme-sm text-brand-500">
-                      Browse File
-                    </span>
+                <div :id="'edit-' + dropzoneId"
+                  class="dropzone border-gray-300 border-dashed rounded-xl bg-gray-50 dark:bg-gray-900 min-h-[140px] flex items-center justify-center hover:border-brand-500 transition-colors">
+                  <div class="dz-message m-0 text-center">
+                    <span class="font-medium underline cursor-pointer text-brand-500 text-sm">Cargar nueva foto para
+                      reemplazar</span>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
-            <div class="flex items-center gap-3 mt-6 lg:justify-end">
+
+            <div
+              class="flex items-center gap-3 border-t border-gray-100 bg-gray-50/50 p-6 dark:border-gray-800 dark:bg-white/[0.02] lg:justify-end lg:px-11">
               <button @click="isEditModalOpen = false" type="button"
-                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
                 Cerrar
               </button>
-              <button v-if="formIsValidEdit" @click="EditarUsuario" type="button"
+              <button v-if="formIsValidEdit" @click="Update" type="button"
                 class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto shadow-lg transition-all">
-                Editar Usuario
+                Guardar Cambios
               </button>
-              <p v-else class="text-xs text-gray-400 italic">Complete todos los campos correctamente para habilitar el
-                botón de edición.</p>
+              <p v-else class="text-[11px] text-gray-400 italic">Complete todos los campos para editar.</p>
             </div>
           </form>
         </div>
@@ -472,30 +401,84 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import Modal from '@/components/Modal/Modal.vue'
+import { ref, watch, nextTick, onBeforeUnmount } from "vue";
+import Modal from "@/components/Modal/Modal.vue";
+import Dropzone from "dropzone";
+import "dropzone/dist/dropzone.css";
 
-const isProfileAddressModal = ref(false)
-const isEditModalOpen = ref(false)
-const showPassword = ref(false)
-// Creamos una función para que el bloque de abajo pueda cerrar el modal
+const isProfileAddressModal = ref(false);
+const isEditModalOpen = ref(false);
+const dropzoneId = `dz-${Math.random().toString(36).substr(2, 5)}`;
+let dropzoneInstance = null;
+
 const cerrarModalDesdeAfuera = () => {
   isProfileAddressModal.value = false
 }
+// Función para inicializar Dropzone
+const initDropzone = (isEdit = false) => {
+  nextTick(() => {
+    const selector = isEdit ? `#edit-${dropzoneId}` : `#reg-${dropzoneId}`;
+    const el = document.querySelector(selector);
+    if (!el) return;
 
-// IMPORTANTE: Exponemos la variable y la función
-defineExpose({
-  isProfileAddressModal,
-  isEditModalOpen,
-  cerrarModalDesdeAfuera
-})
+    // Destruir instancia previa si existe
+    if (dropzoneInstance) dropzoneInstance.destroy();
+
+    dropzoneInstance = new Dropzone(selector, {
+      url: "/target", // No importa porque extraeremos el base64
+      autoProcessQueue: false,
+      maxFiles: 1,
+      acceptedFiles: "image/jpeg,image/png,image/webp",
+      addRemoveLinks: true,
+      dictDefaultMessage: "Arrastra la foto aquí",
+      dictMaxFilesExceeded: "Solo puedes subir 1 imagen",
+      init: function () {
+        this.on("addedfile", function (file) {
+          if (this.files[1]) this.removeFile(this.files[0]); // Reemplazar anterior
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64String = e.target.result.split(",")[1];
+            // Asignar al objeto correspondiente (necesitamos acceder al estado de la clase)
+            // Esto se maneja mejor mediante un evento o referencia directa
+            window.dispatchEvent(
+              new CustomEvent("foto-cargada", {
+                detail: { base64: base64String, isEdit },
+              })
+            );
+          };
+          reader.readAsDataURL(file);
+        });
+      },
+    });
+  });
+};
+
+// Watchers para inicializar cuando se abran los modales
+watch(isProfileAddressModal, (val) => {
+  if (val) initDropzone(false);
+});
+watch(isEditModalOpen, (val) => {
+  if (val) initDropzone(true);
+});
+
+onBeforeUnmount(() => {
+  if (dropzoneInstance) dropzoneInstance.destroy();
+});
+
+defineExpose({ isProfileAddressModal, isEditModalOpen, cerrarModalDesdeAfuera });
 </script>
 <script>
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
-import debounce from 'lodash.debounce';
-import Modal from '@/components/Modal/Modal.vue'
-import { mostraralertas2, enviarsolig, confimar, confimarhabi } from '@/assets/js/function/funciones';
+import debounce from "lodash.debounce";
+import Modal from "@/components/Modal/Modal.vue";
+import {
+  mostraralertas2,
+  enviarsolig,
+  confimar,
+  confimarhabi,
+} from "@/assets/js/function/funciones";
 
 export default {
   data() {
@@ -508,21 +491,20 @@ export default {
       objetoguardar: {
         id_categoria: "",
         nombre: "",
-        descripcion: "1",
+        descripcion: "",
         precio: "",
-        imagen: '',
-        previewFoto: '',
+        imagen: "",
+        previewFoto: "",
         estado: "1",
-
       },
       objetoeditar: {
         id_producto: 0,
         id_categoria: "",
         nombre: "",
-        descripcion: "1",
+        descripcion: "",
         precio: "",
-        imagen: '',
-        previewFoto: '',
+        imagen: "",
+        previewFoto: "",
         estado: "1",
       },
       filteredobjetoarray: [],
@@ -531,13 +513,13 @@ export default {
       isFilterDropdownOpen: false, // Nuevo: control del menu
       isProfileAddressModal: false,
       cargando: false,
-      password: '',
+      password: "",
       currentPage: 1,
       lastPage: 1,
       buscando: false, // Mantenido, pero no se usa en la lógica de paginación actual
       debouncedFilter: null,
       objetoList: [],
-
+      refreshKey: Date.now(),
     };
   },
   created() {
@@ -548,30 +530,67 @@ export default {
   },
   async mounted() {
     const ruta = useRoute();
+
     this.GetData(1, this.searchQuery, this.selectedStatus);
     this.GetObjetoList();
-
+    window.addEventListener("foto-cargada", (e) => {
+      if (e.detail.isEdit) {
+        this.objetoeditar.imagen = e.detail.base64;
+      } else {
+        this.objetoguardar.imagen = e.detail.base64;
+      }
+    });
   },
   computed: {
-
     formIsValid() {
       return (
-        this.objetoguardar.nombre !== '' &&
-        this.objetoguardar.descripcion !== '' &&
-        this.objetoguardar.precio !== ''
+        this.objetoguardar.nombre !== "" &&
+        this.objetoguardar.descripcion !== "" &&
+        this.objetoguardar.precio !== ""
       );
     },
     formIsValidEdit() {
       return (
-        this.objetoeditar.nombre !== '' &&
-        this.objetoeditar.descripcion !== '' &&
-        this.objetoeditar.precio !== ''
+        this.objetoeditar.nombre !== "" &&
+        this.objetoeditar.descripcion !== "" &&
+        this.objetoeditar.precio !== ""
       );
     },
-
-
   },
   methods: {
+    validarPrecio(event, tipo) {
+      let valor = event.target.value;
+
+      // 1. Reemplazar puntos por comas (opcional, por si el usuario usa el teclado numérico)
+      valor = valor.replace(/\./g, ",");
+
+      // 2. Eliminar todo lo que no sea número o coma
+      valor = valor.replace(/[^0-9,]/g, "");
+
+      // 3. Evitar que haya más de una coma
+      const partes = valor.split(",");
+      if (partes.length > 2) {
+        valor = partes[0] + "," + partes.slice(1).join("");
+      }
+
+      // 4. Asignar el valor limpio al objeto correspondiente
+      if (tipo === 'guardar') {
+        this.objetoguardar.precio = valor;
+      } else {
+        this.objetoeditar.precio = valor;
+      }
+    },
+    truncateText(texto, limite) {
+      if (!texto) return '';
+      return texto.length > limite ? texto.slice(0, limite) + '...' : texto;
+    },
+
+    // Opcional: Función para convertir a número antes de enviar a la API
+    formatearParaEnvio(precioString) {
+      if (!precioString) return 0;
+      // Reemplaza la coma por punto para que el backend lo reconozca como float
+      return parseFloat(precioString.replace(",", "."));
+    },
     abrirModalEdicion(user) {
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
       this.objetoeditar = {
@@ -581,22 +600,21 @@ export default {
         descripcion: user.descripcion,
         precio: user.precio,
         imagen: user.imagen,
-        previewFoto: 'data:image/jpeg;base64,' + user.imagen,
+        previewFoto: "data:image/jpeg;base64," + user.imagen,
         estado: user.estado,
       };
       this.$.setupState.isEditModalOpen = true;
     },
     getPhotoUrl(ci) {
       const baseURL2 = API.defaults.baseURL;
-      return `${baseURL2}/restrik/imagenprod/${ci}`;
+      return `${baseURL2}/restrik/imagenprod/${ci}?v=${this.refreshKey}`;
     },
     async GetObjetoList() {
       this.cargando = true;
       try {
-        const response = await API.get(`${this.baseUrl}/categorias`);
+        const response = await API.get(`${this.baseUrl}/getcategoriashabilit`);
 
-        this.objetoList = response.data?.data || []
-
+        this.objetoList = response.data?.data || [];
       } catch (error) {
         console.error("❌ Error al obtener categorias:", error);
         this.objetoList = [];
@@ -610,7 +628,6 @@ export default {
     async GetData(page = 1, searchQuery = "", selectedStatus = "") {
       this.cargando = true;
 
-
       try {
         const params = {
           page: page,
@@ -618,7 +635,6 @@ export default {
           status: selectedStatus, // Parámetro para búsqueda
         };
         const response = await API.get(`${this.baseUrl}/productos`, { params });
-
         const data = response.data?.data || [];
         const pagination = response.data?.pagination || {};
 
@@ -666,17 +682,21 @@ export default {
     },
 
     async registrar() {
-
       try {
         const params = {
           id_categoria: this.objetoguardar.id_categoria,
           nombre: this.objetoguardar.nombre,
           descripcion: this.objetoguardar.descripcion,
-          precio: this.objetoguardar.precio,
+          precio: this.formatearParaEnvio(this.objetoguardar.precio),
           imagen: this.objetoguardar.imagen,
           estado: 1,
         };
-        const exito = await enviarsolig('POST', params, `${this.baseUrl}/productos`, 'Producto registrado con éxito');
+        const exito = await enviarsolig(
+          "POST",
+          params,
+          `${this.baseUrl}/productos`,
+          "Producto registrado con éxito"
+        );
         if (exito) {
           this.$.setupState.isProfileAddressModal = false;
 
@@ -685,32 +705,36 @@ export default {
             nombre: "",
             descripcion: "",
             precio: "",
-            imagen: '',
-            previewFoto: '',
+            imagen: "",
+            previewFoto: "",
             estado: "1",
           };
-
+          
 
           this.actualizar();
+        } else {
+          this.$.setupState.isProfileAddressModal = false;
         }
-
-
       } catch (error) {
         console.error("❌ Error al registrar usuario:", error.response?.data || error);
       }
     },
     async Update() {
-
       try {
         const params = {
           id_categoria: this.objetoeditar.id_categoria,
           nombre: this.objetoeditar.nombre,
           descripcion: this.objetoeditar.descripcion,
-          precio: this.objetoeditar.precio,
+          precio: this.formatearParaEnvio(this.objetoeditar.precio),
           imagen: this.objetoeditar.imagen,
           estado: this.objetoeditar.estado,
         };
-        const exito = await enviarsolig('PUT', params, `${this.baseUrl}/productos/${this.objetoeditar.id_categoria}`, 'Categoría Editada con éxito');
+        const exito = await enviarsolig(
+          "PUT",
+          params,
+          `${this.baseUrl}/productos/${this.objetoeditar.id_producto}`,
+          "Producto Editado con éxito"
+        );
         if (exito) {
           this.$.setupState.isEditModalOpen = false;
 
@@ -719,16 +743,16 @@ export default {
             nombre: "",
             descripcion: "",
             precio: "",
-            imagen: '',
-            previewFoto: '',
+            imagen: "",
+            previewFoto: "",
             estado: "1",
           };
-
-
+          this.refreshKey = Date.now();
           this.actualizar();
         }
-
-
+        else {
+          this.$.setupState.isProfileAddressModal = false;
+        }
       } catch (error) {
         console.error("❌ Error al registrar usuario:", error.response?.data || error);
       }
@@ -736,11 +760,11 @@ export default {
     eliminar(id, nombre) {
       try {
         confimar(
-          `${this.baseUrl}/eliminarcategoria/`,
+          `${this.baseUrl}/eliminarproducto/`,
           id,
-          'Inhabilitar registro',
-          '¿Realmente desea inhabilitar el usuario  ' + nombre + '?',
-          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+          "Inhabilitar registro",
+          "¿Realmente desea inhabilitar el plato  " + nombre + "?",
+          this.actualizar // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
         console.error("Error al inhabilitar el usuario:", error);
@@ -750,11 +774,11 @@ export default {
     habilitar(id, nombre) {
       try {
         confimarhabi(
-          `${this.baseUrl}/habilitarcategoria/`,
+          `${this.baseUrl}/habilitarproducto/`,
           id,
-          'Habilitar registro',
-          '¿Desea habilitar el usuario ' + nombre + '?',
-          this.actualizar   // 👈 callback para refrescar la tabla al confirmar
+          "Habilitar registro",
+          "¿Desea habilitar el plato " + nombre + "?",
+          this.actualizar // 👈 callback para refrescar la tabla al confirmar
         );
       } catch (error) {
         console.error("Error al eliminar la oferta:", error);
@@ -766,7 +790,6 @@ export default {
       this.isFilterDropdownOpen = false;
       this.filterAndFetch();
     },
-
   },
 };
 </script>
@@ -778,7 +801,7 @@ export default {
 }
 
 .dropzone:hover {
-  border-color: #F5B30F;
+  border-color: #f5b30f;
 }
 
 .dropzone .dz-preview {
@@ -798,7 +821,7 @@ export default {
 }
 
 .dropzone .dz-preview .dz-progress .dz-upload {
-  background: #F5B30F;
+  background: #f5b30f;
 }
 
 .dark .dropzone {
@@ -807,6 +830,6 @@ export default {
 }
 
 .dark .dropzone:hover {
-  border-color: #F5B30F;
+  border-color: #f5b30f;
 }
 </style>

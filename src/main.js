@@ -3,9 +3,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import VueApexCharts from 'vue3-apexcharts'
-import './assets/main.css'
+import './assets/main.css' //estilos del admin
 import './assets/styles/bienvenido.css'
 import './assets/styles/login.css'
+import './assets/styles/home.css'//estilos del pagehome
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
