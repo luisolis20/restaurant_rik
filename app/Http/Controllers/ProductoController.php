@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Producto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
 
 class ProductoController extends Controller
@@ -19,9 +18,15 @@ class ProductoController extends Controller
             $perPage = min($perPage, 50);
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
+            $id_categoria = $request->input('id_categoria');
 
             $query = Producto::select(
-                'productos.*',
+                'productos.id_producto',
+                'productos.nombre',
+                'productos.descripcion',
+                'productos.precio',
+                'productos.estado',
+                'productos.id_categoria',
                 'categorias.nombre as categoria_nombre'
             )
                 ->join('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria');
@@ -30,6 +35,13 @@ class ProductoController extends Controller
                     $q->where('productos.nombre', 'LIKE', "%{$searchQuery}%");
                 });
             }
+            if ($status !== null && $status !== '') {
+                $query->where('productos.estado', $status);
+            }
+            if ($id_categoria !== null && $id_categoria !== '') {
+                $query->where('productos.id_categoria', $id_categoria);
+            }
+
 
             $data = $query->paginate($perPage);
 
@@ -58,6 +70,7 @@ class ProductoController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+
     public function getFotografia($ci)
     {
         try {
@@ -104,18 +117,19 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        if (!empty($inputs['imagen'])) {
+        if (! empty($inputs['imagen'])) {
             $inputs['imagen'] = base64_decode($inputs['imagen']);
         }
 
         $res = Producto::create($inputs);
         $data = $res->toArray();
-        if (!empty($res->imagen)) {
+        if (! empty($res->imagen)) {
             $data['imagen'] = base64_encode($res->imagen);
         }
+
         return response()->json([
             'data' => $data,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => 'Agregado con Éxito!!',
         ]);
     }
 
@@ -137,10 +151,10 @@ class ProductoController extends Controller
             $attributes = $item->getAttributes();
 
             foreach ($attributes as $key => $value) {
-                if (in_array($key, ['imagen']) && !empty($value)) {
+                if (in_array($key, ['imagen']) && ! empty($value)) {
                     // ✅ Convertir BLOB a base64
                     $attributes[$key] = base64_encode($value);
-                } elseif (is_string($value) && !in_array($key, ['imagen'])) {
+                } elseif (is_string($value) && ! in_array($key, ['imagen'])) {
                     $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                 }
             }
@@ -183,14 +197,15 @@ class ProductoController extends Controller
                 if (!empty($res->imagen)) {
                     $data['imagen'] = base64_encode($res->imagen);
                 }
+
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => 'Actualizado con Éxito!!',
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => 'Error al Actualizar',
                 ]);
             }
         } else {
@@ -212,15 +227,20 @@ class ProductoController extends Controller
             $res->save();
             $data = $res->toArray();
             if ($data) {
-
+                if (!empty($res->imagen)) {
+                    $data['imagen'] = base64_encode($res->imagen);
+                }
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "Inhabilitado con Éxito!!",
+                    'mensaje' => 'Inhabilitado con Éxito!!',
                 ]);
             } else {
+                if (!empty($res->imagen)) {
+                    $data['imagen'] = base64_encode($res->imagen);
+                }
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                    'mensaje' => 'El usuario no existe (puede que ya la haya eliminado)',
                 ]);
             }
         } else {
@@ -230,6 +250,7 @@ class ProductoController extends Controller
             ]);
         }
     }
+
     public function habilitar(string $id)
     {
         $res = Producto::find($id);
@@ -238,15 +259,20 @@ class ProductoController extends Controller
             $res->save();
             $data = $res->toArray();
             if ($data) {
-
+                if (!empty($res->imagen)) {
+                    $data['imagen'] = base64_encode($res->imagen);
+                }
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "Eliminado con Éxito!!",
+                    'mensaje' => 'Habilitado con Éxito!!',
                 ]);
             } else {
+                if (!empty($res->imagen)) {
+                    $data['imagen'] = base64_encode($res->imagen);
+                }
                 return response()->json([
                     'data' => $data,
-                    'mensaje' => "El usuario no existe (puede que ya la haya eliminado)",
+                    'mensaje' => 'El usuario no existe (puede que ya la haya eliminado)',
                 ]);
             }
         } else {
@@ -255,5 +281,5 @@ class ProductoController extends Controller
                 'mensaje' => "El usuario con id: $id no Existe",
             ]);
         }
-    }           
+    }
 }

@@ -38,30 +38,33 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::prefix('restrik')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::apiResource("users", UserController::class);
-    Route::apiResource("roles", RoleController::class);
-    Route::apiResource("categorias", CategoriaController::class);
-    Route::apiResource("productos", ProductoController::class);
-    Route::apiResource("calificaciones", CalificacionesController::class);
-    Route::apiResource("pedidos", PedidosController::class);
-    Route::apiResource("mesas", MesaController::class);
-    Route::apiResource("detalle_pedidos", DetallePedidoController::class);
-    Route::apiResource("facturas", FacturaController::class);
-    Route::apiResource("detalle_facturas", DetalleFacturaController::class);
-    Route::apiResource("inventarios", InventarioController::class);
-    Route::apiResource("qr_mesas", QrMesaController::class);
-    Route::apiResource("tiempos_preparacion", TiempoPreparacionController::class);
+    Route::apiResource("users", UserController::class)->middleware('throttle:55000,1');
+    Route::apiResource("roles", RoleController::class)->middleware('throttle:55000,1');
+    Route::apiResource("categorias", CategoriaController::class)->middleware('throttle:55000,1');
+    Route::apiResource("productos", ProductoController::class)->middleware('throttle:55000,1');
+    Route::apiResource("calificaciones", CalificacionesController::class)->middleware('throttle:55000,1');
+    Route::apiResource("pedidos", PedidosController::class)->middleware('throttle:55000,1');
+    Route::apiResource("mesas", MesaController::class)->middleware('throttle:55000,1');
+    Route::apiResource("detalle_pedidos", DetallePedidoController::class)->middleware('throttle:55000,1');
+    Route::apiResource("facturas", FacturaController::class)->middleware('throttle:55000,1');
+    Route::apiResource("detalle_facturas", DetalleFacturaController::class)->middleware('throttle:55000,1');
+    Route::apiResource("inventarios", InventarioController::class)->middleware('throttle:55000,1');
+    Route::apiResource("qr_mesas", QrMesaController::class)->middleware('throttle:55000,1');
+    Route::apiResource("tiempos_preparacion", TiempoPreparacionController::class)->middleware('throttle:55000,1');
     
 
-    Route::delete('eliminarqrmesa/{id}', [QrMesaController::class, 'destroy']);
-    Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar']);
+    Route::delete('eliminarqrmesa/{id}', [QrMesaController::class, 'destroy'])->middleware('throttle:55000,1');
+    Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar'])->middleware('throttle:55000,1');
     
-    Route::delete('eliminaruser/{id}', [UserController::class, 'destroy']);
-    Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy']);
-    Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar']);
-    Route::delete('eliminarcategoria/{id}', [CategoriaController::class, 'destroy']);
-    Route::delete('habilitarcategoria/{id}', [CategoriaController::class, 'habilitar']);
-    Route::get('imagenprod/{ci}', [ProductoController::class, 'getFotografia'])->middleware('throttle:5000,1');
+    Route::delete('eliminaruser/{id}', [UserController::class, 'destroy'])->middleware('throttle:55000,1');
+    Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy'])->middleware('throttle:55000,1');
+    Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar'])->middleware('throttle:55000,1');
+    Route::delete('eliminarcategoria/{id}', [CategoriaController::class, 'destroy'])->middleware('throttle:55000,1');
+    Route::get('getcategoriashabilit', [CategoriaController::class, 'getCategoriasHabilit'])->middleware('throttle:55000,1');
+    Route::delete('habilitarcategoria/{id}', [CategoriaController::class, 'habilitar'])->middleware('throttle:55000,1');
+    Route::delete('eliminarproducto/{id}', [ProductoController::class, 'destroy'])->middleware('throttle:55000,1');
+    Route::delete('habilitarproducto/{id}', [ProductoController::class, 'habilitar'])->middleware('throttle:55000,1');
+    Route::get('imagenprod/{ci}', [ProductoController::class, 'getFotografia'])->middleware('throttle:55000,1');
     Route::middleware('auth:api')->group(function () {
         //Colocar aquí las rutas que necesiten autenticación
     });
