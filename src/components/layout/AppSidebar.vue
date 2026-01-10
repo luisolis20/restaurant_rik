@@ -196,7 +196,7 @@ const menuGroups = [
         icon: PlateIcon,
         name: "Platos",
         subItems: [
-          { name: "Todos los platos", path: "/platos", pro: false },
+          { name: "Stok de Platos", path: "/stock/platos", pro: false },
         ],
       },
      

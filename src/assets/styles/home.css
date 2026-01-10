@@ -1203,6 +1203,35 @@ body.pagehome {
   font-weight: 700;
   color: var(--accent-color);
 }
+.badge-disponible {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #28a745; /* Verde éxito */
+  color: white;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+.badge-agotado {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #dc3545; /* Rojo peligro */
+  color: white;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 2;
+}
 
 /*--------------------------------------------------------------
 # Testimonials Section

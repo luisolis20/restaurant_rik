@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import DashUiView from '../views/DashUiView.vue'
-//import PlatosAllView from '../views/Op_Plato/PlatosAllView.vue'
+import StockPlatosAllView from '../views/Op_Plato/StockPlatosAllView.vue'
 import CategoriaAllView from '../views/Mantenimiento/Op_Categoria/CategoriaAllView.vue'
 import UsuariosAllView from '../views/Mantenimiento/Op_Users/UsuariosAllView.vue'
 import RolesAllView from '../views/Mantenimiento/Op_Roles/RolesAllView.vue'
@@ -52,6 +52,11 @@ const routes = [
     path: '/home',
     name: 'pagehome',
     component: PageHomeView
+  },
+  {
+    path: '/stock/platos',
+    name: 'stockplatos',
+    component: StockPlatosAllView
   },
 
 

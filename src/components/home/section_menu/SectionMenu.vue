@@ -10,51 +10,36 @@
     <div class="row mb-4 justify-content-center">
       <div class="col-md-6">
         <div class="input-group">
-          <span class="input-group-text bg-white border-end-0"
-            ><i class="bi bi-search"></i
-          ></span>
-          <input
-            type="text"
-            v-model="searchQueryGeneral"
-            @input="debouncedSearchGeneral"
-            class="form-control border-start-0"
-            placeholder="Buscar plato en todo el menú..."
-          />
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+          <input type="text" v-model="searchQueryGeneral" @input="debouncedSearchGeneral"
+            class="form-control border-start-0" placeholder="Buscar plato en todo el menú..." />
         </div>
       </div>
     </div>
     <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
       <li class="nav-item">
-        <a class="nav-link" :class="{ active: selectedCategoryId === '' }" @click="selectCategory('')" style="cursor:pointer">
+        <a class="nav-link" :class="{ active: selectedCategoryId === '' }" @click="selectCategory('')"
+          style="cursor:pointer">
           <h4>Todos</h4>
         </a>
       </li>
       <li v-for="cat in objetoListCategory" :key="cat.id_categoria" class="nav-item">
-        <a 
-          class="nav-link" 
-          :class="{ active: selectedCategoryId === cat.id_categoria }" 
-          @click="selectCategory(cat.id_categoria)"
-          style="cursor:pointer"
-        >
+        <a class="nav-link" :class="{ active: selectedCategoryId === cat.id_categoria }"
+          @click="selectCategory(cat.id_categoria)" style="cursor:pointer">
           <h4>{{ cat.nombre }}</h4>
         </a>
       </li>
     </ul>
     <div v-if="selectedCategoryId !== ''" class="row mt-3 justify-content-center" data-aos="fade-up">
       <div class="col-md-4">
-        <input 
-          type="text" 
-          v-model="searchQueryCategory" 
-          @input="debouncedSearchCategory"
-          class="form-control form-control-sm text-center" 
-          :placeholder="'Buscar en ' + currentCategoryName + '...'"
-        />
+        <input type="text" v-model="searchQueryCategory" @input="debouncedSearchCategory"
+          class="form-control form-control-sm text-center" :placeholder="'Buscar en ' + currentCategoryName + '...'" />
       </div>
     </div>
 
     <div class="tab-content mt-4" data-aos="fade-up" data-aos-delay="200">
       <div class="tab-pane fade show active">
-        
+
         <div v-if="cargando" class="text-center py-5">
           <div class="spinner-border text-danger" role="status"></div>
         </div>
@@ -65,29 +50,35 @@
 
         <div v-else class="row gy-5">
           <div v-for="plato in objetoListPlatos" :key="plato.id_producto" class="col-lg-4 mensu-item">
-            <a :href="getPhotoUrl(plato.id_producto)" class="glightbox">
-              <img :src="getPhotoUrl(plato.id_producto)" @error="handleImageError" class="mensu-img img-fluid" alt="" />
-            </a>
-            <h4>{{ plato.nombre }}</h4>
+            <div class="position-relative overflow-hidden">
+              <a :href="getPhotoUrl(plato.id_producto)" class="glightbox">
+                <img :src="getPhotoUrl(plato.id_producto)" @error="handleImageError" class="mensu-img img-fluid"
+                  alt="" />
+              </a>
+
+              <div v-if="plato.cantidad_disponible > 0" class="badge-disponible">
+                Disponible
+              </div>
+              <div v-else class="badge-agotado">
+                Agotado
+              </div>
+            </div>
+
+            <h4>{{ plato.productos_nombre }}</h4>
             <p class="ingredientes">{{ truncateText(plato.descripcion, 100) || 'Sin descripción disponible' }}</p>
             <p class="precio">${{ plato.precio }}</p>
+            <p class="text-muted" style="font-size: 0.8rem;">Disponible: {{ plato.cantidad_disponible }}</p>
           </div>
         </div>
 
         <div v-if="lastPagePlatos > 1" class="d-flex justify-content-center mt-5 gap-3">
-          <button 
-            class="btn btn-outline-danger btn-sm" 
-            @click="previousPage" 
-            :disabled="currentPagePlatos === 1 || cargando"
-          >
+          <button class="btn btn-outline-danger btn-sm" @click="previousPage"
+            :disabled="currentPagePlatos === 1 || cargando">
             <i class="bi bi-chevron-left"></i> Anterior
           </button>
           <span class="align-self-center">Página {{ currentPagePlatos }} de {{ lastPagePlatos }}</span>
-          <button 
-            class="btn btn-outline-danger btn-sm" 
-            @click="nextPage" 
-            :disabled="currentPagePlatos === lastPagePlatos || cargando"
-          >
+          <button class="btn btn-outline-danger btn-sm" @click="nextPage"
+            :disabled="currentPagePlatos === lastPagePlatos || cargando">
             Siguiente <i class="bi bi-chevron-right"></i>
           </button>
         </div>
@@ -108,12 +99,14 @@ export default {
       objetoListCategory: [],
       objetoListPlatos: [],
       cargando: false,
-      
+      pollingTimer: null, // Guardará el temporizador
+      isFetching: false,  // Control para evitar peticiones simultáneas
+
       // Búsquedas
       searchQueryGeneral: "",
       searchQueryCategory: "",
       selectedCategoryId: "",
-      
+
       // Paginación
       currentPagePlatos: 1,
       lastPagePlatos: 1,
@@ -132,6 +125,10 @@ export default {
     await this.GetDataCategory();
     // 2. Cargar platos iniciales (todos)
     await this.GetDataPlatos();
+    this.startLiveUpdates();
+  },
+  beforeUnmount() {
+    this.stopLiveUpdates();
   },
   created() {
     // Ahora sí puedes usar this.filterAndFetch
@@ -140,6 +137,22 @@ export default {
     }, 900);
   },
   methods: {
+    startLiveUpdates() {
+      this.pollingTimer = setInterval(async () => {
+        // Solo actualiza si:
+        // 1. No está cargando ya una petición (isFetching)
+        // 2. El usuario NO está escribiendo (searchQueryGeneral vacío o corto)
+        if (!this.isFetching && this.searchQueryGeneral === "" && this.searchQueryCategory === "") {
+          console.log("Actualizando stock en vivo...");
+          await this.GetDataPlatos(this.currentPagePlatos, true); // Pasamos true para modo silencioso
+        }
+      }, 10000); // 10 segundos es un tiempo prudente para evitar el Error 429
+    },
+    stopLiveUpdates() {
+      if (this.pollingTimer) {
+        clearInterval(this.pollingTimer);
+      }
+    },
     getPhotoUrl(ci) {
       const baseURL2 = API.defaults.baseURL;
       return `${baseURL2}/restrik/imagenprod/${ci}`;
@@ -153,25 +166,27 @@ export default {
       event.target.src =
         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/480px-User_icon_2.svg.png";
     },
-    async GetDataPlatos(page = 1) {
-      this.cargando = true;
+    async GetDataPlatos(page = 1, silent = false) {
+      if (!silent) this.cargando = true;
+      this.isFetching = true;
       try {
         const params = {
           page: page,
           // Si hay búsqueda general, ignora la categoría. Si no, usa la seleccionada + búsqueda local.
           search_query: this.searchQueryGeneral || this.searchQueryCategory,
-          id_categoria: this.selectedCategoryId, 
+          id_categoria: this.selectedCategoryId,
           status: 1
         };
-        
-        const response = await API.get(`${this.baseUrl}/productos`, { params });
+
+        const response = await API.get(`${this.baseUrl}/inventarios`, { params });
         this.objetoListPlatos = response.data?.data || [];
         this.currentPagePlatos = response.data?.pagination?.current_page || 1;
         this.lastPagePlatos = response.data?.pagination?.last_page || 1;
       } catch (error) {
         this.objetoListPlatos = [];
       } finally {
-        this.cargando = false;
+        if (!silent) this.cargando = false;
+        this.isFetching = false;
       }
     },
     async GetDataCategory() {
@@ -182,7 +197,7 @@ export default {
         console.error("Error categorías:", error);
       }
     },
-   // --- ACCIONES ---
+    // --- ACCIONES ---
     selectCategory(id) {
       this.selectedCategoryId = id;
       this.searchQueryGeneral = ""; // Limpiamos búsqueda general al filtrar por categoría
@@ -191,14 +206,14 @@ export default {
       this.GetDataPlatos(1);
     },
 
-    debouncedSearchGeneral: debounce(function() {
+    debouncedSearchGeneral: debounce(function () {
       this.selectedCategoryId = ""; // Al buscar general, reseteamos categoría
       this.searchQueryCategory = "";
       this.currentPagePlatos = 1;
       this.GetDataPlatos(1);
     }, 500),
 
-    debouncedSearchCategory: debounce(function() {
+    debouncedSearchCategory: debounce(function () {
       this.currentPagePlatos = 1;
       this.GetDataPlatos(1);
     }, 500),
