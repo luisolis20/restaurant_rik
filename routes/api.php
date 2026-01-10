@@ -61,6 +61,7 @@ Route::prefix('restrik')->group(function () {
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::delete('eliminarcategoria/{id}', [CategoriaController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::get('getcategoriashabilit', [CategoriaController::class, 'getCategoriasHabilit'])->middleware('throttle:55000,1');
+    Route::get('getprodhabilit', [ProductoController::class, 'getProductosHabilit'])->middleware('throttle:55000,1');
     Route::delete('habilitarcategoria/{id}', [CategoriaController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::delete('eliminarproducto/{id}', [ProductoController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarproducto/{id}', [ProductoController::class, 'habilitar'])->middleware('throttle:55000,1');

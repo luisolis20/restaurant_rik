@@ -132,6 +132,48 @@ class ProductoController extends Controller
             'mensaje' => 'Agregado con Éxito!!',
         ]);
     }
+    public function getProductosHabilit()
+    {
+        // Aplica paginación al resultado del filtro
+        $data = Producto::select('productos.id_producto',
+                'productos.nombre',
+                'productos.descripcion',
+                'productos.precio',
+                'productos.estado',
+                'productos.id_categoria',
+                'categorias.nombre as categoria_nombre'
+            )
+            ->join('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
+            ->where('productos.estado', 1)
+            ->paginate(20);
+        if ($data->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron datos para el ID especificado'], 200);
+        }
+
+        // Convertir los campos a UTF-8 válido para cada página
+        $data->getCollection()->transform(function ($item) {
+            $attributes = $item->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if (is_string($value)) {
+                    $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                }
+            }
+            return $attributes;
+        });
+
+        // Retornar la respuesta JSON con los metadatos de paginación
+        try {
+            return response()->json([
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Display the specified resource.

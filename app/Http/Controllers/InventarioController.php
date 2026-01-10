@@ -18,16 +18,33 @@ class InventarioController extends Controller
             $perPage = min($perPage, 50);
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
+            $id_categoria = $request->input('id_categoria');
 
             $query = Inventario::select(
                 'inventario.*',
                 'productos.nombre as productos_nombre',
+                'productos.id_categoria as id_prod_cate',
+                'productos.descripcion',
+                'productos.estado',
+                'productos.precio',
+                'categorias.nombre as nombre_categoria',
+                'categorias.id_categoria as id_cate',
+
+
             )
-                ->join('productos', 'productos.id_producto', '=', 'inventario.id_producto');
+                ->join('productos', 'productos.id_producto', '=', 'inventario.id_producto')
+                ->join('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria');
+
             if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('inventario.cantidad_disponible', 'LIKE', "%{$searchQuery}%");
+                    $q->where('productos.nombre', 'LIKE', "%{$searchQuery}%");
                 });
+            }
+            if ($status !== null && $status !== '') {
+                $query->where('productos.estado', $status);
+            }
+             if ($id_categoria !== null && $id_categoria !== '') {
+                $query->where('productos.id_categoria', $id_categoria);
             }
             
             $data = $query->paginate($perPage);
@@ -37,6 +54,7 @@ class InventarioController extends Controller
             }
             $data->getCollection()->transform(function ($item) {
                 $attributes = $item->getAttributes();
+                $attributes['hasPhoto'] = true;
                 foreach ($attributes as $key => $value) {
                     if (is_string($value)) {
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
@@ -65,13 +83,39 @@ class InventarioController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
-        $res = Inventario::create($inputs);
+        // 1. Validar que lleguen los datos necesarios
+        $request->validate([
+            'id_producto' => 'required',
+            'cantidad_disponible' => 'required|numeric|min:1'
+        ]);
+
+        $id_producto = $request->input('id_producto');
+        $nueva_cantidad = $request->input('cantidad_disponible');
+
+        // 2. Buscar si el plato ya existe en el inventario
+        $registroExistente = Inventario::where('id_producto', $id_producto)->first();
+
+        if ($registroExistente) {
+            // CASO A: El plato ya existe, sumamos la cantidad
+            $registroExistente->cantidad_disponible += $nueva_cantidad;
+            
+            // Opcional: Si el plato estaba inactivo (estado 0), podrías activarlo aquí
+            // $registroExistente->estado = 1; 
+
+            $registroExistente->save();
+            $res = $registroExistente;
+            $mensaje = "¡Cantidad sumada al stock existente con éxito!";
+        } else {
+            // CASO B: El plato no existe, se crea normal
+            $res = Inventario::create($request->all());
+            $mensaje = "¡Plato registrado en inventario con éxito!";
+        }
+
         return response()->json([
             'data' => $res,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => $mensaje,
         ]);
+        
     }
 
     /**
@@ -101,21 +145,48 @@ class InventarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // 1. Buscamos el registro de inventario que queremos actualizar
         $res = Inventario::find($id);
+
         if (isset($res)) {
+            // Obtenemos la cantidad que viene del formulario
+            $cantidad_nueva = (int)$request->cantidad_disponible;
+            
+            // Obtenemos la cantidad que hay actualmente en la base de datos
+            $cantidad_actual = (int)$res->cantidad_disponible;
+
+            /**
+             * LÓGICA DE ACTUALIZACIÓN:
+             * Si el usuario en el modal de edición escribe un número, 
+             * este se sumará o restará al actual.
+             * Ejemplo: Si hay 10 y el usuario escribe 5 -> Resultado 15
+             * Ejemplo: Si hay 10 y el usuario escribe -3 -> Resultado 7
+             */
+            
             $res->id_producto = $request->id_producto;
-            $res->cantidad_disponible = $request->cantidad_disponible;
-            $res->fecha_actualizacion = $request->fecha_actualizacion;
+            
+            // Aplicamos la operación aritmética
+            $res->cantidad_disponible = $cantidad_actual + $cantidad_nueva;
+
+            // Validación opcional: No permitir stock negativo
+            if ($res->cantidad_disponible < 0) {
+                return response()->json([
+                    'error' => true,
+                    'mensaje' => "La operación resultaría en stock negativo (" . $res->cantidad_disponible . ")",
+                ]);
+            }
+
+            
 
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => "Stock actualizado correctamente. Nuevo total: " . $res->cantidad_disponible,
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => "Error al Actualizar en la base de datos",
                 ]);
             }
         } else {
