@@ -187,7 +187,12 @@ export function enviarsolig(metodo,parametros,url,mensaje){
             return false;
         }
     }).catch(function (error) {
-        mostraralertas('Servidor no Disponible', 'error');
+        if(error.response.status==409){
+            mostraralertas(error.response.data.mensaje,'warning');
+            
+        }else{
+            mostraralertas('Servidor no Disponible', 'error');
+        }
         return false;
     });
 }

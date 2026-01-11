@@ -164,6 +164,7 @@ import {
   PlugInIcon,
   PlateIcon,
   MantenimientoIcon,
+  MesaIcon,
 } from "../../icons";
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
@@ -197,6 +198,13 @@ const menuGroups = [
         name: "Platos",
         subItems: [
           { name: "Stok de Platos", path: "/stock/platos", pro: false },
+        ],
+      },
+      {
+        icon: MesaIcon,
+        name: "Mesas",
+        subItems: [
+          { name: "Mesas Disponibles", path: "/mesas", pro: false },
         ],
       },
      

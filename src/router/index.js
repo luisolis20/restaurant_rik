@@ -8,6 +8,7 @@ import UsuariosAllView from '../views/Mantenimiento/Op_Users/UsuariosAllView.vue
 import RolesAllView from '../views/Mantenimiento/Op_Roles/RolesAllView.vue'
 import PlatosAllView from '../views/Mantenimiento/Op_Plato/PlatosAllView.vue'
 import PageHomeView from '../views/Home/PageHomeView.vue'
+import MesasAllView from '../views/Mesas/MesasAllView.vue'
 
 
 
@@ -52,6 +53,11 @@ const routes = [
     path: '/home',
     name: 'pagehome',
     component: PageHomeView
+  },
+  {
+    path: '/mesas',
+    name: 'mesas',
+    component: MesasAllView
   },
   {
     path: '/stock/platos',
