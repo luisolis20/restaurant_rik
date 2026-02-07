@@ -31,7 +31,8 @@
           <form class="formulario" @submit.prevent="verifyTable">
             <select v-model="selectedTable" class="manual-input">
               <option value="" disabled selected>Seleccione una mesa</option>
-              <option v-for="n in 20" :key="n" :value="n">Mesa {{ n }}</option>
+              <option v-for="obj in objetoList" :key="obj.id_mesa" :value="obj.codigo_mesa">Mesa {{ obj.codigo_mesa }}
+              </option>
             </select>
 
             <input type="text" v-model="waiterCode" placeholder="Código de validación (opcional)" class="manual-input">
@@ -54,7 +55,7 @@
 
     <div class="page back">
       <div class="contenido">
-        
+
         <h1>¿Eres cliente?</h1>
         <p>Da clic en el botón de abajo para scanear el código QR de tu mesa</p>
         <button id="login" class="botonl" @click="setClose">Scanear código QR</button>
@@ -196,8 +197,51 @@ onUnmounted(() => {
 </script>
 
 <script>
+import API from "@/assets/js/services/axios";
+import { useRoute } from "vue-router";
+import debounce from "lodash.debounce";
 export default {
-  name: 'Login'
-}
-</script>
+  name: 'Login',
+  data() {
+    return {
+      objetoList: [],
+      idus: 0,
+      baseUrl: "/restrik",
 
+    };
+  },
+  async mounted() {
+    const ruta = useRoute();
+    this.GetObjetoList();
+  },
+  computed: {
+    formIsValid() {
+      return (
+        this.waiterCode !== "" &&
+        this.selectedTable !== ""
+      );
+    },
+  },
+  methods: {
+    async GetObjetoList() {
+      this.cargando = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/mesas`);
+
+        this.objetoList = response.data?.data || [];
+      } catch (error) {
+        console.error("❌ Error al obtener carreras:", error);
+        this.objetoList = [];
+      }
+    },
+    async verifyTable() {
+      if (!this.selectedTable) {
+        alert("Por favor seleccione una mesa");
+        return;
+      }
+      alert(`Verificando Mesa ${this.selectedTable}...`);
+      // Aquí iría tu lógica de API para validar la mesa
+    },
+  },
+};
+</script>

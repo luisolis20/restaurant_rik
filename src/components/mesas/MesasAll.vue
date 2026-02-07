@@ -84,6 +84,9 @@
                         <th class="py-3 text-left">
                             <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Estado</p>
                         </th>
+                        <th class="py-3 text-center">
+                            <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Imagen QR</p>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,7 +112,7 @@
                         </td>
                         <td class="py-3 whitespace-nowrap">
                             <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                                {{ post.capacidad }}
+                                {{ post.capacidad }} personas
                             </p>
                         </td>
 
@@ -124,6 +127,18 @@
                                 {{ post.estado }}
                             </span>
                         </td>
+                        <td class="py-3 whitespace-nowrap">
+                            <div v-if="post.codigo_qr" class="flex flex-col items-center gap-1">
+                                <qrcode-vue :value="post.codigo_qr" :size="70" level="H" render-as="svg"
+                                    class="p-1 bg-white border rounded" />
+                                <span class="text-[10px] text-gray-400">{{ post.codigo_qr.substring(0, 8) }}...</span>
+                            </div>
+
+                            <div v-else class="text-gray-400 text-xs italic text-center">
+                                Sin QR
+                            </div>
+                        </td>
+
 
                         <!-- Acciones de Edición y Eliminación -->
                         <td class="py-3 text-right whitespace-nowrap">
@@ -143,6 +158,20 @@
                                         <polyline points="3 6 5 6 21 6" />
                                         <path
                                             d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                    </svg>
+                                </button>
+                                <button @click="generarQR(post.id_mesa, post.codigo_mesa)" v-if="!post.codigo_qr"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                        <line x1="7" y1="7" x2="7" y2="7"></line>
+                                        <line x1="17" y1="7" x2="17" y2="7"></line>
+                                        <line x1="17" y1="17" x2="17" y2="17"></line>
+                                        <line x1="7" y1="17" x2="7" y2="17"></line>
                                     </svg>
                                 </button>
                                 <button @click="habilitar(post.id_mesa, post.codigo_mesa)"
@@ -317,8 +346,8 @@
                                             class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                                             RICM-
                                         </span>
-                                        <input type="text" v-model="objetoeditar.codigo_mesa" @input="soloNumeros" placeholder="001"
-                                            maxlength="3"
+                                        <input type="text" v-model="objetoeditar.codigo_mesa" @input="soloNumeros"
+                                            placeholder="001" maxlength="3"
                                             class="dark:bg-dark-900 h-11 w-full rounded-r-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white focus:ring-brand-500 focus:border-brand-500" />
                                     </div>
                                     <p class="text-xs text-gray-400 italic">
@@ -403,11 +432,13 @@ import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from "lodash.debounce";
 import Modal from "@/components/Modal/Modal.vue";
+import QrcodeVue from 'qrcode.vue';
 import {
     mostraralertas2,
     enviarsolig,
     confimar,
     confimarhabi,
+    qrconfimar
 } from "@/assets/js/function/funciones";
 
 export default {
@@ -416,8 +447,6 @@ export default {
             idus: 0,
             baseUrl: "/restrik",
             photoCache: {},
-            precioProducto: "",
-            precioProductoEditar: "",
             usersarray: [],
             objetoguardar: {
                 codigo_mesa: "",
@@ -449,6 +478,9 @@ export default {
         this.debouncedFilter = debounce(() => {
             this.filterAndFetch();
         }, 900);
+    },
+    components: {
+        QrcodeVue,
     },
     async mounted() {
         const ruta = useRoute();
@@ -611,6 +643,21 @@ export default {
                 );
             } catch (error) {
                 console.error("Error al inhabilitar el usuario:", error);
+                this.cargando = false;
+            }
+        },
+        generarQR(id, nombre) {
+            try {
+                qrconfimar(
+                    "POST",
+                    `${this.baseUrl}/generarqr`,
+                    { id_mesa: id },
+                    "Generar QR",
+                    "¿Desea generar el QR para la mesa " + nombre + "?",
+                    this.actualizar // 👈 callback para refrescar la tabla al confirmar
+                );
+            } catch (error) {
+                console.error("Error al generar QR:", error);
                 this.cargando = false;
             }
         },
