@@ -57,6 +57,7 @@ Route::prefix('restrik')->group(function () {
     Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::delete('eliminarmesa/{id}', [MesaController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarmesa/{id}', [MesaController::class, 'habilitar'])->middleware('throttle:55000,1');
+    Route::post('generarqr', [MesaController::class, 'generarQr'])->middleware('throttle:55000,1');
     
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy'])->middleware('throttle:55000,1');

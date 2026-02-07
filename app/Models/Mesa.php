@@ -36,4 +36,11 @@ class Mesa extends Model
             'id_mesa'    // PK en mesas
         );
     }
+    public function qrMesa()
+    {
+        // hasOne busca un registro en qr_mesas donde id_mesa coincida
+        return $this->hasOne(QrMesa::class, 'id_mesa', 'id_mesa')
+                    ->where('estado', 'activo') // Opcional: solo traer el activo
+                    ->latest('fecha_generacion'); 
+    }
 }

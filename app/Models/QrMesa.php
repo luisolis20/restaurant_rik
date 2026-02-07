@@ -30,23 +30,11 @@ class QrMesa extends Model
     protected $fillable = [
         'id_mesa',
         'codigo_qr',
-        'url_acceso',
         'estado',
+        'fecha_generacion',
     ];
 
-    /**
-     * Casting de atributos
-     */
-    protected $casts = [
-        'id_qr'    => 'integer',
-        'id_mesa'  => 'integer',
-    ];
-
-    /**
-     * Constantes para ENUM estado (opcional, recomendado)
-     */
-    const ESTADO_ACTIVO   = 'activo';
-    const ESTADO_INACTIVO = 'inactivo';
+    
 
     /**
      * Relación: el QR pertenece a una mesa

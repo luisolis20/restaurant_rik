@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mesa;
+use App\Models\QrMesa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str; // Para generar strings aleatorios
+use SimpleSoftwareIO\QrCode\Facades\QrCode; // La librería
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class MesaController extends Controller
 {
@@ -18,7 +23,9 @@ class MesaController extends Controller
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
 
-            $query = Mesa::select('mesas.*');
+            $query = Mesa::select('mesas.*','qr_mesas.codigo_qr')
+            
+                ->leftJoin('qr_mesas', 'qr_mesas.id_mesa', '=', 'mesas.id_mesa');
             if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('mesas.codigo_mesa', 'LIKE', "%{$searchQuery}%");
@@ -84,6 +91,53 @@ class MesaController extends Controller
             ], 200);
         }
 
+    }
+    public function generarQr(Request $request)
+    {
+        $request->validate([
+            'id_mesa' => 'required|exists:mesas,id_mesa'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Desactivar QRs anteriores de esa mesa (para seguridad)
+            QrMesa::where('id_mesa', $request->id_mesa)
+                  ->update(['estado' => 'inactivo']);
+
+            // 2. Generar Token Seguro y Aleatorio
+            // Usamos 64 caracteres alfanuméricos aleatorios. Imposible de adivinar.
+            $tokenSeguro = Str::random(8); 
+            
+            // 3. Crear la URL que tendrá el QR (ej. tu dominio + menu + token)
+            // Esta URL es la que el cliente escaneará
+            $urlDestino = url('/menu/digital/' . $tokenSeguro);
+
+            // 4. Guardar en Base de Datos
+            $nuevoQr = QrMesa::create([
+                'id_mesa' => $request->id_mesa,
+                'codigo_qr' => $tokenSeguro, // Guardamos el token, no la URL completa (opcional)
+                'estado' => 'activo',
+                'fecha_generacion' => Carbon::now()
+            ]);
+
+            // 5. Generar la imagen del QR en formato SVG o Base64
+            // Usamos generate($urlDestino)
+            // base64_encode para poder enviarlo por JSON y pintarlo en Vue
+            $imagenQr = base64_encode(QrCode::format('svg')->size(300)->generate($tokenSeguro));
+
+            DB::commit();
+
+            return response()->json([
+                'mensaje' => 'QR Generado con éxito',
+                'codigo_qr' => $tokenSeguro,
+                'imagen_qr' => $imagenQr // Enviamos la imagen lista para mostrar
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['mensaje' => 'Error al generar QR: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
