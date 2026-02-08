@@ -69,11 +69,20 @@ class PedidosController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
         $res = Pedido::create($inputs);
         return response()->json([
             'data' => $res,
             'mensaje' => "Agregado con Éxito!!",
+        ]);
+    }
+    public function getPedidopendiente(string $id)
+    {
+        $res = Pedido::where('estado_pedido', 'pendiente')
+        ->where('id_mesa', $id)
+        ->get();
+        return response()->json([
+            'data' => $res,
+            'mensaje' => "Pedidos pendientes obtenidos con éxito!!",
         ]);
     }
 

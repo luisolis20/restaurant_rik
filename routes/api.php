@@ -44,6 +44,7 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("productos", ProductoController::class)->middleware('throttle:55000,1');
     Route::apiResource("calificaciones", CalificacionesController::class)->middleware('throttle:55000,1');
     Route::apiResource("pedidos", PedidosController::class)->middleware('throttle:55000,1');
+    Route::get('pedidospedidiente/{id}', [PedidosController::class, 'getPedidopendiente'])->middleware('throttle:55000,1');
     Route::apiResource("mesas", MesaController::class)->middleware('throttle:55000,1');
     Route::apiResource("detalle_pedidos", DetallePedidoController::class)->middleware('throttle:55000,1');
     Route::apiResource("facturas", FacturaController::class)->middleware('throttle:55000,1');
