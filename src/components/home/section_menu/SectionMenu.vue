@@ -113,7 +113,7 @@
             <div class="modal-footer-custom mt-3">
               <button class="btn btn-secondary" @click="cerrarModalPlato">Cancelar</button> &nbsp;
               <button class="btn btn-danger" :disabled="selectedProduct.cantidad_disponible <= 0 || pedidoCantidad <= 0"
-                @click="agregarAlCarrito(selectedProduct)"><i class="bi bi-cart-plus-fill"></i> 
+                @click="agregarAlCarrito(selectedProduct)"><i class="bi bi-cart-plus-fill"></i>
                 {{ selectedProduct.cantidad_disponible <= 0 ? 'Agotado' : 'Agregar al Carrito' }} </button>
             </div>
           </div>
@@ -158,6 +158,13 @@ defineExpose({
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import { debounce } from "lodash";
+import { getMe } from '@/store/auth';
+import {
+  mostraralertas2,
+  enviaractualizacionpedido,
+  confimar,
+  confimarhabi,
+} from "@/assets/js/function/funciones";
 export default {
   name: "SectionMenu",
   data() {
@@ -180,6 +187,7 @@ export default {
       isProductModalOpen: false,
       selectedProduct: null,
       pedidoCantidad: 1,
+      idmesa: 0,
     };
   },
   computed: {
@@ -194,6 +202,9 @@ export default {
   },
   async mounted() {
     const ruta = useRoute();
+    const usuario = await getMe();
+    console.log(usuario);
+    this.idmesa = usuario.id_mesa;
 
     // 1. Cargar todas las categorías una sola vez
     await this.GetDataCategory();
@@ -350,15 +361,61 @@ export default {
         this.pedidoCantidad = nuevaCantidad;
       }
     },
-    agregarAlCarrito(plato) {
-      
-      this.$emit('agregar-al-carrito', {
-        id: plato.id_producto,
-        nombre: plato.productos_nombre,
-        precio: plato.precio,
-        cantidad: this.pedidoCantidad
-      });
-      this.cerrarModalPlato();
+    async agregarAlCarrito(plato) {
+      try {
+        const params = {
+          id_producto: plato.id_producto,
+          cantidad_disponible: plato.cantidad_disponible - this.pedidoCantidad,
+        };
+        const exito = await enviaractualizacionpedido(
+          "PUT",
+          params,
+          `${this.baseUrl}/inventarios/${plato.id_inventario}`
+        );
+        if (exito) {
+          const params2 = {
+            id_mesa: this.idmesa,
+            estado_pedido: 'pendiente',
+          };
+          const exito2 = await enviaractualizacionpedido(
+            "POST",
+            params2,
+            `${this.baseUrl}/pedidos`
+          );
+          if (exito2) {
+            const response = await API.get(`${this.baseUrl}/pedidospedidiente/${this.idmesa}`);
+            const params3 = {
+              id_pedido: response.data.data.id_pedido,
+              id_producto: plato.id_producto,
+              cantidad: this.pedidoCantidad,
+              precio_unitario: plato.precio,
+            };
+            const exito3 = await enviaractualizacionpedido(
+              "PUT",
+              params3,
+              `${this.baseUrl}/detalle_pedidos`
+            );
+            if (exito3) {
+              this.$emit('agregar-al-carrito');
+              this.cerrarModalPlato();
+              await this.GetDataPlatos(this.currentPagePlatos, true);
+            } else {
+              mostraralertas2('No se pudo actualizar el stock', 'error');
+              this.cerrarModalPlato();
+            }
+          } else {
+            mostraralertas2('No se pudo añadir al carrito', 'error');
+            this.cerrarModalPlato();
+          }
+
+        }
+        else {
+          mostraralertas2('No se pudo actualizar el stock', 'error');
+          this.cerrarModalPlato();
+        }
+      } catch (error) {
+        console.error("❌ Error al registrar usuario:", error.response?.data || error);
+      }
     },
   },
 };
