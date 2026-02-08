@@ -46,7 +46,7 @@
 import { ChevronDownIcon, LogoutIcon } from '@/icons'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useUsuario } from "@/composables/useUsuario"
-//import API from "@/assets/js/services/axios"
+import API from "@/assets/js/services/axios"
 
 // Estado
 const dropdownOpen = ref(false)
@@ -73,19 +73,19 @@ const handleClickOutside = (event) => {
 }
 
 // Lógica de Sesión
-/*const cerrarsesion = async () => {
+const cerrarsesion = async () => {
   try {
-    const token = localStorage.getItem("token_bio")
+    const token = localStorage.getItem("token_rest")
 
     if (!token) {
       console.warn("⚠️ No hay token, cerrando sesión localmente...")
       localStorage.clear()
-      window.location.href = "/biometrico"
+      window.location.href = "/login"
       return
     }
 
     const response = await API.get(
-      "/biometrico/logout",
+      "/restrik/logout",
       {},
       {
         headers: { Authorization: `Bearer ${token}` }
@@ -94,14 +94,14 @@ const handleClickOutside = (event) => {
 
     console.log("✅ Sesión cerrada:", response.data)
     localStorage.clear()
-    window.location.href = "/biometrico"
+    window.location.href = "/login"
   } catch (error) {
     console.error("❌ Error al cerrar sesión:", error.response?.data || error)
     localStorage.clear()
-    window.location.href = "/biometrico"
+    window.location.href = "/login"
   }
 }
-*/
+
 // Ciclo de vida
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)

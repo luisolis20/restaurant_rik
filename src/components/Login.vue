@@ -28,7 +28,7 @@
           <h2>Ingreso Manual</h2>
           <p class="qr-subtitle">Seleccione su mesa para continuar</p>
 
-          <form class="formulario" @submit.prevent="verifyTable">
+          <form class="formulario" @submit.prevent="handleSubmit2">
             <select v-model="selectedTable" class="manual-input">
               <option value="" disabled selected>Seleccione una mesa</option>
               <option v-for="obj in objetoList" :key="obj.id_mesa" :value="obj.codigo_mesa">Mesa {{ obj.codigo_mesa }}
@@ -67,10 +67,10 @@
         <img src="@/assets/img/logo.png" alt="Logo" class="content-logo" />
         <h1>Iniciar Sesión</h1>
         <p class="qr-subtitle">Ingrese el usuario y clave proporcionados por el administrador del sitio</p>
-        <form class="formulario">
-          <input type="email" placeholder="email">
+        <form class="formulario" @submit.prevent="handleSubmit">
+          <input type="email" placeholder="email" v-model="email">
           <div class="password-wrapper">
-            <input type="password" id="reg-pass" placeholder="password">
+            <input type="password" id="reg-pass" placeholder="password" v-model="password">
             <span class="toggle-password" @click="togglePassword('reg-pass')">
               <svg id="icon-reg-pass" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -80,7 +80,7 @@
               </svg>
             </span>
           </div>
-          <button class="botonl" @click.prevent="">Acceder</button>
+          <button class="botonl" type="submit">Acceder</button>
         </form>
       </div>
     </div>
@@ -88,28 +88,79 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import script3 from "@/assets/js/login";
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { Html5Qrcode } from "html5-qrcode";
+import { useRouter } from "vue-router";
+import API from "@/assets/js/services/axios"
+
 let html5QrCode = null;
 const qrResult = ref("");
 const isScanning = ref(false);
 const manualMode = ref(false); // Nueva variable
 const selectedTable = ref(""); // Datos de la mesa
 const waiterCode = ref("");
+const email = ref("");
+const password = ref("");
+const mesaQr = ref("");
 
+const router = useRouter();
 
+const loginInstance = {
+  ...script3.data(),
+  $router: router,
+  ...script3.methods,
+};
+const mesaInsance = {
+  ...script3.data(),
+  $router: router,
+  ...script3.methods,
+};
+const mesaQrInsance = {
+  ...script3.data(),
+  $router: router,
+  ...script3.methods,
+};
+// Sincronizar valores
+watch(email, (val) => (loginInstance.email = val));
+watch(password, (val) => (loginInstance.password = val));
+
+// Sincronizar valores
+watch(selectedTable, (val) => (mesaInsance.email = val));
+watch(waiterCode, (val) => (mesaInsance.password = val));
+
+const handleSubmit = () => {
+  loginInstance.login.call(loginInstance);
+};
+const handleSubmit2 = () => {
+  mesaInsance.login.call(mesaInsance);
+};
 const startScanner = async () => {
   html5QrCode = new Html5Qrcode("reader");
 
-  const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+  const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
     // Aquí manejas el éxito del escaneo
-    console.log(`Código escaneado: ${decodedText}`);
+    await stopScanner();
+    console.log(`Código detectado: ${decodedText}`);
     qrResult.value = decodedText;
-
-    // Ejemplo: Redirigir o hacer login
-    alert("Acceso concedido para: " + decodedText);
-    stopScanner();
+    try {
+      
+      const responseVerif = await API.get(`/restrik/verificar_qr/${decodedText}`);
+      
+      if (responseVerif.data) {
+        console.log("Datos de verificación:", responseVerif.data.data.codigo_mesa);
+        await loginAutomaticoPorQR(decodedText, responseVerif.data.data.codigo_mesa);
+      } else {
+        alert("Código QR no válido o mesa inactiva");
+        startScanner(); // Reiniciar si falló
+      }
+    } catch (err) {
+      console.error("Error al validar QR:", err);
+      alert("Error de conexión al validar el código");
+      startScanner();
+    }
   };
+  
 
   const config = {
     fps: 10,
@@ -151,14 +202,7 @@ const toggleManual = (value) => {
     setTimeout(() => startScanner(), 100);
   }
 };
-const verifyTable = () => {
-  if (!selectedTable.value) {
-    alert("Por favor seleccione una mesa");
-    return;
-  }
-  alert(`Verificando Mesa ${selectedTable.value}...`);
-  // Aquí iría tu lógica de API para validar la mesa
-};
+
 const setActive = () => {
   const container = document.getElementById('contenedor');
   container.className = 'active';
@@ -181,6 +225,18 @@ const togglePassword = (inputId) => {
     input.type = 'password';
     // SVG Ojo abierto
     iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+};
+const loginAutomaticoPorQR = async (codigoqr, codigoMesa) => {
+  try {
+    
+    mesaQrInsance.email = codigoMesa; 
+    mesaQrInsance.password = codigoqr; 
+    
+    await mesaQrInsance.login.call(mesaQrInsance);
+    
+  } catch (error) {
+    console.error("Error en login automático:", error);
   }
 };
 
@@ -214,14 +270,6 @@ export default {
     const ruta = useRoute();
     this.GetObjetoList();
   },
-  computed: {
-    formIsValid() {
-      return (
-        this.waiterCode !== "" &&
-        this.selectedTable !== ""
-      );
-    },
-  },
   methods: {
     async GetObjetoList() {
       this.cargando = true;
@@ -233,14 +281,6 @@ export default {
         console.error("❌ Error al obtener carreras:", error);
         this.objetoList = [];
       }
-    },
-    async verifyTable() {
-      if (!this.selectedTable) {
-        alert("Por favor seleccione una mesa");
-        return;
-      }
-      alert(`Verificando Mesa ${this.selectedTable}...`);
-      // Aquí iría tu lógica de API para validar la mesa
     },
   },
 };

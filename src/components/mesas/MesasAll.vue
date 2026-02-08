@@ -129,14 +129,24 @@
                         </td>
                         <td class="py-3 whitespace-nowrap">
                             <div v-if="post.codigo_qr" class="flex flex-col items-center gap-1">
-                                <qrcode-vue :value="post.codigo_qr" :size="70" level="H" render-as="svg"
-                                    class="p-1 bg-white border rounded" />
-                                <span class="text-[10px] text-gray-400">{{ post.codigo_qr.substring(0, 8) }}...</span>
+                                <qrcode-vue :value="post.codigo_qr" :size="70" level="H" render-as="canvas"
+                                    :id="'qr-' + post.id_mesa" class="p-1 bg-white border rounded" />
+
+                                <span class="text-[10px] text-gray-400">
+                                    {{ post.codigo_qr.substring(0, 8) }}...
+                                </span>
+
+                                <!-- BOTÓN DESCARGAR PDF -->
+                                <button @click="descargarQRPDF(post)"
+                                    class="mt-1 px-2 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700">
+                                    Descargar PDF
+                                </button>
                             </div>
 
                             <div v-else class="text-gray-400 text-xs italic text-center">
                                 Sin QR
                             </div>
+
                         </td>
 
 
@@ -433,6 +443,7 @@ import { useRoute } from "vue-router";
 import debounce from "lodash.debounce";
 import Modal from "@/components/Modal/Modal.vue";
 import QrcodeVue from 'qrcode.vue';
+import jsPDF from "jspdf";
 import {
     mostraralertas2,
     enviarsolig,
@@ -679,6 +690,41 @@ export default {
             this.selectedStatus = status;
             this.isFilterDropdownOpen = false;
             this.filterAndFetch();
+        },
+        descargarQRPDF(post) {
+            const canvas = document.getElementById(`qr-${post.id_mesa}`);
+
+            if (!canvas || canvas.tagName !== "CANVAS") {
+                console.error("QR no encontrado");
+                alert("No se pudo generar el QR");
+                return;
+            }
+
+            const imgData = canvas.toDataURL("image/png");
+
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4",
+            });
+
+            pdf.setFontSize(16);
+            pdf.text("Código QR de Mesa", 105, 20, { align: "center" });
+
+            pdf.setFontSize(12);
+            pdf.text(`Mesa: ${post.codigo_mesa}`, 105, 30, { align: "center" });
+
+            pdf.addImage(imgData, "PNG", 65, 45, 80, 80);
+
+            pdf.setFontSize(10);
+            pdf.text(
+                "Escanea este código para acceder al menú",
+                105,
+                135,
+                { align: "center" }
+            );
+
+            pdf.save(`QR_Mesa_${post.codigo_mesa}.pdf`);
         },
     },
 };

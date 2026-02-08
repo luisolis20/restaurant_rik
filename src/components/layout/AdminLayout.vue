@@ -16,8 +16,8 @@
             class="text-brand-500 hover:text-brand-600 transition-colors duration-200 font-medium">
             DonMonta
           </a>
-          
-          
+
+
         </p>
       </footer>
     </div>
@@ -32,4 +32,13 @@ import Backdrop from './Backdrop.vue'
 
 // En JS no necesitas definir tipos para la desestructuración
 const { isExpanded, isHovered } = useSidebar()
+</script>
+<script>
+import { getMe } from '@/store/auth';
+export default {
+  async mounted() {
+
+    const usuario = await getMe();
+  },
+}
 </script>
