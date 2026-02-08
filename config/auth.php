@@ -40,6 +40,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'usuarios',
         ],
+        'mesa_guard' => [
+            'driver' => 'jwt',
+            'provider' => 'mesas',
+        ],
     ],
 
     /*
@@ -63,6 +67,10 @@ return [
         'usuarios' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        'mesas' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Mesa::class,
         ],
 
         // 'users' => [

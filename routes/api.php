@@ -58,7 +58,7 @@ Route::prefix('restrik')->group(function () {
     Route::delete('eliminarmesa/{id}', [MesaController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarmesa/{id}', [MesaController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::post('generarqr', [MesaController::class, 'generarQr'])->middleware('throttle:55000,1');
-    
+    Route::get('verificar_qr/{codigo}', [QrMesaController::class, 'verificar'])->middleware('throttle:10000,1');
     Route::delete('eliminaruser/{id}', [UserController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('eliminarrol/{id}', [RoleController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitaruser/{id}', [UserController::class, 'habilitar'])->middleware('throttle:55000,1');
@@ -69,7 +69,10 @@ Route::prefix('restrik')->group(function () {
     Route::delete('eliminarproducto/{id}', [ProductoController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarproducto/{id}', [ProductoController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::get('imagenprod/{ci}', [ProductoController::class, 'getFotografia'])->middleware('throttle:55000,1');
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware('auth:api,mesa_guard')->group(function () {
+        Route::get('me', [AuthController::class, 'me']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::get('logout', [AuthController::class, 'logout'])->name('logout');
         //Colocar aquí las rutas que necesiten autenticación
     });
 });
