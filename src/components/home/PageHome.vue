@@ -19,26 +19,7 @@
                             <li><a href="#events">Events</a></li>
                             <li><a href="#chefs">Chefs</a></li>
                             <li><a href="#gallery">Gallery</a></li>
-                            <li class="dropdown">
-                                <a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                <ul>
-                                    <li><a href="#">Dropdown 1</a></li>
-                                    <li class="dropdown">
-                                        <a href="#"><span>Deep Dropdown</span>
-                                            <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                        <ul>
-                                            <li><a href="#">Deep Dropdown 1</a></li>
-                                            <li><a href="#">Deep Dropdown 2</a></li>
-                                            <li><a href="#">Deep Dropdown 3</a></li>
-                                            <li><a href="#">Deep Dropdown 4</a></li>
-                                            <li><a href="#">Deep Dropdown 5</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#">Dropdown 2</a></li>
-                                    <li><a href="#">Dropdown 3</a></li>
-                                    <li><a href="#">Dropdown 4</a></li>
-                                </ul>
-                            </li>
+
                             <li><a href="#contact">Contact</a></li>
                         </ul>
                         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -239,11 +220,40 @@
                 </section><!-- /Stats Section -->
                 <!-- Menu Section -->
                 <section id="menu" class="mensu section">
-                    <SectionMenu />
+                    <SectionMenu @agregar-al-carrito="gestionarCarrito" />
 
 
                 </section><!-- /Menu Section -->
             </main>
+            <div v-if="carrito.length > 0" class="cart-floating-btn" @click="mostrarDetalle = !mostrarDetalle">
+                <i class="bi bi-cart-fill"></i>
+                <span class="cart-badge">{{ carrito.length }}</span>
+            </div>
+
+            <div v-if="mostrarDetalle" class="cart-sidebar shadow-lg">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <h5 class="mb-0">Mis Pedidos</h5>
+                    <button class="btn-close" @click="mostrarDetalle = false"></button>
+                </div>
+                <div class="cart-items p-3">
+                    <div v-for="(item, index) in carrito" :key="index"
+                        class="d-flex justify-content-between mb-2 border-bottom pb-2">
+                        <div>
+                            <p class="mb-0 fw-bold">{{ item.nombre }}</p>
+                            <small class="text-muted">Cant: {{ item.cantidad }}</small>
+                        </div>
+                        <span>${{ (item.precio * item.cantidad).toFixed(2) }}</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-light mt-auto">
+                    <div class="d-flex justify-content-between fw-bold mb-3">
+                        <span>Total:</span>
+                        <span>${{ totalPagar.toFixed(2) }}</span>
+                    </div>
+                    <button class="btn btn-danger w-100 mb-2" @click="carrito = []">Vaciar Carrito</button>
+                    <button class="btn btn-primary w-100" @click="procesarPago">Confirmar Pedido</button>
+                </div>
+            </div>
         </div>
     </shadow-root>
 </template>
@@ -262,14 +272,61 @@ export default {
 
     data() {
         return {
+            carrito: [],
+            mostrarDetalle: false,
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
         @import url("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css");
-        
+        /* Estilos del Carrito Flotante */
+                .cart-floating-btn {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    background-color: #ce1212;
+                    color: white;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    z-index: 9999;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                }
+                .cart-badge {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    background: white;
+                    color: #ce1212;
+                    border-radius: 50%;
+                    padding: 2px 7px;
+                    font-size: 12px;
+                    font-weight: bold;
+                }
+                .cart-sidebar {
+                    position: fixed;
+                    right: 0;
+                    top: 0;
+                    width: 350px;
+                    height: 100vh;
+                    background: white;
+                    z-index: 10000;
+                    display: flex;
+                    flex-direction: column;
+                    border-left: 1px solid #dee2e6;
+                }
+                .cart-items { overflow-y: auto; flex-grow: 1; }
         
       `,
         };
+    },
+    computed: {
+        totalPagar() {
+            return this.carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+        }
     },
 
     async mounted() {
@@ -281,7 +338,7 @@ export default {
     },
 
     methods: {
-       async cerrarSesion() {
+        async cerrarSesion() {
             try {
                 const token = localStorage.getItem("token_rest");
 
@@ -309,6 +366,20 @@ export default {
                 window.location.href = "/login"
             }
         },
+        gestionarCarrito(producto) {
+            const existe = this.carrito.find(item => item.id === producto.id);
+
+            if (existe) {
+                // Sumamos la cantidad que viene del evento (producto.cantidad)
+                existe.cantidad += producto.cantidad;
+            } else {
+                // Si no existe, lo agregamos con la cantidad seleccionada
+                this.carrito.push({ ...producto });
+            }
+        },
+        procesarPago() {
+            alert("Redirigiendo a pasarela de pago...");
+        }
     },
 };
 </script>

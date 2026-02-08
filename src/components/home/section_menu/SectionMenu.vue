@@ -68,6 +68,54 @@
             <p class="ingredientes">{{ truncateText(plato.descripcion, 100) || 'Sin descripción disponible' }}</p>
             <p class="precio">${{ plato.precio }}</p>
             <p class="text-muted" style="font-size: 0.8rem;">Disponible: {{ plato.cantidad_disponible }}</p>
+            <button class="btn btn-danger btn-sm rounded-pill mt-2" :disabled="plato.cantidad_disponible <= 0"
+              @click="abrirModalPlato(plato)">
+              <i class="bi bi-cart-plus-fill"></i> Añadir al carrito
+            </button>
+          </div>
+        </div>
+        <div v-if="isProductModalOpen" class="modal-overlay">
+          <div class="modal-content-custom animate__animated animate__fadeInDown">
+            <div class="modal-header-custom">
+              <h3>Detalle del Producto</h3>
+              <button @click="cerrarModalPlato" class="btn-close-modal">&times;</button>
+            </div>
+
+            <div class="modal-body-custom" v-if="selectedProduct">
+              <div class="row">
+                <div class="col-md-5">
+                  <img :src="getPhotoUrl(selectedProduct.id_producto)" class="img-fluid rounded" alt="">
+                </div>
+                <div class="col-md-7">
+                  <h4>{{ selectedProduct.productos_nombre }}</h4>
+                  <p class="text-muted">{{ selectedProduct.descripcion }}</p>
+                  <p class="fw-bold">Precio Unitario: ${{ selectedProduct.precio }}</p>
+
+                  <div class="form-group mt-3">
+                    <label>Cantidad a pedir:</label>
+                    <div class="input-group mb-3" style="max-width: 150px;">
+                      <button class="btn btn-outline-secondary" @click="cambiarCantidad(-1)">-</button>
+                      <input type="number" v-model.number="pedidoCantidad" class="form-control text-center" readonly>
+                      <button class="btn btn-outline-secondary" @click="cambiarCantidad(1)">+</button>
+                    </div>
+                    <small class="text-danger" v-if="selectedProduct.cantidad_disponible < 10">
+                      ¡Solo quedan {{ selectedProduct.cantidad_disponible }} unidades!
+                    </small>
+                  </div>
+
+                  <div class="total-section mt-4 p-3 bg-light rounded">
+                    <h5 class="mb-0">Total: <span class="text-danger">${{ totalCalculado }}</span></h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer-custom mt-3">
+              <button class="btn btn-secondary" @click="cerrarModalPlato">Cancelar</button> &nbsp;
+              <button class="btn btn-danger" :disabled="selectedProduct.cantidad_disponible <= 0 || pedidoCantidad <= 0"
+                @click="agregarAlCarrito(selectedProduct)"><i class="bi bi-cart-plus-fill"></i> 
+                {{ selectedProduct.cantidad_disponible <= 0 ? 'Agotado' : 'Agregar al Carrito' }} </button>
+            </div>
           </div>
         </div>
 
@@ -85,8 +133,27 @@
 
       </div>
     </div>
+
   </div>
 </template>
+<script setup>
+import { ref, watch, nextTick, onBeforeUnmount } from "vue";
+import Modal from "@/components/Modal/Modal.vue";
+
+const isProfileAddressModal = ref(false);
+const isEditModalOpen = ref(false);
+
+const cerrarModalDesdeAfuera = () => {
+  isProfileAddressModal.value = false
+}
+
+
+defineExpose({
+  isProfileAddressModal,
+  isEditModalOpen,
+  cerrarModalDesdeAfuera
+})
+</script>
 <script>
 import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
@@ -110,12 +177,19 @@ export default {
       // Paginación
       currentPagePlatos: 1,
       lastPagePlatos: 1,
+      isProductModalOpen: false,
+      selectedProduct: null,
+      pedidoCantidad: 1,
     };
   },
   computed: {
     currentCategoryName() {
       const cat = this.objetoListCategory.find(c => c.id_categoria === this.selectedCategoryId);
       return cat ? cat.nombre : '';
+    },
+    totalCalculado() {
+      if (!this.selectedProduct) return 0;
+      return (this.selectedProduct.precio * this.pedidoCantidad).toFixed(2);
     }
   },
   async mounted() {
@@ -135,6 +209,37 @@ export default {
     this.debouncedFilter = debounce(() => {
       this.filterAndFetch();
     }, 900);
+  },
+  watch: {
+    // Observamos cuando la lista de platos cambie (por el polling)
+    objetoListPlatos: {
+      handler(newList) {
+        if (this.isProductModalOpen && this.selectedProduct) {
+          // Buscamos la versión actualizada del producto que está en el modal
+          const platoActualizado = newList.find(
+            p => p.id_producto === this.selectedProduct.id_producto
+          );
+
+          if (platoActualizado) {
+            // Actualizamos la referencia del producto seleccionado
+            this.selectedProduct = platoActualizado;
+
+            // Opcional: Si el stock bajó y es menor a lo que el usuario eligió, 
+            // ajustamos la cantidad del pedido automáticamente
+            if (this.pedidoCantidad > platoActualizado.cantidad_disponible) {
+              this.pedidoCantidad = platoActualizado.cantidad_disponible;
+            }
+
+            // Si el producto se agotó (stock 0) mientras el modal estaba abierto
+            if (platoActualizado.cantidad_disponible <= 0) {
+              // Podrías cerrar el modal o mostrar un mensaje
+              // this.cerrarModalPlato(); 
+            }
+          }
+        }
+      },
+      deep: true // Importante para detectar cambios internos en los objetos
+    }
   },
   methods: {
     startLiveUpdates() {
@@ -229,6 +334,70 @@ export default {
         this.GetDataPlatos(this.currentPagePlatos - 1);
       }
     },
+    abrirModalPlato(plato) {
+      this.selectedProduct = plato;
+      this.pedidoCantidad = 1;
+      this.isProductModalOpen = true;
+    },
+    cerrarModalPlato() {
+      this.isProductModalOpen = false;
+      this.selectedProduct = null;
+    },
+    cambiarCantidad(valor) {
+      const nuevaCantidad = this.pedidoCantidad + valor;
+      // Validación: No menos de 1 y no más de lo disponible
+      if (nuevaCantidad >= 1 && nuevaCantidad <= this.selectedProduct.cantidad_disponible) {
+        this.pedidoCantidad = nuevaCantidad;
+      }
+    },
+    agregarAlCarrito(plato) {
+      
+      this.$emit('agregar-al-carrito', {
+        id: plato.id_producto,
+        nombre: plato.productos_nombre,
+        precio: plato.precio,
+        cantidad: this.pedidoCantidad
+      });
+      this.cerrarModalPlato();
+    },
   },
 };
 </script>
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.modal-content-custom {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header-custom {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+</style>
