@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class PedidosController extends Controller
 {
@@ -25,14 +24,13 @@ class PedidosController extends Controller
                 'mesas.estado',
             )
                 ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa');
-             if (! empty($searchQuery)) {
+            if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('pedidos.fecha_pedido', 'LIKE', "%{$searchQuery}%");
-                   
-            
+
                 });
             }
-        
+
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -45,6 +43,7 @@ class PedidosController extends Controller
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
+
                 return $attributes;
             });
 
@@ -56,10 +55,10 @@ class PedidosController extends Controller
                     'total' => $data->total(),
                     'last_page' => $data->lastPage(),
                 ],
-                
+
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
 
@@ -70,19 +69,25 @@ class PedidosController extends Controller
     {
         $inputs = $request->input();
         $res = Pedido::create($inputs);
+
         return response()->json([
             'data' => $res,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => 'Agregado con Éxito!!',
         ]);
     }
+
     public function getPedidopendiente(string $id)
     {
+        // Usamos first() para obtener el pedido pendiente más reciente de esa mesa
         $res = Pedido::where('estado_pedido', 'pendiente')
-        ->where('id_mesa', $id)
-        ->get();
+            ->where('id_mesa', $id)
+            ->orderBy('fecha_pedido', 'desc') // El más nuevo
+            ->first();
+
         return response()->json([
+            // Si no hay, enviamos null explícito para que el frontend sepa que debe crear uno
             'data' => $res,
-            'mensaje' => "Pedidos pendientes obtenidos con éxito!!",
+            'mensaje' => $res ? 'Pedido pendiente encontrado' : 'No hay pedidos pendientes',
         ]);
     }
 
@@ -98,7 +103,7 @@ class PedidosController extends Controller
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Encontrado con Éxito!!",
+                'mensaje' => 'Encontrado con Éxito!!',
             ]);
         } else {
             return response()->json([
@@ -118,18 +123,17 @@ class PedidosController extends Controller
             $res->id_mesa = $request->id_mesa;
             $res->fecha_pedido = $request->fecha_pedido;
             $res->estado_pedido = $request->estado_pedido;
-             $res->total = $request->total;
+            $res->total = $request->total;
 
-            
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => 'Actualizado con Éxito!!',
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => 'Error al Actualizar',
                 ]);
             }
         } else {
@@ -143,7 +147,4 @@ class PedidosController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   
-    
-    
 }

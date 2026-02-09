@@ -52,8 +52,8 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("inventarios", InventarioController::class)->middleware('throttle:55000,1');
     Route::apiResource("qr_mesas", QrMesaController::class)->middleware('throttle:55000,1');
     Route::apiResource("tiempos_preparacion", TiempoPreparacionController::class)->middleware('throttle:55000,1');
-    
-
+    Route::get('/detalle_pedidos/pedido/{id_pedido}', [DetallePedidoController::class, 'getDetallesByPedido']);
+    Route::delete('/detalle_pedidos/vaciar/{id_pedido}', [DetallePedidoController::class, 'vaciarCarrito']);
     Route::delete('eliminarqrmesa/{id}', [QrMesaController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::delete('eliminarmesa/{id}', [MesaController::class, 'destroy'])->middleware('throttle:55000,1');

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetallePedido;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DetallePedidoController extends Controller
 {
@@ -27,14 +27,13 @@ class DetallePedidoController extends Controller
             )
                 ->join('pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
                 ->join('productos', 'detalle_pedidos.id_producto', '=', 'productos.id_producto');
-             if (! empty($searchQuery)) {
+            if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('detalle_pedidos.cantidad', 'LIKE', "%{$searchQuery}%");
-                   
-            
+
                 });
             }
-        
+
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -47,6 +46,7 @@ class DetallePedidoController extends Controller
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
+
                 return $attributes;
             });
 
@@ -58,10 +58,10 @@ class DetallePedidoController extends Controller
                     'total' => $data->total(),
                     'last_page' => $data->lastPage(),
                 ],
-                
+
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
 
@@ -71,12 +71,45 @@ class DetallePedidoController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
+        // $inputs["password"] = md5($request->password);
         $res = DetallePedido::create($inputs);
+
         return response()->json([
             'data' => $res,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => 'Agregado con Éxito!!',
         ]);
+    }
+
+    public function getDetallesByPedido(string $id_pedido)
+    {
+        try {
+            // Obtenemos los detalles filtrados por el ID del pedido
+            // Cargamos la relación 'producto' para obtener el nombre y otros datos
+            $detalles = DetallePedido::select('detalle_pedidos.*', 'productos.nombre as producto_nombre',
+                'inventario.*')
+                ->join('productos', 'detalle_pedidos.id_producto', '=', 'productos.id_producto')
+                ->join('inventario', 'detalle_pedidos.id_producto', '=', 'inventario.id_producto')
+                ->where('detalle_pedidos.id_pedido', $id_pedido)
+                ->get();
+
+            if ($detalles->isEmpty()) {
+                return response()->json([
+                    'data' => [],
+                    'mensaje' => 'El pedido no tiene productos registrados.',
+                ], 200);
+            }
+
+            return response()->json([
+                'data' => $detalles,
+                'mensaje' => 'Detalles del pedido obtenidos con éxito.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'mensaje' => 'Error al obtener los detalles',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -91,7 +124,7 @@ class DetallePedidoController extends Controller
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Encontrado con Éxito!!",
+                'mensaje' => 'Encontrado con Éxito!!',
             ]);
         } else {
             return response()->json([
@@ -113,16 +146,16 @@ class DetallePedidoController extends Controller
             $res->cantidad = $request->cantidad;
             $res->precio_unitario = $request->precio_unitario;
             $res->subtotal = $request->subtotal;
-            
+
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => 'Actualizado con Éxito!!',
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => 'Error al Actualizar',
                 ]);
             }
         } else {
@@ -136,7 +169,68 @@ class DetallePedidoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   
-    
-    
+    public function destroy(string $id)
+    {
+        $res = DetallePedido::find($id);
+        if (isset($res)) {
+            if ($res->delete()) {
+                return response()->json([
+                    'data' => $res,
+                    'mensaje' => 'Eliminado con Éxito!!',
+                ]);
+            } else {
+                return response()->json([
+                    'data' => $res,
+                    'mensaje' => 'No se pudo eliminar',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'error' => true,
+                'mensaje' => "El pedido con id: $id no Existe",
+            ]);
+        }
+    }
+
+    public function vaciarCarrito($id_pedido)
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Obtener todos los detalles de este pedido
+            $detalles = DetallePedido::where('id_pedido', $id_pedido)->get();
+
+            if ($detalles->isEmpty()) {
+                return response()->json(['mensaje' => 'El carrito ya está vacío'], 200);
+            }
+
+            // 2. Devolver stock a cada producto antes de borrar
+            foreach ($detalles as $detalle) {
+                // Buscamos el inventario relacionado al producto
+                $inventario = DB::table('inventario')
+                    ->where('id_producto', $detalle->id_producto)
+                    ->first();
+
+                if ($inventario) {
+                    DB::table('inventario')
+                        ->where('id_inventario', $inventario->id_inventario)
+                        ->increment('cantidad_disponible', $detalle->cantidad);
+                }
+            }
+
+            // 3. Eliminar todos los detalles del pedido
+            DB::table('detalle_pedidos')->where('id_pedido', $id_pedido)->delete();
+
+            DB::commit();
+
+            return response()->json(['mensaje' => 'Carrito vaciado y stock restaurado'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'mensaje' => 'Error al vaciar el carrito',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
