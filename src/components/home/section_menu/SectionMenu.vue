@@ -363,58 +363,66 @@ export default {
     },
     async agregarAlCarrito(plato) {
       try {
-        const params = {
+        // 1. Actualizar Stock del Producto (Inventario)
+        const paramsStock = {
           id_producto: plato.id_producto,
-          cantidad_disponible: plato.cantidad_disponible - this.pedidoCantidad,
+          cantidad_disponible: -this.pedidoCantidad,
         };
-        const exito = await enviaractualizacionpedido(
+        const stockActualizado = await enviaractualizacionpedido(
           "PUT",
-          params,
+          paramsStock,
           `${this.baseUrl}/inventarios/${plato.id_inventario}`
         );
-        if (exito) {
-          const params2 = {
-            id_mesa: this.idmesa,
-            estado_pedido: 'pendiente',
-          };
-          const exito2 = await enviaractualizacionpedido(
+
+        if (!stockActualizado) {
+          mostraralertas2('No se pudo actualizar el stock', 'error');
+          return;
+        }
+
+        // 2. Verificar si ya existe un pedido pendiente para esta mesa
+        let idPedidoActivo = null;
+        const resPedido = await API.get(`${this.baseUrl}/pedidospedidiente/${this.idmesa}`);
+
+        // Si data existe, usamos ese ID. Si no, creamos uno nuevo.
+        if (resPedido.data.data && resPedido.data.data.id_pedido) {
+          idPedidoActivo = resPedido.data.data.id_pedido;
+        } else {
+          const nuevoPedido = await enviaractualizacionpedido(
             "POST",
-            params2,
+            { id_mesa: this.idmesa, estado_pedido: 'pendiente', total: 0 },
             `${this.baseUrl}/pedidos`
           );
-          if (exito2) {
-            const response = await API.get(`${this.baseUrl}/pedidospedidiente/${this.idmesa}`);
-            const params3 = {
-              id_pedido: response.data.data.id_pedido,
-              id_producto: plato.id_producto,
-              cantidad: this.pedidoCantidad,
-              precio_unitario: plato.precio,
-            };
-            const exito3 = await enviaractualizacionpedido(
-              "PUT",
-              params3,
-              `${this.baseUrl}/detalle_pedidos`
-            );
-            if (exito3) {
-              this.$emit('agregar-al-carrito');
-              this.cerrarModalPlato();
-              await this.GetDataPlatos(this.currentPagePlatos, true);
-            } else {
-              mostraralertas2('No se pudo actualizar el stock', 'error');
-              this.cerrarModalPlato();
-            }
-          } else {
-            mostraralertas2('No se pudo añadir al carrito', 'error');
-            this.cerrarModalPlato();
-          }
+          // Aquí asumo que tu función 'enviaractualizacionpedido' o el backend retorna el objeto creado
+          // Si no, tendrías que volver a consultar el id_pedido recién creado.
+          const resNuevo = await API.get(`${this.baseUrl}/pedidospedidiente/${this.idmesa}`);
+          idPedidoActivo = resNuevo.data.data.id_pedido;
+        }
 
-        }
-        else {
-          mostraralertas2('No se pudo actualizar el stock', 'error');
+        // 3. Agregar el detalle al pedido (idPedidoActivo)
+        const paramsDetalle = {
+          id_pedido: idPedidoActivo,
+          id_producto: plato.id_producto,
+          cantidad: this.pedidoCantidad,
+          precio_unitario: plato.precio,
+          subtotal: (this.pedidoCantidad * plato.precio) // Calcula el subtotal aquí
+        };
+
+        const exitoDetalle = await enviaractualizacionpedido(
+          "POST", // Cambia a POST si es un insert nuevo en detalle_pedidos
+          paramsDetalle,
+          `${this.baseUrl}/detalle_pedidos`
+        );
+
+        if (exitoDetalle) {
+          this.$emit('agregar-al-carrito'); // Esto avisará al PageHome para refrescar el sidebar
           this.cerrarModalPlato();
+          await this.GetDataPlatos(this.currentPagePlatos, true);
+          //mostraralertas2('Producto añadido al pedido', 'success');
         }
+
       } catch (error) {
-        console.error("❌ Error al registrar usuario:", error.response?.data || error);
+        console.error("❌ Error en el proceso de pedido:", error);
+        mostraralertas2('Error crítico al procesar el pedido', 'error');
       }
     },
   },

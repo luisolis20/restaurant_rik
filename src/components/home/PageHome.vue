@@ -220,7 +220,7 @@
                 </section><!-- /Stats Section -->
                 <!-- Menu Section -->
                 <section id="menu" class="mensu section">
-                    <SectionMenu @agregar-al-carrito="gestionarCarrito" />
+                    <SectionMenu @agregar-al-carrito="cargarPedidoPendiente" />
 
 
                 </section><!-- /Menu Section -->
@@ -236,13 +236,17 @@
                     <button class="btn-close" @click="mostrarDetalle = false"></button>
                 </div>
                 <div class="cart-items p-3">
-                    <div v-for="(item, index) in carrito" :key="index"
+                    <div v-for="item in carrito" :key="item.id_detalle"
                         class="d-flex justify-content-between mb-2 border-bottom pb-2">
                         <div>
-                            <p class="mb-0 fw-bold">{{ item.nombre }}</p>
-                            <small class="text-muted">Cant: {{ item.cantidad }}</small>
+                            <p class="mb-0 fw-bold">{{ item.producto_nombre || 'Plato' }}</p>
+                            <small class="text-muted">Cant: {{ item.cantidad }} x ${{ item.precio_unitario }}</small>
                         </div>
-                        <span>${{ (item.precio * item.cantidad).toFixed(2) }}</span>
+                        <span>${{ (item.precio_unitario * item.cantidad).toFixed(2) }}</span>
+                        <button class="btn btn-danger btn-sm rounded-pill mt-2" :disabled="item.cantidad <= 0"
+                            @click="eliminarPedido(item.id_detalle, item.cantidad, item.id_producto, item.id_inventario)">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="p-3 bg-light mt-auto">
@@ -250,7 +254,7 @@
                         <span>Total:</span>
                         <span>${{ totalPagar.toFixed(2) }}</span>
                     </div>
-                    <button class="btn btn-danger w-100 mb-2" @click="carrito = []">Vaciar Carrito</button>
+                    <button class="btn btn-danger w-100 mb-2" @click="vaciarCarritoTotal">Vaciar Carrito</button>
                     <button class="btn btn-primary w-100" @click="procesarPago">Confirmar Pedido</button>
                 </div>
             </div>
@@ -261,7 +265,13 @@
 import { initYummyEffects } from "@/assets/js/function/yummyEffects.js";
 import SectionMenu from "@/components/home/section_menu/SectionMenu.vue";
 import { getMe } from '@/store/auth';
-import API from "@/assets/js/services/axios"
+import API from "@/assets/js/services/axios";
+import {
+    mostraralertas2,
+    enviaractualizacionpedido,
+    confimar,
+    confimarhabi,
+} from "@/assets/js/function/funciones";
 
 
 export default {
@@ -274,6 +284,8 @@ export default {
         return {
             carrito: [],
             mostrarDetalle: false,
+            idMesa: null,
+            baseUrl: "/restrik",
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
@@ -325,7 +337,10 @@ export default {
     },
     computed: {
         totalPagar() {
-            return this.carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+            return this.carrito.reduce((acc, item) => acc + (item.precio_unitario * item.cantidad), 0);
+        },
+        totalItems() {
+            return this.carrito.reduce((acc, item) => acc + item.cantidad, 0);
         }
     },
 
@@ -335,6 +350,10 @@ export default {
             initYummyEffects();
         });
         const usuario = await getMe();
+        if (usuario) {
+            this.idMesa = usuario.id_mesa; // Ajusta según tu objeto user
+            this.cargarPedidoPendiente();
+        }
     },
 
     methods: {
@@ -366,17 +385,62 @@ export default {
                 window.location.href = "/login"
             }
         },
-        gestionarCarrito(producto) {
-            const existe = this.carrito.find(item => item.id === producto.id);
+        async cargarPedidoPendiente() {
+            try {
+                // Buscamos el pedido pendiente de esta mesa
+                const res = await API.get(`${this.baseUrl}/pedidospedidiente/${this.idMesa}`);
 
-            if (existe) {
-                // Sumamos la cantidad que viene del evento (producto.cantidad)
-                existe.cantidad += producto.cantidad;
-            } else {
-                // Si no existe, lo agregamos con la cantidad seleccionada
-                this.carrito.push({ ...producto });
+                if (res.data.data) {
+                    const idPedido = res.data.data.id_pedido;
+                    // Obtenemos los detalles de ese pedido (necesitas este endpoint en Laravel)
+                    const resDetalles = await API.get(`${this.baseUrl}/detalle_pedidos/pedido/${idPedido}`);
+                    this.carrito = resDetalles.data.data;
+                    console.log(this.carrito);
+                }
+            } catch (error) {
+                console.error("Error cargando carrito:", error);
             }
         },
+        async eliminarPedido(idDetalle, cantidad, id_producto, id_inventario) {
+            try {
+                const paramsStock = {
+                    id_producto: id_producto,
+                    cantidad_disponible: cantidad,
+                };
+                const stockActualizado = await enviaractualizacionpedido(
+                    "PUT",
+                    paramsStock,
+                    `${this.baseUrl}/inventarios/${id_inventario}`
+                );
+
+                if (!stockActualizado) {
+                    mostraralertas2('No se pudo actualizar el stock', 'error');
+                    return;
+                }
+                await API.delete(`${this.baseUrl}/detalle_pedidos/${idDetalle}`);
+                this.carrito = this.carrito.filter(item => item.id_detalle !== idDetalle);
+            } catch (error) {
+                console.error("Error eliminando pedido:", error);
+            }
+        },
+        async vaciarCarritoTotal() {
+            try {
+                if (this.carrito.length === 0) return;
+                const idPedido = this.carrito[0].id_pedido;
+                const response = await API.delete(`${this.baseUrl}/detalle_pedidos/vaciar/${idPedido}`);
+
+                if (response.status === 200) {
+                    this.carrito = []; // Limpiamos la vista
+                    mostraralertas2("Carrito vaciado", "success");
+                    // Opcional: recargar menú si el stock se muestra ahí
+                }
+            }
+            catch (error) {
+                console.error("❌ Error al vaciar carrito:", error.response?.data || error);
+                this.carrito = [];
+            }
+        },
+
         procesarPago() {
             alert("Redirigiendo a pasarela de pago...");
         }
