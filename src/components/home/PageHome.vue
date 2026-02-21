@@ -12,15 +12,17 @@
                     <nav id="navmenu" class="navmenu">
                         <ul>
                             <li>
-                                <a href="#hero" class="active">Home<br /></a>
+                                <a href="#hero" class="active">Inicio<br /></a>
                             </li>
-                            <li><a href="#about">About</a></li>
+                            <li><a href="#about">Nosotros</a></li>
                             <li><a href="#menu">Menu</a></li>
+                            <!--
                             <li><a href="#events">Events</a></li>
                             <li><a href="#chefs">Chefs</a></li>
                             <li><a href="#gallery">Gallery</a></li>
 
                             <li><a href="#contact">Contact</a></li>
+                            -->
                         </ul>
                         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
                     </nav>
@@ -55,7 +57,7 @@
                     <!-- Section Title -->
                     <div class="container section-title">
                         <h2>Sobre Nosotros<br /></h2>
-                        <p><span>Lee más</span> <span class="description-title">Sobre Nosotros</span></p>
+                        <p><span>Nuestra  Pasión</span> <span class="description-title">por el Sabor</span></p>
                     </div>
                     <!-- End Section Title -->
 
@@ -71,29 +73,27 @@
                             <div class="col-lg-5">
                                 <div class="contentito ps-0 ps-lg-5">
                                     <p class="fst-italic">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                        eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                        En Rico Rico nacimos con el propósito de ofrecer platos frescos y llenos de tradición. Nos especializamos en mariscos, 
+                                        arroces y encocados preparados con ingredientes seleccionados cuidadosamente cada día.
+                                        
                                     </p>
                                     <ul>
                                         <li>
                                             <i class="bi bi-check-circle-fill"></i>
-                                            <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
+                                            <span>Ingredientes frescos y de calidad garantizada.</span>
                                         </li>
                                         <li>
                                             <i class="bi bi-check-circle-fill"></i>
-                                            <span>Duis aute irure dolor in reprehenderit in voluptate velit.</span>
+                                            <span>Recetas tradicionales con sabor auténtico</span>
                                         </li>
                                         <li>
                                             <i class="bi bi-check-circle-fill"></i>
-                                            <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-                                                aute irure dolor in reprehenderit in voluptate trideta
-                                                storacalaperda mastiro dolore eu fugiat nulla pariatur.</span>
+                                            <span>Atención rápida y personalizada.</span>
                                         </li>
                                     </ul>
                                     <p>
-                                        Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                                        irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                                        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident
+                                        Nuestro compromiso es brindar a cada cliente una experiencia gastronómica inolvidable en un ambiente acogedor y familiar. 
+                                        En Rico Rico, cada plato cuenta una historia.
                                     </p>
 
                                     <div class="position-relative mt-4">
@@ -118,11 +118,8 @@
                                 <div class="why-box">
                                     <h3>¿Por qué elegir nuestro restaurante?</h3>
                                     <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Duis aute irure dolor in
-                                        reprehenderit
-                                        Asperiores dolores sed et. Tenetur quia eos. Autem tempore quibusdam vel
-                                        necessitatibus optio ad corporis.
+                                        En Rico Rico combinamos tradición y sabor en cada plato. Utilizamos ingredientes frescos y recetas auténticas para ofrecerte una experiencia gastronómica única. 
+                                        Nuestro compromiso es brindarte calidad, buen servicio y el verdadero sabor del mar en cada visita.
                                     </p>
                                     <div class="text-center">
                                         <a href="#" class="more-btn"><span>Learn More</span> <i
@@ -138,9 +135,8 @@
                                         <div
                                             class="icon-box d-flex flex-column justify-content-center align-items-center">
                                             <i class="bi bi-clipboard-data"></i>
-                                            <h4>Corporis voluptates officia eiusmod</h4>
-                                            <p>Consequuntur sunt aut quasi enim aliquam quae harum pariatur laboris nisi
-                                                ut aliquip</p>
+                                            <h4>Ingredientes Frescos</h4>
+                                            <p>Seleccionamos productos frescos todos los días para garantizar el mejor sabor. </p>
                                         </div>
                                     </div><!-- End Icon Box -->
 
@@ -148,9 +144,8 @@
                                         <div
                                             class="icon-box d-flex flex-column justify-content-center align-items-center">
                                             <i class="bi bi-gem"></i>
-                                            <h4>Ullamco laboris ladore lore pan</h4>
-                                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                                                deserunt</p>
+                                            <h4>Calidad Garantizada</h4>
+                                            <p>Cada plato es preparado bajo altos estándares de higiene y calidad.</p>
                                         </div>
                                     </div><!-- End Icon Box -->
 
@@ -158,9 +153,8 @@
                                         <div
                                             class="icon-box d-flex flex-column justify-content-center align-items-center">
                                             <i class="bi bi-inboxes"></i>
-                                            <h4>Labore consequatur incidid dolore</h4>
-                                            <p>Aut suscipit aut cum nemo deleniti aut omnis. Doloribus ut maiores omnis
-                                                facere</p>
+                                            <h4>Atención Personalizada</h4>
+                                            <p>Brindamos un servicio amable y rápido para que tu experiencia sea inolvidable.</p>
                                         </div>
                                     </div><!-- End Icon Box -->
 
@@ -185,7 +179,7 @@
                                 <div class="stats-item text-center w-100 h-100">
                                     <span data-purecounter-start="0" data-purecounter-end="232"
                                         data-purecounter-duration="1" class="purecounter"></span>
-                                    <p>Clients</p>
+                                    <p>👨‍👩‍👧Clientes Satisfechos</p>
                                 </div>
                             </div><!-- End Stats Item -->
 
@@ -193,7 +187,7 @@
                                 <div class="stats-item text-center w-100 h-100">
                                     <span data-purecounter-start="0" data-purecounter-end="521"
                                         data-purecounter-duration="1" class="purecounter"></span>
-                                    <p>Projects</p>
+                                    <p>🚀 Servicio Rápido</p>
                                 </div>
                             </div><!-- End Stats Item -->
 
@@ -201,7 +195,7 @@
                                 <div class="stats-item text-center w-100 h-100">
                                     <span data-purecounter-start="0" data-purecounter-end="1453"
                                         data-purecounter-duration="1" class="purecounter"></span>
-                                    <p>Hours Of Support</p>
+                                    <p>👨‍🍳 Chefs Especializados</p>
                                 </div>
                             </div><!-- End Stats Item -->
 
@@ -209,7 +203,7 @@
                                 <div class="stats-item text-center w-100 h-100">
                                     <span data-purecounter-start="0" data-purecounter-end="32"
                                         data-purecounter-duration="1" class="purecounter"></span>
-                                    <p>Workers</p>
+                                    <p>🏆 Equipo Profesional</p>
                                 </div>
                             </div><!-- End Stats Item -->
 
