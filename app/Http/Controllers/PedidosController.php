@@ -91,6 +91,57 @@ class PedidosController extends Controller
         ]);
     }
 
+    public function obtenerPedidosEnPreparacion()
+    {
+        try {
+            // Obtenemos los pedidos con estado 'preparacion'
+            // Opcional: ordenar por fecha para que los más antiguos aparezcan primero
+            $pedidos = Pedido::select(
+                'pedidos.*',
+                'mesas.*',
+            )
+                ->where('estado_pedido', 'preparacion')
+                ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa')
+                ->orderBy('fecha_pedido', 'asc')
+                ->get();
+
+            if ($pedidos->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'mensaje' => 'No hay pedidos en preparación actualmente',
+                    'data' => [],
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $pedidos,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Error al obtener los pedidos',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getPedidopreparacion(string $id)
+    {
+        // Usamos first() para obtener el pedido pendiente más reciente de esa mesa
+        $res = Pedido::where('estado_pedido', 'preparacion')
+            ->where('id_mesa', $id)
+            ->orderBy('fecha_pedido', 'desc') // El más nuevo
+            ->first();
+
+        return response()->json([
+            // Si no hay, enviamos null explícito para que el frontend sepa que debe crear uno
+            'data' => $res,
+            'mensaje' => $res ? 'Pedido pendiente encontrado' : 'No hay pedidos pendientes',
+        ]);
+    }
+
     /**
      * Display the specified resource.
      */

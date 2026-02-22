@@ -45,14 +45,17 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("calificaciones", CalificacionesController::class)->middleware('throttle:55000,1');
     Route::apiResource("pedidos", PedidosController::class)->middleware('throttle:55000,1');
     Route::get('pedidospedidiente/{id}', [PedidosController::class, 'getPedidopendiente'])->middleware('throttle:55000,1');
+    Route::get('pedidospreparacion/{id}', [PedidosController::class, 'getPedidopreparacion'])->middleware('throttle:55000,1');
     Route::apiResource("mesas", MesaController::class)->middleware('throttle:55000,1');
     Route::apiResource("detalle_pedidos", DetallePedidoController::class)->middleware('throttle:55000,1');
+    Route::get('pedidosrecientes', [DetallePedidoController::class, 'getDetallesPedidos'])->middleware('throttle:55000,1');
     Route::apiResource("facturas", FacturaController::class)->middleware('throttle:55000,1');
     Route::apiResource("detalle_facturas", DetalleFacturaController::class)->middleware('throttle:55000,1');
     Route::apiResource("inventarios", InventarioController::class)->middleware('throttle:55000,1');
     Route::apiResource("qr_mesas", QrMesaController::class)->middleware('throttle:55000,1');
     Route::apiResource("tiempos_preparacion", TiempoPreparacionController::class)->middleware('throttle:55000,1');
-    Route::get('/detalle_pedidos/pedido/{id_pedido}', [DetallePedidoController::class, 'getDetallesByPedido']);
+    Route::get('/detalle_pedidos/pedido/{id_pedido}', [DetallePedidoController::class, 'getDetallesByPedido'])->middleware('throttle:55000,1');
+    Route::get('/notificacionpedidos', [PedidosController::class, 'obtenerPedidosEnPreparacion'])->middleware('throttle:55000,1');
     Route::delete('/detalle_pedidos/vaciar/{id_pedido}', [DetallePedidoController::class, 'vaciarCarrito']);
     Route::delete('eliminarqrmesa/{id}', [QrMesaController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarqrmesa/{id}', [QrMesaController::class, 'habilitar'])->middleware('throttle:55000,1');

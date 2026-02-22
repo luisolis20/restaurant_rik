@@ -65,6 +65,53 @@ class DetallePedidoController extends Controller
         }
     }
 
+    public function getDetallesPedidos(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 20);
+            $perPage = min($perPage, 50);
+            $searchQuery = $request->input('search_query');
+            $status = $request->input('status');
+            $query = DetallePedido::select('detalle_pedidos.*', 'productos.nombre as producto_nombre',
+                'inventario.*', 'mesas.*', 'pedidos.*', 'productos.id_producto','tiempo_preparacion.*')
+                ->join('productos', 'detalle_pedidos.id_producto', '=', 'productos.id_producto')
+                ->join('inventario', 'detalle_pedidos.id_producto', '=', 'inventario.id_producto')
+                ->join('pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
+                ->join('mesas', 'pedidos.id_mesa', '=', 'mesas.id_mesa')
+                ->join('tiempo_preparacion', 'pedidos.id_pedido', '=', 'tiempo_preparacion.id_pedido');
+            if ($status !== null && $status !== '') {
+                $query->where('pedidos.estado_pedido', $status);
+            }
+            $data = $query->paginate($perPage);
+
+            if ($data->isEmpty()) {
+                return response()->json(['data' => [], 'message' => 'No se encontraron datos'], 200);
+            }
+            $groupedData = $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if (is_string($value)) {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+
+                return $attributes;
+            })->groupBy('id_pedido'); // <--- Agrupación aquí
+
+            return response()->json([
+                'data' => $groupedData, // Ahora los ítems vienen agrupados por su ID de pedido
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
