@@ -223,6 +223,28 @@
                 <i class="bi bi-cart-fill"></i>
                 <span class="cart-badge">{{ carrito.length }}</span>
             </div>
+            <div v-if="pedidoEnPreparacion" class="timer-floating-btn" @click="mostrarTiempo = !mostrarTiempo">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div v-if="mostrarTiempo" class="timer-sidebar shadow-lg">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <h5 class="mb-0">Estado de Preparación</h5>
+                    <button class="btn-close" @click="mostrarTiempo = false"></button>
+                </div>
+                <div class="p-4 text-center">
+                    <div v-if="!datosTiempo.tiempo_estimado_minutos || datosTiempo.tiempo_estimado_minutos === 0">
+                        <div class="spinner-border text-danger mb-3" role="status"></div>
+                        <p class="text-muted">El pedido aún no llega a manos del chef, apenas el chef lo tome el tiempo del pedido se va a actualizar.</p>
+                    </div>
+                    <div v-else>
+                        <h2 class="display-4 fw-bold text-danger">{{ datosTiempo.tiempo_estimado_minutos }} min</h2>
+                        <p>Tiempo estimado de entrega</p>
+                        <hr>
+                        <small class="text-muted">Iniciado a las: {{ formatearFecha(datosTiempo.fecha_inicio) }}</small>
+                    </div>
+                    <button class="btn btn-outline-secondary w-100 mt-4" @click="obtenerEstadoTiempo">Actualizar Estado</button>
+                </div>
+            </div>
 
             <div v-if="mostrarDetalle" class="cart-sidebar shadow-lg">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
@@ -249,7 +271,7 @@
                         <span>${{ totalPagar.toFixed(2) }}</span>
                     </div>
                     <button class="btn btn-danger w-100 mb-2" @click="vaciarCarritoTotal">Vaciar Carrito</button>
-                    <button class="btn btn-primary w-100" @click="procesarPago">Confirmar Pedido</button>
+                    <button class="btn btn-primary w-100" @click="confirmarPedido">Confirmar Pedido</button>
                 </div>
             </div>
         </div>
@@ -278,6 +300,10 @@ export default {
         return {
             carrito: [],
             mostrarDetalle: false,
+            mostrarTiempo: false, // Nuevo
+            pedidoEnPreparacion: null, // Guardará el ID del pedido enviado
+            datosTiempo: {},
+            intervaloTiempo: null,
             idMesa: null,
             baseUrl: "/restrik",
             bootstrapStyles: `
@@ -347,10 +373,38 @@ export default {
         if (usuario) {
             this.idMesa = usuario.id_mesa; // Ajusta según tu objeto user
             this.cargarPedidoPendiente();
+            await this.verificarPedidoEnCocina();
         }
+        this.intervaloTiempo = setInterval(() => {
+            if (this.pedidoEnPreparacion) this.obtenerEstadoTiempo();
+        }, 60000);
+    },
+    beforeUnmount() {
+        clearInterval(this.intervaloTiempo);
     },
 
     methods: {
+        async verificarPedidoEnCocina() {
+            try {
+                const res = await API.get(`${this.baseUrl}/pedidospreparacion/${this.idMesa}`);
+                // Si el backend devuelve un pedido pero su estado es 'preparacion'
+                // (Nota: Asegúrate que tu endpoint getPedidopendiente devuelva también los de preparacion o crea uno nuevo)
+                if (res.data.data && res.data.data.estado_pedido === 'preparacion') {
+                    this.pedidoEnPreparacion = res.data.data.id_pedido;
+                    this.obtenerEstadoTiempo();
+                }
+            } catch (e) { console.error(e); }
+        },
+        async obtenerEstadoTiempo() {
+            if (!this.pedidoEnPreparacion) return;
+            try {
+                // Necesitas este endpoint en Laravel: GET /tiempos_preparacion/{id_pedido}
+                const res = await API.get(`${this.baseUrl}/tiempos_preparacion/${this.pedidoEnPreparacion}`);
+                if (res.data.data) {
+                    this.datosTiempo = res.data.data;
+                }
+            } catch (e) { console.error("Error al obtener tiempos", e); }
+        },
         async cerrarSesion() {
             try {
                 const token = localStorage.getItem("token_rest");
@@ -372,6 +426,7 @@ export default {
 
                 console.log("✅ Sesión cerrada:", response.data)
                 localStorage.clear()
+                await this.vaciarCarritoTotal()
                 window.location.href = "/login"
             } catch (error) {
                 console.error("❌ Error al cerrar sesión:", error.response?.data || error)
@@ -425,7 +480,7 @@ export default {
 
                 if (response.status === 200) {
                     this.carrito = []; // Limpiamos la vista
-                    mostraralertas2("Carrito vaciado", "success");
+                    //mostraralertas2("Carrito vaciado", "success");
                     // Opcional: recargar menú si el stock se muestra ahí
                 }
             }
@@ -435,9 +490,45 @@ export default {
             }
         },
 
-        procesarPago() {
-            alert("Redirigiendo a pasarela de pago...");
+        async confirmarPedido() {
+            if (this.carrito.length === 0) return;
+            const idPed = this.carrito[0].id_pedido;
+            
+            const params = {
+                id_pedido: idPed,
+                id_mesa: this.idMesa,
+                fecha_pedido: new Date().toISOString(),
+                estado_pedido: 'preparacion',
+                total: this.totalPagar
+            };
+
+            try {
+                // 1. Actualizar estado del pedido
+                const response = await enviaractualizacionpedido("PUT", params, `${this.baseUrl}/pedidos/${idPed}`);
+                
+                if (response) {
+                    // 2. Crear registro en tiempos_preparacion
+                    const params2 = { id_pedido: idPed };
+                    const response2 = await enviaractualizacionpedido("POST", params2, `${this.baseUrl}/tiempos_preparacion`);
+                    
+                    if (response2) {
+                        this.pedidoEnPreparacion = idPed;
+                        this.carrito = [];
+                        this.mostrarDetalle = false;
+                        this.mostrarTiempo = true; // Mostramos el reloj automáticamente
+                        await this.obtenerEstadoTiempo();
+                        mostraralertas2("Pedido enviado a cocina", "success");
+                    }
+                }
+            } catch (error) {
+                console.error("❌ Error:", error);
+            }
+        },
+        formatearFecha(fecha) {
+            if (!fecha) return '--:--';
+            return new Date(fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
+        
     },
 };
 </script>
