@@ -84,19 +84,39 @@
                       Precio Total: ${{ productos[0].total }}
                     </span>
                     <br>
-                    <span class="text-gray-500 text-theme-xs dark:text-gray-400" v-if="productos[0].estado_pedido === 'cocinando'">
-                      El pedido estará listo en: {{ productos[0].tiempo_preparacion }} minutos
+                    <span class="text-gray-500 text-theme-xs dark:text-gray-400"
+                      v-if="productos[0].estado_pedido === 'cocinando'">
+                      El pedido estará listo en: {{ productos[0].tiempo_estimado_minutos }} minutos
                     </span>
                   </div>
-                  <div class="flex items-center gap-3" >
+                  <div class="flex items-center gap-3">
                     <div class="relative" v-if="productos[0].estado_pedido === 'preparacion'">
-                      <button @click="abrirModalEdicion(productos[0])"
+                      <button @click="abrirModalEdicion(idPedido, productos)"
                         class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
                         Ver pedido
                       </button>
                     </div>
-                    <div class="relative" v-if="productos[0].estado_pedido === 'cocinando'">
-                      <span>En </span>
+                    <div class="relative flex items-center gap-2" v-if="productos[0].estado_pedido === 'cocinando'">
+                      <div class="flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 dark:bg-brand-500/10">
+                        <svg class="animate-spin-slow text-brand-600" width="16" height="16" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+
+                        <span class="font-mono text-sm font-bold text-brand-700 dark:text-brand-400">
+                          {{ getTiempoRestante(productos[0].fecha_fin) }}
+                        </span>
+                      </div>
+
+                      <button @click="finalizarPedido(idPedido, productos)"
+                        class="text-gray-400 hover:text-success-600 transition-colors" title="Marcar como listo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -178,27 +198,67 @@
           </div>
 
           <form class="flex flex-col flex-1 overflow-hidden">
-            <div class="px-6 pb-4 overflow-y-auto custom-scrollbar lg:px-11">
-              <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                
-                <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Mesa que realiza el pedido 
+            <div class="px-6 pt-8 lg:px-11 lg:pt-11">
+              <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">Pedido #{{ objetoeditar.id_pedido }}</h4>
+              <p class="text-sm text-gray-500">Mesa: <span class="font-bold text-brand-500">{{ objetoeditar.codigo_mesa
+                  }}</span></p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-6 py-4 lg:px-11 custom-scrollbar">
+              <div class="mb-6 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <table class="w-full text-left text-sm">
+                  <thead class="bg-gray-50 dark:bg-white/5">
+                    <tr>
+                      <th class="p-3">Plato</th>
+                      <th class="p-3">Cant.</th>
+                      <th class="p-3">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in objetoeditar.productos" :key="item.id_detalle"
+                      class="border-t border-gray-100 dark:border-gray-800">
+                      <td class="p-3 font-medium">{{ item.producto_nombre }}</td>
+                      <td class="p-3">{{ item.cantidad }}</td>
+                      <td class="p-3">${{ (item.precio_unitario * item.cantidad).toFixed(2) }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-gray-50/50 font-bold">
+                      <td colspan="2" class="p-3 text-right">Total Pedido:</td>
+                      <td class="p-3 text-brand-600">${{ objetoeditar.total }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div
+                class="grid grid-cols-1 gap-4 lg:grid-cols-3 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+
+                <div class="lg:col-span-1">
+                  <label
+                    class="mb-1.5 block text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
+                    Tiempo Estimado (Minutos)
                   </label>
-                  <input type="text" disabled placeholder="0.00" v-model="objetoeditar.codigo_mesa"
-                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
+                  <input type="number" v-model.number="objetoeditar.tiempo_estimado_minutos" placeholder="Ej. 20"
+                    class="h-12 w-full rounded-xl border-2 border-brand-200 bg-white px-4 text-lg font-bold text-gray-800 focus:border-brand-500 focus:ring-0 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Cantidad Disponible
+                  <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Se marca inicio a las:
                   </label>
-                  <input type="number" v-model="objetoeditar.cantidad_disponible" min="-100"
-                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:text-white" />
-                  <p class="text-xs text-gray-400 italic">
-                    Si desea restar el stock, añada un valor negativo. Ej. -5
-                  </p>
+                  <input type="datetime-local" v-model="objetoeditar.fecha_inicio" disabled
+                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
                 </div>
+
+                <div>
+                  <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Finalización estimada:
+                  </label>
+                  <input type="datetime-local" v-model="objetoeditar.fecha_fin" disabled
+                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
+                </div>
+
               </div>
             </div>
 
@@ -222,11 +282,13 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onBeforeUnmount } from "vue";
+import { ref, watch, nextTick, onBeforeUnmount, onMounted, onUnmounted } from "vue";
 import Modal from "@/components/Modal/Modal.vue";
 
 const isProfileAddressModal = ref(false);
 const isEditModalOpen = ref(false);
+const ahoraRef = ref(new Date());
+let timerInterval = null;
 
 const cerrarModalDesdeAfuera = () => {
   isProfileAddressModal.value = false
@@ -238,6 +300,15 @@ defineExpose({
   isEditModalOpen,
   cerrarModalDesdeAfuera
 })
+onMounted(() => {
+  timerInterval = setInterval(() => {
+    ahoraRef.value = new Date();
+  }, 1000); // Actualiza cada segundo
+});
+
+onUnmounted(() => {
+  clearInterval(timerInterval);
+});
 
 </script>
 <script>
@@ -245,11 +316,13 @@ import API from "@/assets/js/services/axios";
 import { useRoute } from "vue-router";
 import debounce from "lodash.debounce";
 import Modal from "@/components/Modal/Modal.vue";
+import { getMe } from '@/store/auth';
 import {
   mostraralertas2,
   enviarsolig,
   confimar,
   confimarhabi,
+  enviarsoligtiempo,
 } from "@/assets/js/function/funciones";
 
 export default {
@@ -271,17 +344,16 @@ export default {
       objetoList: [],
       refreshKey: Date.now(),
       objetoeditar: {
-        id_tiempo: 0,
         id_pedido: 0,
+        id_tiempo: 0,
+        id_mesa: 0,
+        fecha_pedido: "",
+        codigo_mesa: "",
+        total: 0,
+        productos: [], // Lista para el modal
         tiempo_estimado_minutos: 0,
         fecha_inicio: "",
         fecha_fin: "",
-        precio: "",
-        imagen: "",
-        previewFoto: "",
-        nombre: "",
-        total: 0,
-        codigo_mesa: "",
       },
       isProfileAddressModal: false,
       id_usuario_chef: 0,
@@ -297,10 +369,34 @@ export default {
   computed: {
     formIsValidEdit() {
       return (
-        this.objetoeditar.id_usuario_chef !== 0 &&
-        this.objetoeditar.tiempo_estimado_minutos !== 0
+        this.objetoeditar.tiempo_estimado_minutos > 0 &&
+        this.objetoeditar.fecha_inicio !== ""
       );
     },
+  },
+  watch: {
+    'objetoeditar.tiempo_estimado_minutos': function (newVal) {
+      if (newVal > 0) {
+        const ahora = new Date();
+
+        // Formatear fecha para input datetime-local (YYYY-MM-DDTHH:mm)
+        const formatFecha = (date) => {
+          const tzOffset = date.getTimezoneOffset() * 60000; // offset en ms
+          const localISOTime = (new Date(date - tzOffset)).toISOString().slice(0, 16);
+          return localISOTime;
+        };
+
+        // Fecha Inicio: Ahora
+        this.objetoeditar.fecha_inicio = formatFecha(ahora);
+
+        // Fecha Fin: Ahora + N minutos
+        const fechaFin = new Date(ahora.getTime() + newVal * 60000);
+        this.objetoeditar.fecha_fin = formatFecha(fechaFin);
+      } else {
+        this.objetoeditar.fecha_inicio = "";
+        this.objetoeditar.fecha_fin = "";
+      }
+    }
   },
   async mounted() {
     const ruta = useRoute();
@@ -313,22 +409,71 @@ export default {
       const baseURL2 = API.defaults.baseURL;
       return `${baseURL2}/restrik/imagenprod/${ci}?v=${this.refreshKey}`;
     },
-    abrirModalEdicion(user) {
+    getTiempoRestante(fechaFin, idPedido) {
+      if (!fechaFin) return "Calculando...";
+
+      const fin = new Date(fechaFin.replace(' ', 'T'));
+      const dif = fin - this.$.setupState.ahoraRef;
+
+      if (dif <= 0) {
+        // SI EL TIEMPO SE CUMPLE:
+        // Evitamos múltiples llamadas verificando si ya estamos procesando este pedido
+        this.verificarYFinalizarAutomatico(idPedido);
+        return "¡Listo para servir!";
+      }
+
+      const minutos = Math.floor((dif % (1000 * 60 * 60)) / (1000 * 60));
+      const segundos = Math.floor((dif % (1000 * 60)) / 1000);
+      return `${minutos}:${segundos.toString().padStart(2, '0')} min`;
+    },
+    async verificarYFinalizarAutomatico(idPedido) {
+      // Buscamos si el pedido en el array local aún está como 'cocinando'
+      const pedido = this.filteredobjetoarray[idPedido];
+      if (pedido && pedido[0].estado_pedido === 'cocinando') {
+        // Marcamos localmente como 'listo' temporalmente para no repetir la llamada
+        pedido[0].estado_pedido = 'listo';
+        await this.ejecutarFinalizarPedido(idPedido);
+      }
+    },
+    async finalizarPedido(idPedido, productos) {
+
+
+      await this.ejecutarFinalizarPedido(idPedido);
+
+    },
+    async ejecutarFinalizarPedido(idPedido) {
+      try {
+        // Llamamos al nuevo endpoint de facturación
+        const response = await API.post(`${this.baseUrl}/finalizar-facturar/${idPedido}`);
+
+        if (response.status === 200) {
+          mostraralertas2("Pedido finalizado y factura generada", "success");
+          this.actualizar(); // Refresca la tabla
+        }
+      } catch (error) {
+        console.error("Error al finalizar pedido:", error);
+        mostraralertas2("Error al procesar la factura", "error");
+      }
+    },
+    abrirModalEdicion(idPedido, arrayProductos) {
+      const primerProducto = arrayProductos[0];
+      console.log(primerProducto);
       // Clonamos el objeto para no modificar la tabla directamente antes de guardar
+      const ahora = new Date().toISOString().slice(0, 16);
+
       this.objetoeditar = {
-        id_tiempo: user.id_tiempo,
-        id_pedido: user.id_pedido,
-        tiempo_estimado_minutos: user.tiempo_estimado_minutos,
-        fecha_inicio: user.fecha_inicio,
-        fecha_fin: user.fecha_fin,
-        precio: user.precio,
-        imagen: user.imagen,
-        previewFoto: "data:image/jpeg;base64," + user.imagen,
-        nombre: user.nombre,
-        total: user.total,
-        codigo_mesa: user.codigo_mesa,
+        id_pedido: idPedido,
+        id_tiempo: primerProducto.id_tiempo,
+        id_mesa: primerProducto.id_mesa,
+        fecha_pedido: primerProducto.fecha_pedido,
+        codigo_mesa: primerProducto.codigo_mesa,
+        total: primerProducto.total,
+        productos: arrayProductos,
+        tiempo_estimado_minutos: 0, // Valor sugerido
+        fecha_inicio: ahora,
+        fecha_fin: "",
       };
-      
+
       this.$.setupState.isEditModalOpen = true;
     },
     handleImageError(event) {
@@ -346,7 +491,6 @@ export default {
         // Usamos el endpoint que agrupamos en el paso anterior
         const response = await API.get(`${this.baseUrl}/pedidosrecientes`, { params });
 
-        // La data ahora es un objeto: { "1": [...], "2": [...] }
         this.filteredobjetoarray = response.data?.data || {};
 
         const pagination = response.data?.pagination || {};
@@ -387,6 +531,68 @@ export default {
       this.isFilterDropdownOpen = false;
       this.filterAndFetch();
     },
+    async Update() {
+      try {
+        const params = {
+          id_pedido: this.objetoeditar.id_pedido,
+          id_usuario_chef: this.id_usuario_chef,
+          tiempo_estimado_minutos: this.objetoeditar.tiempo_estimado_minutos,
+          fecha_inicio: this.objetoeditar.fecha_inicio,
+          fecha_fin: this.objetoeditar.fecha_fin,
+        };
+        const exito = await enviarsoligtiempo(
+          "PUT",
+          params,
+          `${this.baseUrl}/tiempos_preparacion/${this.objetoeditar.id_tiempo}`
+        );
+        if (exito) {
+          const params2 = {
+            id_mesa: this.objetoeditar.id_mesa,
+            fecha_pedido: this.objetoeditar.fecha_pedido,
+            estado_pedido: "cocinando",
+            total: this.objetoeditar.total,
+          };
+          const exito2 = await enviarsolig(
+            "PUT",
+            params2,
+            `${this.baseUrl}/pedidos/${this.objetoeditar.id_pedido}`,
+            "Tiempo del pedido definido y estado actualizado a cocinando"
+          );
+          if (exito2) {
+            this.$.setupState.isEditModalOpen = false;
+
+            this.objetoeditar = {
+              tiempo_estimado_minutos: 0,
+              fecha_inicio: "",
+              fecha_fin: "",
+            };
+            this.refreshKey = Date.now();
+            this.actualizar();
+          }
+        }
+        else {
+          this.actualizar();
+          this.$.setupState.isProfileAddressModal = false;
+        }
+      } catch (error) {
+        console.error("❌ Error al registrar usuario:", error.response?.data || error);
+      }
+    },
   },
 }
 </script>
+<style scoped>
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+</style>

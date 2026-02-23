@@ -1708,49 +1708,60 @@ body.pagehome {
 .pagehome .starter-section {
   /* Add your styles here */
 }
-/* Botón Flotante del Reloj */
+/* Botón flotante de tiempo */
 .timer-floating-btn {
     position: fixed;
-    bottom: 100px; /* Se ubica arriba del botón del carrito */
+    bottom: 100px; /* Arriba del carrito */
     right: 30px;
-    background-color: #F5B30F; /* Color oscuro profesional */
+    background-color: #198754;
     color: white;
     width: 60px;
     height: 60px;
     border-radius: 50%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     z-index: 9999;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
+    font-size: 10px;
 }
+.timer-floating-btn i { font-size: 20px; }
 
-.timer-floating-btn:hover {
-    transform: scale(1.1);
-}
-
-.timer-floating-btn i {
-    font-size: 24px;
-}
-
-/* Sidebar del Tiempo */
+/* Sidebar de Tiempos */
 .timer-sidebar {
     position: fixed;
     right: 0;
     top: 0;
-    width: 350px;
+    width: 400px;
     height: 100vh;
     background: white;
     z-index: 10000;
     display: flex;
     flex-direction: column;
     border-left: 1px solid #dee2e6;
-    animation: slideIn 0.3s ease-out;
+    overflow-y: auto;
 }
 
-@keyframes slideIn {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
+/* Animación de pedido listo */
+.ready-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.95);
+    z-index: 11000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.ready-card {
+    animation: bounceIn 0.8s ease;
+    color: #198754;
+}
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
 }

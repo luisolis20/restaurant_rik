@@ -237,6 +237,28 @@ export function enviarsolig(metodo, parametros, url, mensaje) {
         return false;
     });
 }
+export function enviarsoligtiempo(metodo, parametros, url) {
+    return API({
+        method: metodo,
+        url: url,
+        data: parametros
+    }).then(function (res) {
+        if (res.status == 200) {
+            return true; // Retornamos éxito
+        } else {
+            mostraralertas('No se pudo recuperar la respuesta', 'error');
+            return false;
+        }
+    }).catch(function (error) {
+        if (error.response.status == 409) {
+            mostraralertas(error.response.data.mensaje, 'warning');
+
+        } else {
+            mostraralertas('Servidor no Disponible', 'error');
+        }
+        return false;
+    });
+}
 export function enviaractualizacionpedido(metodo, parametros, url) {
     return API({
         method: metodo,

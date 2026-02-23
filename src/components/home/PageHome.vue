@@ -57,7 +57,7 @@
                     <!-- Section Title -->
                     <div class="container section-title">
                         <h2>Sobre Nosotros<br /></h2>
-                        <p><span>Nuestra  Pasión</span> <span class="description-title">por el Sabor</span></p>
+                        <p><span>Nuestra Pasión</span> <span class="description-title">por el Sabor</span></p>
                     </div>
                     <!-- End Section Title -->
 
@@ -73,9 +73,11 @@
                             <div class="col-lg-5">
                                 <div class="contentito ps-0 ps-lg-5">
                                     <p class="fst-italic">
-                                        En Rico Rico nacimos con el propósito de ofrecer platos frescos y llenos de tradición. Nos especializamos en mariscos, 
-                                        arroces y encocados preparados con ingredientes seleccionados cuidadosamente cada día.
-                                        
+                                        En Rico Rico nacimos con el propósito de ofrecer platos frescos y llenos de
+                                        tradición. Nos especializamos en mariscos,
+                                        arroces y encocados preparados con ingredientes seleccionados cuidadosamente
+                                        cada día.
+
                                     </p>
                                     <ul>
                                         <li>
@@ -92,7 +94,8 @@
                                         </li>
                                     </ul>
                                     <p>
-                                        Nuestro compromiso es brindar a cada cliente una experiencia gastronómica inolvidable en un ambiente acogedor y familiar. 
+                                        Nuestro compromiso es brindar a cada cliente una experiencia gastronómica
+                                        inolvidable en un ambiente acogedor y familiar.
                                         En Rico Rico, cada plato cuenta una historia.
                                     </p>
 
@@ -118,8 +121,10 @@
                                 <div class="why-box">
                                     <h3>¿Por qué elegir nuestro restaurante?</h3>
                                     <p>
-                                        En Rico Rico combinamos tradición y sabor en cada plato. Utilizamos ingredientes frescos y recetas auténticas para ofrecerte una experiencia gastronómica única. 
-                                        Nuestro compromiso es brindarte calidad, buen servicio y el verdadero sabor del mar en cada visita.
+                                        En Rico Rico combinamos tradición y sabor en cada plato. Utilizamos ingredientes
+                                        frescos y recetas auténticas para ofrecerte una experiencia gastronómica única.
+                                        Nuestro compromiso es brindarte calidad, buen servicio y el verdadero sabor del
+                                        mar en cada visita.
                                     </p>
                                     <div class="text-center">
                                         <a href="#" class="more-btn"><span>Learn More</span> <i
@@ -136,7 +141,8 @@
                                             class="icon-box d-flex flex-column justify-content-center align-items-center">
                                             <i class="bi bi-clipboard-data"></i>
                                             <h4>Ingredientes Frescos</h4>
-                                            <p>Seleccionamos productos frescos todos los días para garantizar el mejor sabor. </p>
+                                            <p>Seleccionamos productos frescos todos los días para garantizar el mejor
+                                                sabor. </p>
                                         </div>
                                     </div><!-- End Icon Box -->
 
@@ -154,7 +160,8 @@
                                             class="icon-box d-flex flex-column justify-content-center align-items-center">
                                             <i class="bi bi-inboxes"></i>
                                             <h4>Atención Personalizada</h4>
-                                            <p>Brindamos un servicio amable y rápido para que tu experiencia sea inolvidable.</p>
+                                            <p>Brindamos un servicio amable y rápido para que tu experiencia sea
+                                                inolvidable.</p>
                                         </div>
                                     </div><!-- End Icon Box -->
 
@@ -223,26 +230,56 @@
                 <i class="bi bi-cart-fill"></i>
                 <span class="cart-badge">{{ carrito.length }}</span>
             </div>
-            <div v-if="pedidoEnPreparacion" class="timer-floating-btn" @click="mostrarTiempo = !mostrarTiempo">
-                <i class="bi bi-clock-history"></i>
+            <div v-if="pedidosAgrupados.length > 0" class="timer-floating-btn" @click="mostrarTiempo = !mostrarTiempo">
+                <i class="bi bi-hourglass-split"></i>
+                <span class="fw-bold">{{ tiempoMasCercano }}</span>
             </div>
+
             <div v-if="mostrarTiempo" class="timer-sidebar shadow-lg">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                    <h5 class="mb-0">Estado de Preparación</h5>
-                    <button class="btn-close" @click="mostrarTiempo = false"></button>
+                    <h5 class="mb-0">Seguimiento de Cocina</h5>
+                    <button class="btn-close btn-close-dark" @click="mostrarTiempo = false"></button>
                 </div>
-                <div class="p-4 text-center">
-                    <div v-if="!datosTiempo.tiempo_estimado_minutos || datosTiempo.tiempo_estimado_minutos === 0">
-                        <div class="spinner-border text-danger mb-3" role="status"></div>
-                        <p class="text-muted">El pedido aún no llega a manos del chef, apenas el chef lo tome el tiempo del pedido se va a actualizar.</p>
+
+                <div class="p-3">
+                    <div v-for="pedido in pedidosAgrupados" :key="pedido.id_pedido" class="card mb-3 border-success">
+                        <div class="card-header bg-success text-white d-flex justify-content-between">
+                            <span>Pedido #{{ pedido.id_pedido }}</span>
+                            <span class="badge bg-light text-dark">Chef: {{ pedido.nombre_chef }}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <h2 class="display-6 fw-bold text-success">{{ pedido.cuentaRegresiva }}</h2>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                        :style="{ width: pedido.porcentaje + '%' }"></div>
+                                </div>
+                            </div>
+
+                            <h6>Platos:</h6>
+                            <ul class="list-group list-group-flush mb-3">
+                                <li v-for="prod in pedido.productos" :key="prod.id_detalle"
+                                    class="list-group-item d-flex justify-content-between py-1 small">
+                                    <span>{{ prod.cantidad }}x {{ prod.producto_nombre }}</span>
+                                    <span class="text-muted">${{ (prod.precio_unitario * prod.cantidad).toFixed(2)
+                                        }}</span>
+                                </li>
+                            </ul>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total Pedido:</span>
+                                <span>${{ pedido.total }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div v-else>
-                        <h2 class="display-4 fw-bold text-danger">{{ datosTiempo.tiempo_estimado_minutos }} min</h2>
-                        <p>Tiempo estimado de entrega</p>
-                        <hr>
-                        <small class="text-muted">Iniciado a las: {{ formatearFecha(datosTiempo.fecha_inicio) }}</small>
-                    </div>
-                    <button class="btn btn-outline-secondary w-100 mt-4" @click="obtenerEstadoTiempo">Actualizar Estado</button>
+                </div>
+            </div>
+
+            <div v-if="mostrarModalListo" class="ready-overlay" @click="mostrarModalListo = false">
+                <div class="ready-card">
+                    <i class="bi bi-check-circle-fill" style="font-size: 8rem;"></i>
+                    <h1 class="display-3 fw-bold">¡PEDIDO LISTO!</h1>
+                    <p class="fs-4">Tu deliciosa orden está saliendo de la cocina hacia tu mesa.</p>
+                    <button class="btn btn-success btn-lg mt-4 px-5 rounded-pill">¡Genial!</button>
                 </div>
             </div>
 
@@ -303,9 +340,14 @@ export default {
             mostrarTiempo: false, // Nuevo
             pedidoEnPreparacion: null, // Guardará el ID del pedido enviado
             datosTiempo: {},
-            intervaloTiempo: null,
+            intervaloReloj: null,
+            intervaloServidor: null,
             idMesa: null,
             baseUrl: "/restrik",
+            pedidosAgrupados: [],
+            ahora: new Date(),
+            mostrarModalListo: false,
+            tiempoMasCercano: "00:00",
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
@@ -375,35 +417,94 @@ export default {
             this.cargarPedidoPendiente();
             await this.verificarPedidoEnCocina();
         }
-        this.intervaloTiempo = setInterval(() => {
-            if (this.pedidoEnPreparacion) this.obtenerEstadoTiempo();
-        }, 60000);
+        this.intervaloReloj = setInterval(() => {
+            this.ahora = new Date();
+            this.actualizarContadores();
+        }, 1000);
+
+        // Consultar al servidor cada 30 segundos por si hay cambios de estado
+        this.intervaloServidor = setInterval(() => {
+            this.verificarPedidoEnCocina();
+        }, 30000);
     },
     beforeUnmount() {
-        clearInterval(this.intervaloTiempo);
+        clearInterval(this.intervaloReloj);
+        clearInterval(this.intervaloServidor);
     },
 
     methods: {
         async verificarPedidoEnCocina() {
+            if (!this.idMesa) return;
             try {
-                const res = await API.get(`${this.baseUrl}/pedidospreparacion/${this.idMesa}`);
-                // Si el backend devuelve un pedido pero su estado es 'preparacion'
-                // (Nota: Asegúrate que tu endpoint getPedidopendiente devuelva también los de preparacion o crea uno nuevo)
-                if (res.data.data && res.data.data.estado_pedido === 'preparacion') {
-                    this.pedidoEnPreparacion = res.data.data.id_pedido;
-                    this.obtenerEstadoTiempo();
+                const res = await API.get(`${this.baseUrl}/pedidoscocinando/${this.idMesa}`);
+                if (res.data.data && res.data.data.length > 0) {
+                    this.agruparPedidos(res.data.data);
+                } else {
+                    this.pedidosAgrupados = [];
                 }
             } catch (e) { console.error(e); }
         },
-        async obtenerEstadoTiempo() {
-            if (!this.pedidoEnPreparacion) return;
-            try {
-                // Necesitas este endpoint en Laravel: GET /tiempos_preparacion/{id_pedido}
-                const res = await API.get(`${this.baseUrl}/tiempos_preparacion/${this.pedidoEnPreparacion}`);
-                if (res.data.data) {
-                    this.datosTiempo = res.data.data;
+
+        agruparPedidos(dataRaw) {
+            const grupos = {};
+            dataRaw.forEach(item => {
+                if (!grupos[item.id_pedido]) {
+                    grupos[item.id_pedido] = {
+                        id_pedido: item.id_pedido,
+                        nombre_chef: item.nombre + ' ' + item.apellido,
+                        fecha_inicio: new Date(item.fecha_inicio.replace(' ', 'T')),
+                        fecha_fin: new Date(item.fecha_fin.replace(' ', 'T')),
+                        total: item.total,
+                        productos: [],
+                        cuentaRegresiva: "00:00",
+                        porcentaje: 0,
+                        yaNotificado: false
+                    };
                 }
-            } catch (e) { console.error("Error al obtener tiempos", e); }
+                grupos[item.id_pedido].productos.push(item);
+            });
+            this.pedidosAgrupados = Object.values(grupos);
+        },
+
+        actualizarContadores() {
+            let minTime = Infinity;
+
+            this.pedidosAgrupados.forEach(pedido => {
+                const totalMs = pedido.fecha_fin - pedido.fecha_inicio;
+                const restanteMs = pedido.fecha_fin - this.ahora;
+
+                if (restanteMs <= 0) {
+                    pedido.cuentaRegresiva = "¡LISTO!";
+                    pedido.porcentaje = 100;
+
+                    // Si acaba de terminar y no hemos mostrado el modal
+                    if (!pedido.yaNotificado) {
+                        this.mostrarModalListo = true;
+                        pedido.yaNotificado = true;
+                        // Opcional: Sonido de notificación
+                    }
+                } else {
+                    const totalSegundos = Math.floor(restanteMs / 1000);
+                    const minutos = Math.floor(totalSegundos / 60);
+                    const segundos = totalSegundos % 60;
+                    pedido.cuentaRegresiva = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+
+                    // Calcular progreso de la barra
+                    const transcurridoMs = this.ahora - pedido.fecha_inicio;
+                    pedido.porcentaje = Math.min((transcurridoMs / totalMs) * 100, 100);
+
+                    if (totalSegundos < minTime) minTime = totalSegundos;
+                }
+            });
+
+            // Actualizar el tiempo del botón flotante con el pedido más próximo
+            if (minTime !== Infinity) {
+                const m = Math.floor(minTime / 60);
+                const s = minTime % 60;
+                this.tiempoMasCercano = `${m}:${s.toString().padStart(2, '0')}`;
+            } else {
+                this.tiempoMasCercano = "LISTO";
+            }
         },
         async cerrarSesion() {
             try {
@@ -493,7 +594,7 @@ export default {
         async confirmarPedido() {
             if (this.carrito.length === 0) return;
             const idPed = this.carrito[0].id_pedido;
-            
+
             const params = {
                 id_pedido: idPed,
                 id_mesa: this.idMesa,
@@ -505,18 +606,18 @@ export default {
             try {
                 // 1. Actualizar estado del pedido
                 const response = await enviaractualizacionpedido("PUT", params, `${this.baseUrl}/pedidos/${idPed}`);
-                
+
                 if (response) {
                     // 2. Crear registro en tiempos_preparacion
                     const params2 = { id_pedido: idPed };
                     const response2 = await enviaractualizacionpedido("POST", params2, `${this.baseUrl}/tiempos_preparacion`);
-                    
+
                     if (response2) {
                         this.pedidoEnPreparacion = idPed;
                         this.carrito = [];
                         this.mostrarDetalle = false;
                         this.mostrarTiempo = true; // Mostramos el reloj automáticamente
-                        await this.obtenerEstadoTiempo();
+                        
                         mostraralertas2("Pedido enviado a cocina", "success");
                     }
                 }
@@ -528,7 +629,7 @@ export default {
             if (!fecha) return '--:--';
             return new Date(fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-        
+
     },
 };
 </script>
