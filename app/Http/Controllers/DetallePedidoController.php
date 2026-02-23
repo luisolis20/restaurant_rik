@@ -73,12 +73,12 @@ class DetallePedidoController extends Controller
             $searchQuery = $request->input('search_query');
             $status = $request->input('status');
             $query = DetallePedido::select('detalle_pedidos.*', 'productos.nombre as producto_nombre',
-                'inventario.*', 'mesas.*', 'pedidos.*', 'productos.id_producto','tiempo_preparacion.*')
+                'inventario.*', 'mesas.*', 'pedidos.*', 'productos.id_producto','tiempos_preparacion.*')
                 ->join('productos', 'detalle_pedidos.id_producto', '=', 'productos.id_producto')
                 ->join('inventario', 'detalle_pedidos.id_producto', '=', 'inventario.id_producto')
                 ->join('pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
                 ->join('mesas', 'pedidos.id_mesa', '=', 'mesas.id_mesa')
-                ->join('tiempo_preparacion', 'pedidos.id_pedido', '=', 'tiempo_preparacion.id_pedido');
+                ->join('tiempos_preparacion', 'pedidos.id_pedido', '=', 'tiempos_preparacion.id_pedido');
             if ($status !== null && $status !== '') {
                 $query->where('pedidos.estado_pedido', $status);
             }

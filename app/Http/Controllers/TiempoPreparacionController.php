@@ -84,7 +84,11 @@ class TiempoPreparacionController extends Controller
      */
     public function show(string $id)
     {
-        $res = TiempoPreparacion::find($id);
+        $res = TiempoPreparacion::Select('tiempos_preparacion.*','pedidos.*','usuarios.*')
+        ->join('pedidos', 'pedidos.id_pedido', '=', 'tiempos_preparacion.id_pedido')
+        ->join('usuarios', 'usuarios.id_usuario', '=', 'tiempos_preparacion.id_usuario_chef')
+        ->where('pedidos.id_pedido', $id)
+        ->first();
         if (isset($res)) {
             // Verificar si la imagen existe y codificarla en base64
             // $res->imagen = $res->imagen ? base64_encode($res->imagen) : null;
@@ -96,9 +100,10 @@ class TiempoPreparacionController extends Controller
         } else {
             return response()->json([
                 'error' => true,
-                'mensaje' => "El Tiempo de Preparación con id: $id no Existe",
+                'mensaje' => "La Calificacion con id: $id no Existe",
             ]);
         }
+      
     }
 
     /**

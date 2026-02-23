@@ -46,10 +46,12 @@ Route::prefix('restrik')->group(function () {
     Route::apiResource("pedidos", PedidosController::class)->middleware('throttle:55000,1');
     Route::get('pedidospedidiente/{id}', [PedidosController::class, 'getPedidopendiente'])->middleware('throttle:55000,1');
     Route::get('pedidospreparacion/{id}', [PedidosController::class, 'getPedidopreparacion'])->middleware('throttle:55000,1');
+    Route::get('pedidoscocinando/{id}', [PedidosController::class, 'getPedidococinando'])->middleware('throttle:55000,1');
     Route::apiResource("mesas", MesaController::class)->middleware('throttle:55000,1');
     Route::apiResource("detalle_pedidos", DetallePedidoController::class)->middleware('throttle:55000,1');
     Route::get('pedidosrecientes', [DetallePedidoController::class, 'getDetallesPedidos'])->middleware('throttle:55000,1');
     Route::apiResource("facturas", FacturaController::class)->middleware('throttle:55000,1');
+    Route::post('finalizar-facturar/{id}', [FacturaController::class, 'finalizarYFacturar'])->middleware('throttle:55000,1');
     Route::apiResource("detalle_facturas", DetalleFacturaController::class)->middleware('throttle:55000,1');
     Route::apiResource("inventarios", InventarioController::class)->middleware('throttle:55000,1');
     Route::apiResource("qr_mesas", QrMesaController::class)->middleware('throttle:55000,1');

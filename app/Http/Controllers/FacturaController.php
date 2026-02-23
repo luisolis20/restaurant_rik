@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetalleFactura;
 use App\Models\Factura;
+use App\Models\Pedido;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class FacturaController extends Controller
 {
@@ -24,14 +26,13 @@ class FacturaController extends Controller
                 'pedidos.fecha_pedido as fecha_pedido',
             )
                 ->join('pedidos', 'pedidos.id_pedido', '=', 'facturas.id_pedido');
-             if (! empty($searchQuery)) {
+            if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('facturas.numero_factura', 'LIKE', "%{$searchQuery}%");
-                   
-            
+
                 });
             }
-        
+
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -44,6 +45,7 @@ class FacturaController extends Controller
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
+
                 return $attributes;
             });
 
@@ -55,10 +57,10 @@ class FacturaController extends Controller
                     'total' => $data->total(),
                     'last_page' => $data->lastPage(),
                 ],
-                
+
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
 
@@ -68,11 +70,12 @@ class FacturaController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
+        // $inputs["password"] = md5($request->password);
         $res = Factura::create($inputs);
+
         return response()->json([
             'data' => $res,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => 'Agregado con Éxito!!',
         ]);
     }
 
@@ -88,7 +91,7 @@ class FacturaController extends Controller
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Encontrado con Éxito!!",
+                'mensaje' => 'Encontrado con Éxito!!',
             ]);
         } else {
             return response()->json([
@@ -111,19 +114,19 @@ class FacturaController extends Controller
             $res->tipo_comprobante = $request->tipo_comprobante;
             $res->subtotal = $request->subtotal;
             $res->iva = $request->iva;
-            $res->total = $request->total;   
-            $res->estado_factura = $request->estado_factura;   
-            $res->fecha_emision = $request->fecha_emision; 
-                
+            $res->total = $request->total;
+            $res->estado_factura = $request->estado_factura;
+            $res->fecha_emision = $request->fecha_emision;
+
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => 'Actualizado con Éxito!!',
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => 'Error al Actualizar',
                 ]);
             }
         } else {
@@ -137,13 +140,55 @@ class FacturaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   
-    
-    
+    public function finalizarYFacturar(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Cargamos el pedido con sus detalles Y el producto de cada detalle
+            // Usamos el punto (.) para cargar la relación anidada
+            $pedido = Pedido::with('detalles.producto')->findOrFail($id);
+
+            if ($pedido->estado_pedido === 'listo') {
+                return response()->json(['mensaje' => 'El pedido ya fue finalizado'], 400);
+            }
+
+            // 2. Actualizar estado del pedido
+            $pedido->update(['estado_pedido' => 'listo']);
+
+            // 3. Crear la factura
+            $factura = Factura::create([
+                'id_pedido' => $pedido->id_pedido,
+                'numero_factura' => 'FAC-'.strtoupper(uniqid()),
+                'tipo_comprobante' => 'factura',
+                'subtotal' => $pedido->total,
+                'total' => $pedido->total,
+                'estado_factura' => 'pendiente',
+            ]);
+
+            // 4. Registrar detalles de factura
+            foreach ($pedido->detalles as $detalle) {
+                // Accedemos al nombre a través de la relación 'producto'
+                // Usamos un valor por defecto ('Producto desconocido') por seguridad
+                $nombreProducto = $detalle->producto ? $detalle->producto->nombre : 'Producto sin nombre';
+
+                DetalleFactura::create([
+                    'id_factura' => $factura->id_factura,
+                    'descripcion' => $nombreProducto,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json(['mensaje' => 'Pedido listo y factura generada'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['error' => 'Error en servidor: '.$e->getMessage()], 500);
+        }
+    }
 }
-
-
-
-
-
-
