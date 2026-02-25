@@ -500,6 +500,8 @@ export default {
       } catch (error) {
         console.warn("⚠️ Error:", error);
         this.filteredobjetoarray = {};
+        this.currentPage = 1;
+        this.lastPage = 1;
       } finally {
         this.cargando = false;
       }
