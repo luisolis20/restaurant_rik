@@ -105,7 +105,7 @@
                         </svg>
 
                         <span class="font-mono text-sm font-bold text-brand-700 dark:text-brand-400">
-                          {{ getTiempoRestante(productos[0].fecha_fin) }}
+                          {{ getTiempoRestante(productos[0].fecha_fin, idPedido) }}
                         </span>
                       </div>
 
@@ -116,6 +116,20 @@
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
+                      </button>
+                    </div>
+                    <div class="relative" v-if="productos[0].estado_pedido === 'listo'">
+                      <button @click="abrirModalFactura(idPedido)"
+                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Ver Factura
                       </button>
                     </div>
                   </div>
@@ -201,7 +215,7 @@
             <div class="px-6 pt-8 lg:px-11 lg:pt-11">
               <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">Pedido #{{ objetoeditar.id_pedido }}</h4>
               <p class="text-sm text-gray-500">Mesa: <span class="font-bold text-brand-500">{{ objetoeditar.codigo_mesa
-                  }}</span></p>
+              }}</span></p>
             </div>
 
             <div class="flex-1 overflow-y-auto px-6 py-4 lg:px-11 custom-scrollbar">
@@ -278,6 +292,91 @@
         </div>
       </template>
     </Modal>
+    <Modal v-if="isInvoiceModalOpen" @close="isInvoiceModalOpen = false">
+      <template #body>
+        <div
+          class="relative w-full max-w-[600px] max-h-[90vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 shadow-2xl">
+
+          <div class="px-8 pt-8 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="text-2xl font-bold text-gray-800 dark:text-white uppercase">
+                  {{ facturaData.tipo_comprobante }}
+                </h4>
+                <p class="text-brand-600 font-mono font-bold">{{ facturaData.numero_factura }}</p>
+              </div>
+              <button @click="isInvoiceModalOpen = false" class="text-gray-400 hover:text-gray-600">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+              <div>
+                <p class="text-gray-500">Fecha de Emisión:</p>
+                <p class="font-medium dark:text-gray-300">{{ facturaData.fecha_emision }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-gray-500">Pedido Origen:</p>
+                <p class="font-medium dark:text-gray-300">#{{ facturaData.id_pedido }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="text-gray-400 border-b border-gray-100 dark:border-gray-800">
+                  <th class="pb-3 font-medium">Descripción</th>
+                  <th class="pb-3 font-medium text-center">Cant.</th>
+                  <th class="pb-3 font-medium text-right">Precio</th>
+                  <th class="pb-3 font-medium text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                <tr v-for="item in facturaDetalle" :key="item.id_detalle_factura">
+                  <td class="py-4 dark:text-gray-300">{{ item.descripcion }}</td>
+                  <td class="py-4 text-center dark:text-gray-300">{{ item.cantidad }}</td>
+                  <td class="py-4 text-right dark:text-gray-300">${{ item.precio_unitario }}</td>
+                  <td class="py-4 text-right font-medium dark:text-white">${{ item.subtotal }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="px-8 py-6 bg-gray-50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-gray-800">
+            <div class="flex flex-col gap-2 w-full max-w-[200px] ml-auto">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Subtotal:</span>
+                <span class="font-medium dark:text-gray-300">${{ facturaData.subtotal }}</span>
+              </div>
+              <div class="flex justify-between text-xl font-bold border-t border-gray-200 dark:border-gray-700 pt-2">
+                <span class="text-gray-800 dark:text-white">TOTAL:</span>
+                <span class="text-brand-600">${{ facturaData.total }}</span>
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-3">
+              <button @click="isInvoiceModalOpen = false"
+                class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                Cerrar
+              </button>
+              <button
+                class="flex-1 bg-gray-800 dark:bg-brand-500 text-white px-4 py-2.5 rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-2 4H6a2 2 0 0 1-2-2v-4h12v4a2 2 0 0 1-2 2z">
+                  </path>
+                </svg>
+                Imprimir
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -287,8 +386,8 @@ import Modal from "@/components/Modal/Modal.vue";
 
 const isProfileAddressModal = ref(false);
 const isEditModalOpen = ref(false);
-const ahoraRef = ref(new Date());
-let timerInterval = null;
+/*const ahoraRef = ref(new Date());
+let timerInterval = null;*/
 
 const cerrarModalDesdeAfuera = () => {
   isProfileAddressModal.value = false
@@ -300,7 +399,7 @@ defineExpose({
   isEditModalOpen,
   cerrarModalDesdeAfuera
 })
-onMounted(() => {
+/*onMounted(() => {
   timerInterval = setInterval(() => {
     ahoraRef.value = new Date();
   }, 1000); // Actualiza cada segundo
@@ -308,7 +407,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timerInterval);
-});
+});*/
 
 </script>
 <script>
@@ -357,6 +456,13 @@ export default {
       },
       isProfileAddressModal: false,
       id_usuario_chef: 0,
+      ahora: new Date(), // Timer centralizado aquí
+      timerInterval: null,
+      pedidosEnProceso: new Set(), // Para evitar llamadas duplicadas
+      pollingInterval: null,
+      isInvoiceModalOpen: false,
+      facturaData: {},
+      facturaDetalle: [],
 
     }
   },
@@ -365,6 +471,12 @@ export default {
     this.debouncedFilter = debounce(() => {
       this.filterAndFetch();
     }, 900);
+  },
+  unmounted() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   },
   computed: {
     formIsValidEdit() {
@@ -399,6 +511,13 @@ export default {
     }
   },
   async mounted() {
+    this.timerInterval = setInterval(() => {
+      this.ahora = new Date();
+      // console.log("Reloj funcionando:", this.ahora); // Para debugear
+    }, 1000);
+    this.pollingInterval = setInterval(() => {
+      this.actualizarSilenciosamente();
+    }, 30000);
     const ruta = useRoute();
     const usuario = await getMe();
     this.id_usuario_chef = usuario.id_usuario;
@@ -409,30 +528,66 @@ export default {
       const baseURL2 = API.defaults.baseURL;
       return `${baseURL2}/restrik/imagenprod/${ci}?v=${this.refreshKey}`;
     },
+    async abrirModalFactura(idPedido) {
+      try {
+        // 1. Buscamos la factura asociada al pedido
+        const response = await API.get(`${this.baseUrl}/factura-por-pedido/${idPedido}`);
+
+        if (response.data) {
+          this.facturaData = response.data.factura;
+          this.facturaDetalle = response.data.detalles;
+          this.isInvoiceModalOpen = true;
+        } else {
+          mostraralertas2("No se encontró la factura para este pedido", "error");
+        }
+      } catch (error) {
+        console.error("Error al obtener factura:", error);
+        mostraralertas2("Error al cargar los datos de la factura", "error");
+      }
+    },
+    async actualizarSilenciosamente() {
+      try {
+        const params = { page: this.currentPage, status: this.selectedStatus };
+        const response = await API.get(`${this.baseUrl}/pedidosrecientes`, { params });
+        this.filteredobjetoarray = response.data?.data || {};
+        this.lastPage = response.data?.pagination?.last_page || 1;
+      } catch (error) {
+        console.warn("Error en actualización silenciosa", error);
+      }
+    },
     getTiempoRestante(fechaFin, idPedido) {
       if (!fechaFin) return "Calculando...";
 
       const fin = new Date(fechaFin.replace(' ', 'T'));
-      const dif = fin - this.$.setupState.ahoraRef;
+      const dif = fin - this.ahora;
 
       if (dif <= 0) {
-        // SI EL TIEMPO SE CUMPLE:
-        // Evitamos múltiples llamadas verificando si ya estamos procesando este pedido
+        // Disparamos la verificación sin bloquear el renderizado
         this.verificarYFinalizarAutomatico(idPedido);
-        return "¡Listo para servir!";
+        return "¡Listo!";
       }
 
-      const minutos = Math.floor((dif % (1000 * 60 * 60)) / (1000 * 60));
-      const segundos = Math.floor((dif % (1000 * 60)) / 1000);
+      const minutos = Math.floor((dif / 1000 / 60));
+      const segundos = Math.floor((dif / 1000) % 60);
       return `${minutos}:${segundos.toString().padStart(2, '0')} min`;
     },
     async verificarYFinalizarAutomatico(idPedido) {
-      // Buscamos si el pedido en el array local aún está como 'cocinando'
-      const pedido = this.filteredobjetoarray[idPedido];
-      if (pedido && pedido[0].estado_pedido === 'cocinando') {
-        // Marcamos localmente como 'listo' temporalmente para no repetir la llamada
-        pedido[0].estado_pedido = 'listo';
+      // 1. Si ya se está procesando, ignorar
+      if (this.pedidosEnProceso.has(idPedido)) return;
+
+      const pedidoContenedor = this.filteredobjetoarray[idPedido];
+      if (pedidoContenedor && pedidoContenedor[0].estado_pedido === 'cocinando') {
+
+        // 2. Bloqueamos localmente antes de la petición
+        this.pedidosEnProceso.add(idPedido);
+
+        // Opcional: Cambiar estado visual inmediatamente
+        pedidoContenedor[0].estado_pedido = 'listo';
+
         await this.ejecutarFinalizarPedido(idPedido);
+
+        // 3. Limpiamos el bloqueo tras terminar
+        this.pedidosEnProceso.delete(idPedido);
       }
     },
     async finalizarPedido(idPedido, productos) {
@@ -562,14 +717,14 @@ export default {
           );
           if (exito2) {
             this.$.setupState.isEditModalOpen = false;
+            this.actualizar();
+            this.refreshKey = Date.now();
 
             this.objetoeditar = {
               tiempo_estimado_minutos: 0,
               fecha_inicio: "",
               fecha_fin: "",
             };
-            this.refreshKey = Date.now();
-            this.actualizar();
           }
         }
         else {
@@ -577,7 +732,11 @@ export default {
           this.$.setupState.isProfileAddressModal = false;
         }
       } catch (error) {
-        console.error("❌ Error al registrar usuario:", error.response?.data || error);
+        console.error("Error al actualizar:", error);
+        mostraralertas2("Ocurrió un error al guardar", "error");
+      } finally {
+        // Pase lo que pase, nos aseguramos que el estado de carga se limpie
+        this.cargando = false;
       }
     },
   },
