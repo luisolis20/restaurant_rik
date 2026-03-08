@@ -75,6 +75,7 @@ Route::prefix('restrik')->group(function () {
     Route::delete('eliminarproducto/{id}', [ProductoController::class, 'destroy'])->middleware('throttle:55000,1');
     Route::delete('habilitarproducto/{id}', [ProductoController::class, 'habilitar'])->middleware('throttle:55000,1');
     Route::get('imagenprod/{ci}', [ProductoController::class, 'getFotografia'])->middleware('throttle:55000,1');
+    Route::get('/factura-por-pedido/{id_pedido}', [FacturaController::class, 'getFacturaByPedido']);
     Route::middleware('auth:api,mesa_guard')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('refresh', [AuthController::class, 'refresh']);

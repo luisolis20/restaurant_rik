@@ -191,4 +191,40 @@ class FacturaController extends Controller
             return response()->json(['error' => 'Error en servidor: '.$e->getMessage()], 500);
         }
     }
+    public function getFacturaByPedido($id_pedido)
+    {
+        try {
+            // Buscamos la factura usando el ID del pedido
+            // 'detalles' es el nombre de la relación definida en el modelo Factura
+            $factura = Factura::with('detalles')
+                ->where('id_pedido', $id_pedido)
+                ->first();
+
+            if (!$factura) {
+                return response()->json([
+                    'message' => 'No se encontró factura para el pedido #' . $id_pedido
+                ], 404);
+            }
+
+            // Formateamos la respuesta para el modal de Vue
+            return response()->json([
+                'factura' => [
+                    'id_factura'      => $factura->id_factura,
+                    'id_pedido'       => $factura->id_pedido,
+                    'numero_factura'  => $factura->numero_factura,
+                    'tipo_comprobante'=> ucfirst(str_replace('_', ' ', $factura->tipo_comprobante)),
+                    'subtotal'        => number_format($factura->subtotal, 2, '.', ''),
+                    'total'           => number_format($factura->total, 2, '.', ''),
+                    'fecha_emision'   => $factura->fecha_emision->format('d/m/Y H:i'),
+                ],
+                'detalles' => $factura->detalles // Esto trae el array de detalle_facturas
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener la factura',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

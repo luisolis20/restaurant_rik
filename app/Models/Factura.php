@@ -70,4 +70,8 @@ class Factura extends Model
             'id_pedido'    // PK en pedidos
         );
     }
+    public function detalles()
+    {
+        return $this->hasMany(DetalleFactura::class, 'id_factura', 'id_factura');
+    }
 }
