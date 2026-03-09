@@ -32,7 +32,6 @@ class Factura extends Model
         'numero_factura',
         'tipo_comprobante',
         'subtotal',
-        'iva',
         'total',
         'estado_factura',
         'fecha_emision',

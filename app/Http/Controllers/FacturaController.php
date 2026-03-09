@@ -29,7 +29,6 @@ class FacturaController extends Controller
             if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('facturas.numero_factura', 'LIKE', "%{$searchQuery}%");
-
                 });
             }
 
@@ -60,7 +59,7 @@ class FacturaController extends Controller
 
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
 
@@ -110,10 +109,8 @@ class FacturaController extends Controller
         if (isset($res)) {
             $res->id_pedido = $request->id_pedido;
             $res->numero_factura = $request->numero_factura;
-            $res->comentario = $request->comentario;
             $res->tipo_comprobante = $request->tipo_comprobante;
             $res->subtotal = $request->subtotal;
-            $res->iva = $request->iva;
             $res->total = $request->total;
             $res->estado_factura = $request->estado_factura;
             $res->fecha_emision = $request->fecha_emision;
@@ -159,7 +156,7 @@ class FacturaController extends Controller
             // 3. Crear la factura
             $factura = Factura::create([
                 'id_pedido' => $pedido->id_pedido,
-                'numero_factura' => 'FAC-'.strtoupper(uniqid()),
+                'numero_factura' => 'FAC-' . strtoupper(uniqid()),
                 'tipo_comprobante' => 'factura',
                 'subtotal' => $pedido->total,
                 'total' => $pedido->total,
@@ -184,11 +181,10 @@ class FacturaController extends Controller
             DB::commit();
 
             return response()->json(['mensaje' => 'Pedido listo y factura generada'], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json(['error' => 'Error en servidor: '.$e->getMessage()], 500);
+            return response()->json(['error' => 'Error en servidor: ' . $e->getMessage()], 500);
         }
     }
     public function getFacturaByPedido($id_pedido)
@@ -196,7 +192,7 @@ class FacturaController extends Controller
         try {
             // Buscamos la factura usando el ID del pedido
             // 'detalles' es el nombre de la relación definida en el modelo Factura
-            $factura = Factura::with('detalles')
+            $factura = Factura::with(['detalles', 'pedido.mesa'])
                 ->where('id_pedido', $id_pedido)
                 ->first();
 
@@ -212,14 +208,21 @@ class FacturaController extends Controller
                     'id_factura'      => $factura->id_factura,
                     'id_pedido'       => $factura->id_pedido,
                     'numero_factura'  => $factura->numero_factura,
-                    'tipo_comprobante'=> ucfirst(str_replace('_', ' ', $factura->tipo_comprobante)),
+                    'tipo_comprobante' => ucfirst(str_replace('_', ' ', $factura->tipo_comprobante)),
                     'subtotal'        => number_format($factura->subtotal, 2, '.', ''),
                     'total'           => number_format($factura->total, 2, '.', ''),
                     'fecha_emision'   => $factura->fecha_emision->format('d/m/Y H:i'),
+                    'estado_factura'   => $factura->estado_factura,
+
+                    // --- Datos de la Mesa extraídos a través del pedido ---
+                    'mesa' => [
+                        'id_mesa'     => $factura->pedido->mesa->id_mesa ?? null,
+                        'codigo_mesa' => $factura->pedido->mesa->codigo_mesa ?? 'N/A',
+                        'capacidad'   => $factura->pedido->mesa->capacidad ?? 0,
+                    ]
                 ],
                 'detalles' => $factura->detalles // Esto trae el array de detalle_facturas
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al obtener la factura',

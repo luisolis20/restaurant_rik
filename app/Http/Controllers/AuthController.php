@@ -67,6 +67,7 @@ class AuthController extends Controller
                     'mensaje' => 'Código QR incorrecto',
                 ], Response::HTTP_UNAUTHORIZED);
             }
+            $usermesa->update(['estado' => 'ocupada']);
 
             // ERROR CORREGIDO: Usamos $usermesa, no $user (que es null aquí)
             $token2 = auth()->login($usermesa);
@@ -113,6 +114,13 @@ class AuthController extends Controller
             $token = JWTAuth::getToken();
             if (! $token) {
                 return response()->json(['error' => 'No hay token'], Response::HTTP_BAD_REQUEST);
+            }
+            // Intentamos obtener el usuario del token antes de invalidarlo
+            $user = JWTAuth::toUser($token);
+            
+            // Si el usuario que cierra sesión es una instancia del modelo Mesa
+            if ($user instanceof \App\Models\Mesa) {
+                $user->update(['estado' => 'libre']);
             }
             JWTAuth::invalidate($token);
 

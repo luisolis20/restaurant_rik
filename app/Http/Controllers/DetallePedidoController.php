@@ -78,7 +78,8 @@ class DetallePedidoController extends Controller
                 ->join('inventario', 'detalle_pedidos.id_producto', '=', 'inventario.id_producto')
                 ->join('pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
                 ->join('mesas', 'pedidos.id_mesa', '=', 'mesas.id_mesa')
-                ->join('tiempos_preparacion', 'pedidos.id_pedido', '=', 'tiempos_preparacion.id_pedido');
+                ->join('tiempos_preparacion', 'pedidos.id_pedido', '=', 'tiempos_preparacion.id_pedido')
+                ->where('pedidos.estado_pedido', '!=', 'pagado');
             if ($status !== null && $status !== '') {
                 $query->where('pedidos.estado_pedido', $status);
             }
