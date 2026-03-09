@@ -1765,3 +1765,78 @@ body.pagehome {
     70% { transform: scale(0.9); }
     100% { transform: scale(1); opacity: 1; }
 }
+/* Estilos para pantalla */
+#print-section { display: none; }
+
+@media print {
+  /* Configuración de página para ticket (80mm es el estándar) */
+  @page {
+    margin: 0;
+    size: 80mm auto; /* 'auto' permite que el largo crezca según el contenido */
+  }
+
+  body * { visibility: hidden; }
+
+  #print-section, #print-section * {
+    visibility: visible;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  #print-section {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm; /* Ajustar a 58mm si tu impresora es más pequeña */
+    padding: 2mm;
+    font-family: 'Courier New', Courier, monospace; /* Fuente mono para alineación perfecta */
+    font-size: 12px;
+  }
+
+  .ticket-wrapper { width: 100%; }
+
+  .ticket-logo {
+    width: 60%;
+    display: block;
+    margin: 0 auto 10px;
+    filter: grayscale(1); /* Forzar blanco y negro */
+  }
+
+  .ticket-header { text-align: center; margin-bottom: 10px; }
+  .ticket-title { font-size: 16px; font-weight: bold; margin: 0; }
+  .ticket-number { font-size: 14px; margin: 2px 0; }
+
+  .ticket-info p { margin: 2px 0; font-size: 11px; }
+
+  .ticket-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .ticket-table th {
+    border-bottom: 1px dashed #000;
+    padding-bottom: 5px;
+  }
+
+  .desc-col { max-width: 40mm; overflow: hidden; } /* Evita que nombres largos rompan el ticket */
+
+  .ticket-divider { text-align: center; margin: 10px 0; }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px 0;
+  }
+
+  .bold { font-weight: bold; }
+  .Large { font-size: 16px; border-top: 1px solid #000; padding-top: 5px; }
+
+  .ticket-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11px;
+    padding-bottom: 20mm; /* Espacio extra para que el usuario pueda cortar el papel */
+  }
+}

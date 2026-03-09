@@ -362,7 +362,7 @@
                 class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
                 Cerrar
               </button>
-              <button
+              <button @click="imprimirFactura"
                 class="flex-1 bg-gray-800 dark:bg-brand-500 text-white px-4 py-2.5 rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path
@@ -377,6 +377,57 @@
         </div>
       </template>
     </Modal>
+    <div id="print-section" class="ticket-container">
+      <div class="ticket-wrapper">
+        <div class="ticket-header">
+          <img src="@/assets/img/logo.png" alt="Logo" class="ticket-logo" width="60%">
+          <h2 class="ticket-title">{{ facturaData.tipo_comprobante }}</h2>
+          <p class="ticket-number">{{ facturaData.numero_factura }}</p>
+        </div>
+
+        <div class="ticket-info">
+          <p>FECHA: {{ facturaData.fecha_emision }}</p>
+          <p>PEDIDO: #{{ facturaData.id_pedido }}</p>
+          <p>MESA: {{ facturaData.mesa?.codigo_mesa || 'Cargando...' }}</p>
+          <p>--------------------------------</p>
+        </div>
+
+        <table class="ticket-table">
+          <thead>
+            <tr>
+              <th class="text-left">DESC.</th>
+              <th class="text-center">CANT.</th>
+              <th class="text-right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in facturaDetalle" :key="item.id_detalle_factura">
+              <td class="desc-col">{{ item.descripcion }}</td>
+              <td class="text-center">{{ item.cantidad }}</td>
+              <td class="text-right">${{ item.subtotal }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ticket-divider">--------------------------------</div>
+
+        <div class="ticket-totals">
+          <div class="total-row">
+            <span>SUBTOTAL:</span>
+            <span>${{ facturaData.subtotal }}</span>
+          </div>
+          <div class="total-row bold Large">
+            <span>TOTAL:</span>
+            <span>${{ facturaData.total }}</span>
+          </div>
+        </div>
+
+        <div class="ticket-footer">
+          <p>Gracias por su preferencia.</p>
+          <p>¡Vuelva pronto!</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -386,29 +437,15 @@ import Modal from "@/components/Modal/Modal.vue";
 
 const isProfileAddressModal = ref(false);
 const isEditModalOpen = ref(false);
-/*const ahoraRef = ref(new Date());
-let timerInterval = null;*/
 
 const cerrarModalDesdeAfuera = () => {
   isProfileAddressModal.value = false
 }
-
-
 defineExpose({
   isProfileAddressModal,
   isEditModalOpen,
   cerrarModalDesdeAfuera
 })
-/*onMounted(() => {
-  timerInterval = setInterval(() => {
-    ahoraRef.value = new Date();
-  }, 1000); // Actualiza cada segundo
-});
-
-onUnmounted(() => {
-  clearInterval(timerInterval);
-});*/
-
 </script>
 <script>
 import API from "@/assets/js/services/axios";
@@ -528,6 +565,75 @@ export default {
       const baseURL2 = API.defaults.baseURL;
       return `${baseURL2}/restrik/imagenprod/${ci}?v=${this.refreshKey}`;
     },
+    async imprimirFactura() {
+      try {
+        const formatearFechaISO = (fechaStr) => {
+          if (!fechaStr) return null;
+          const [fecha, hora] = fechaStr.split(' ');
+          const [dia, mes, anio] = fecha.split('/');
+          return `${anio}-${mes}-${dia} ${hora}:00`; // Formato YYYY-MM-DD HH:mm:ss
+        };
+        // 1. Preparamos los datos según lo que espera tu controlador backend
+        const params = {
+          id_pedido: this.facturaData.id_pedido,
+          numero_factura: this.facturaData.numero_factura,
+          tipo_comprobante: this.facturaData.tipo_comprobante,
+          subtotal: this.facturaData.subtotal,
+          total: this.facturaData.total,
+          fecha_emision: formatearFechaISO(this.facturaData.fecha_emision),
+          estado_factura: 'pagada' // <--- Cambiamos el estado aquí
+        };
+        
+        // 2. Llamada al backend usando el ID de la factura
+        // Ajusta la URL si tu ruta es diferente (ej. /facturas/)
+
+        const exito = await enviarsoligtiempo(
+          "PUT",
+          params,
+          `${this.baseUrl}/facturas/${this.facturaData.id_factura}`
+        );
+        window.print();
+        if (exito) {
+          const params2 = {
+            id_pedido: this.facturaData.id_pedido,
+            fecha_pedido: formatearFechaISO(this.facturaData.fecha_emision),
+            total: this.facturaData.total,
+            id_mesa: this.facturaData.mesa.id_mesa,
+            estado_pedido: 'pagado'
+
+
+          }
+          const exito2 = await enviarsolig(
+            "PUT",
+            params2,
+            `${this.baseUrl}/pedidos/${this.facturaData.id_pedido}`,
+            "Factura marcada como pagada y pedido actualizado"
+          );
+          
+          if (exito2) {
+            
+            
+            this.actualizar();
+            this.refreshKey = Date.now();
+            // 3. Si se actualizó con éxito en DB, procedemos a imprimir
+            this.isInvoiceModalOpen = false;
+
+          }
+          
+            
+        } else {
+          mostraralertas2("No se pudo actualizar el estado de la factura", "error");
+        }
+
+
+
+      } catch (error) {
+        console.error("Error en el proceso de pago/impresión:", error);
+        mostraralertas2("No se pudo procesar el pago", "error");
+      } finally {
+        this.cargando = false;
+      }
+    },
     async abrirModalFactura(idPedido) {
       try {
         // 1. Buscamos la factura asociada al pedido
@@ -535,6 +641,7 @@ export default {
 
         if (response.data) {
           this.facturaData = response.data.factura;
+          //console.log("Factura encontrada:", response);
           this.facturaDetalle = response.data.detalles;
           this.isInvoiceModalOpen = true;
         } else {

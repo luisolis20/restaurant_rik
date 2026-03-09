@@ -481,8 +481,12 @@ export default {
             lastPage: 1,
             buscando: false, // Mantenido, pero no se usa en la lógica de paginación actual
             debouncedFilter: null,
+            pollingInterval: null,
             objetoList: [],
         };
+    },
+    unmounted() {
+        if (this.pollingInterval) clearInterval(this.pollingInterval);
     },
     created() {
         // Ahora sí puedes usar this.filterAndFetch
@@ -496,6 +500,9 @@ export default {
     async mounted() {
         const ruta = useRoute();
 
+        this.pollingInterval = setInterval(() => {
+            this.actualizarSilenciosamente();
+        }, 10000);
         this.GetData(1, this.searchQuery, this.selectedStatus);
 
     },
@@ -521,6 +528,16 @@ export default {
             // Elimina cualquier caracter que no sea número
             this.objetoguardar.codigo_mesa = this.objetoguardar.codigo_mesa.replace(/[^0-9]/g, '');
             this.objetoeditar.codigo_mesa = this.objetoeditar.codigo_mesa.replace(/[^0-9]/g, '');
+        },
+        async actualizarSilenciosamente() {
+            try {
+                const params = { page: this.currentPage, status: this.selectedStatus };
+                const response = await API.get(`${this.baseUrl}/mesas`, { params });
+                this.filteredobjetoarray = response.data?.data || {};
+                this.lastPage = response.data?.pagination?.last_page || 1;
+            } catch (error) {
+                console.warn("Error en actualización silenciosa", error);
+            }
         },
         abrirModalEdicion(user) {
             // Clonamos el objeto para no modificar la tabla directamente antes de guardar
