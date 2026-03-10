@@ -212,70 +212,74 @@
           </div>
 
           <form class="flex flex-col flex-1 overflow-hidden">
-            <div class="px-6 pt-8 lg:px-11 lg:pt-11">
-              <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">Pedido #{{ objetoeditar.id_pedido }}</h4>
-              <p class="text-sm text-gray-500">Mesa: <span class="font-bold text-brand-500">{{ objetoeditar.codigo_mesa
-              }}</span></p>
-            </div>
-
-            <div class="flex-1 overflow-y-auto px-6 py-4 lg:px-11 custom-scrollbar">
-              <div class="mb-6 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-                <table class="w-full text-left text-sm">
-                  <thead class="bg-gray-50 dark:bg-white/5">
-                    <tr>
-                      <th class="p-3">Plato</th>
-                      <th class="p-3">Cant.</th>
-                      <th class="p-3">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="item in objetoeditar.productos" :key="item.id_detalle"
-                      class="border-t border-gray-100 dark:border-gray-800">
-                      <td class="p-3 font-medium">{{ item.producto_nombre }}</td>
-                      <td class="p-3">{{ item.cantidad }}</td>
-                      <td class="p-3">${{ (item.precio_unitario * item.cantidad).toFixed(2) }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr class="bg-gray-50/50 font-bold">
-                      <td colspan="2" class="p-3 text-right">Total Pedido:</td>
-                      <td class="p-3 text-brand-600">${{ objetoeditar.total }}</td>
-                    </tr>
-                  </tfoot>
-                </table>
+            <div class="px-6 pb-4 overflow-y-auto custom-scrollbar lg:px-11">
+              <div class="px-6 pt-8 lg:px-11 lg:pt-11">
+                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">Pedido #{{ objetoeditar.id_pedido }}
+                </h4>
+                <p class="text-sm text-gray-500">Mesa: <span class="font-bold text-brand-500">{{
+                  objetoeditar.codigo_mesa
+                    }}</span></p>
               </div>
 
-              <div
-                class="grid grid-cols-1 gap-4 lg:grid-cols-3 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-
-                <div class="lg:col-span-1">
-                  <label
-                    class="mb-1.5 block text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
-                    Tiempo Estimado (Minutos)
-                  </label>
-                  <input type="number" v-model.number="objetoeditar.tiempo_estimado_minutos" placeholder="Ej. 20"
-                    class="h-12 w-full rounded-xl border-2 border-brand-200 bg-white px-4 text-lg font-bold text-gray-800 focus:border-brand-500 focus:ring-0 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+              <div class="flex-1 overflow-y-auto px-6 py-4 lg:px-11 custom-scrollbar">
+                <div class="mb-6 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                  <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 dark:bg-white/5">
+                      <tr>
+                        <th class="p-3">Plato</th>
+                        <th class="p-3">Cant.</th>
+                        <th class="p-3">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in objetoeditar.productos" :key="item.id_detalle"
+                        class="border-t border-gray-100 dark:border-gray-800">
+                        <td class="p-3 font-medium">{{ item.producto_nombre }}</td>
+                        <td class="p-3">{{ item.cantidad }}</td>
+                        <td class="p-3">${{ (item.precio_unitario * item.cantidad).toFixed(2) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr class="bg-gray-50/50 font-bold">
+                        <td colspan="2" class="p-3 text-right">Total Pedido:</td>
+                        <td class="p-3 text-brand-600">${{ objetoeditar.total }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
 
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Se marca inicio a las:
-                  </label>
-                  <input type="datetime-local" v-model="objetoeditar.fecha_inicio" disabled
-                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
-                </div>
+                <div
+                  class="grid grid-cols-1 gap-4 lg:grid-cols-3 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
 
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Finalización estimada:
-                  </label>
-                  <input type="datetime-local" v-model="objetoeditar.fecha_fin" disabled
-                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
-                </div>
+                  <div class="lg:col-span-1">
+                    <label
+                      class="mb-1.5 block text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
+                      Tiempo Estimado (Minutos)
+                    </label>
+                    <input type="number" v-model.number="objetoeditar.tiempo_estimado_minutos" placeholder="Ej. 20"
+                      class="h-12 w-full rounded-xl border-2 border-brand-200 bg-white px-4 text-lg font-bold text-gray-800 focus:border-brand-500 focus:ring-0 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+                  </div>
 
+                  <div>
+                    <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Se marca inicio a las:
+                    </label>
+                    <input type="datetime-local" v-model="objetoeditar.fecha_inicio" disabled
+                      class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
+                  </div>
+
+                  <div>
+                    <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Finalización estimada:
+                    </label>
+                    <input type="datetime-local" v-model="objetoeditar.fecha_fin" disabled
+                      class="h-12 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/50" />
+                  </div>
+
+                </div>
               </div>
-            </div>
 
+            </div>
             <div
               class="flex items-center gap-3 border-t border-gray-100 bg-gray-50/50 p-6 dark:border-gray-800 dark:bg-white/[0.02] lg:justify-end lg:px-11">
               <button @click="isEditModalOpen = false" type="button"
@@ -323,54 +327,55 @@
               </div>
             </div>
           </div>
-
-          <div class="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
-            <table class="w-full text-left text-sm">
-              <thead>
-                <tr class="text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                  <th class="pb-3 font-medium">Descripción</th>
-                  <th class="pb-3 font-medium text-center">Cant.</th>
-                  <th class="pb-3 font-medium text-right">Precio</th>
-                  <th class="pb-3 font-medium text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
-                <tr v-for="item in facturaDetalle" :key="item.id_detalle_factura">
-                  <td class="py-4 dark:text-gray-300">{{ item.descripcion }}</td>
-                  <td class="py-4 text-center dark:text-gray-300">{{ item.cantidad }}</td>
-                  <td class="py-4 text-right dark:text-gray-300">${{ item.precio_unitario }}</td>
-                  <td class="py-4 text-right font-medium dark:text-white">${{ item.subtotal }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="px-8 py-6 bg-gray-50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-gray-800">
-            <div class="flex flex-col gap-2 w-full max-w-[200px] ml-auto">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Subtotal:</span>
-                <span class="font-medium dark:text-gray-300">${{ facturaData.subtotal }}</span>
-              </div>
-              <div class="flex justify-between text-xl font-bold border-t border-gray-200 dark:border-gray-700 pt-2">
-                <span class="text-gray-800 dark:text-white">TOTAL:</span>
-                <span class="text-brand-600">${{ facturaData.total }}</span>
-              </div>
+          <div class="px-6 pb-4 overflow-y-auto custom-scrollbar lg:px-11">
+            <div class="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="text-gray-400 border-b border-gray-100 dark:border-gray-800">
+                    <th class="pb-3 font-medium">Descripción</th>
+                    <th class="pb-3 font-medium text-center">Cant.</th>
+                    <th class="pb-3 font-medium text-right">Precio</th>
+                    <th class="pb-3 font-medium text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                  <tr v-for="item in facturaDetalle" :key="item.id_detalle_factura">
+                    <td class="py-4 dark:text-gray-300">{{ item.descripcion }}</td>
+                    <td class="py-4 text-center dark:text-gray-300">{{ item.cantidad }}</td>
+                    <td class="py-4 text-right dark:text-gray-300">${{ item.precio_unitario }}</td>
+                    <td class="py-4 text-right font-medium dark:text-white">${{ item.subtotal }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            <div class="mt-8 flex gap-3">
-              <button @click="isInvoiceModalOpen = false"
-                class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                Cerrar
-              </button>
-              <button @click="imprimirFactura"
-                class="flex-1 bg-gray-800 dark:bg-brand-500 text-white px-4 py-2.5 rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path
-                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-2 4H6a2 2 0 0 1-2-2v-4h12v4a2 2 0 0 1-2 2z">
-                  </path>
-                </svg>
-                Imprimir
-              </button>
+            <div class="px-8 py-6 bg-gray-50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-gray-800">
+              <div class="flex flex-col gap-2 w-full max-w-[200px] ml-auto">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-500">Subtotal:</span>
+                  <span class="font-medium dark:text-gray-300">${{ facturaData.subtotal }}</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <span class="text-gray-800 dark:text-white">TOTAL:</span>
+                  <span class="text-brand-600">${{ facturaData.total }}</span>
+                </div>
+              </div>
+
+              <div class="mt-8 flex gap-3">
+                <button @click="isInvoiceModalOpen = false"
+                  class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                  Cerrar
+                </button>
+                <button @click="imprimirFactura"
+                  class="flex-1 bg-gray-800 dark:bg-brand-500 text-white px-4 py-2.5 rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-2 4H6a2 2 0 0 1-2-2v-4h12v4a2 2 0 0 1-2 2z">
+                    </path>
+                  </svg>
+                  Imprimir
+                </button>
+              </div>
             </div>
           </div>
 
@@ -583,7 +588,7 @@ export default {
           fecha_emision: formatearFechaISO(this.facturaData.fecha_emision),
           estado_factura: 'pagada' // <--- Cambiamos el estado aquí
         };
-        
+
         // 2. Llamada al backend usando el ID de la factura
         // Ajusta la URL si tu ruta es diferente (ej. /facturas/)
 
@@ -609,18 +614,18 @@ export default {
             `${this.baseUrl}/pedidos/${this.facturaData.id_pedido}`,
             "Factura marcada como pagada y pedido actualizado"
           );
-          
+
           if (exito2) {
-            
-            
+
+
             this.actualizar();
             this.refreshKey = Date.now();
             // 3. Si se actualizó con éxito en DB, procedemos a imprimir
             this.isInvoiceModalOpen = false;
 
           }
-          
-            
+
+
         } else {
           mostraralertas2("No se pudo actualizar el estado de la factura", "error");
         }

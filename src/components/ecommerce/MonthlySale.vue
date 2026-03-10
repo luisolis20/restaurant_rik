@@ -1,27 +1,20 @@
 <template>
-  <div
-    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6"
-  >
+  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Monthly Sales</h3>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Ventas Mensuales</h3>
+        <p class="text-sm text-gray-500">Año seleccionado: {{ selectedYear }}</p>
+      </div>
 
       <div class="relative h-fit">
-        <DropdownMenu :menu-items="menuItems">
+        <DropdownMenu :menu-items="yearMenuItems">
           <template #icon>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M10.2441 6C10.2441 5.0335 11.0276 4.25 11.9941 4.25H12.0041C12.9706 4.25 13.7541 5.0335 13.7541 6C13.7541 6.9665 12.9706 7.75 12.0041 7.75H11.9941C11.0276 7.75 10.2441 6.9665 10.2441 6ZM10.2441 18C10.2441 17.0335 11.0276 16.25 11.9941 16.25H12.0041C12.9706 16.25 13.7541 17.0335 13.7541 18C13.7541 18.9665 12.9706 19.75 12.0041 19.75H11.9941C11.0276 19.75 10.2441 18.9665 10.2441 18ZM11.9941 10.25C11.0276 10.25 10.2441 11.0335 10.2441 12C10.2441 12.9665 11.0276 13.75 11.9941 13.75H12.0041C12.9706 13.75 13.7541 12.9665 13.7541 12C13.7541 11.0335 12.9706 10.25 12.0041 10.25H11.9941Z"
-                fill="currentColor"
-              />
-            </svg>
+            <div class="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+              <span class="text-sm font-medium text-gray-700 dark:text-white">{{ selectedYear }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </template>
         </DropdownMenu>
       </div>
@@ -29,111 +22,124 @@
 
     <div class="max-w-full overflow-x-auto custom-scrollbar">
       <div id="chartOne" class="-ml-5 min-w-[650px] xl:min-w-full pl-2">
-        <VueApexCharts type="bar" height="180" :options="chartOptions" :series="series" />
+        <VueApexCharts 
+          v-if="!loading"
+          type="bar" 
+          height="180" 
+          :options="chartOptions" 
+          :series="series" 
+        />
+        <div v-else class="h-[180px] flex items-center justify-center">
+          <span class="text-gray-400 animate-pulse">Cargando estadísticas...</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import DropdownMenu from '../common/DropdownMenu.vue'
-const menuItems = [
-  { label: 'View More', onClick: () => console.log('View More clicked') },
-  { label: 'Delete', onClick: () => console.log('Delete clicked') },
-]
+<script>
+import API from "@/assets/js/services/axios";
+import VueApexCharts from 'vue3-apexcharts';
+import DropdownMenu from '../common/DropdownMenu.vue';
 
-import VueApexCharts from 'vue3-apexcharts'
-
-const series = ref([
-  {
-    name: 'Sales',
-    data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+export default {
+  name: 'MonthlySalesChart',
+  components: {
+    VueApexCharts,
+    DropdownMenu
   },
-])
-
-const chartOptions = ref({
-  colors: ['#465fff'],
-  chart: {
-    fontFamily: 'Outfit, sans-serif',
-    type: 'bar',
-    toolbar: {
-      show: false,
+  data() {
+    return {
+      loading: true,
+      baseUrl: "/restrik",
+      pollingInterval: null,
+      selectedYear: new Date().getFullYear(),
+      availableYears: [],
+      series: [
+        {
+          name: 'Ventas',
+          data: []
+        }
+      ],
+      chartOptions: {
+        colors: ['#F5B30F'],
+        chart: {
+          fontFamily: 'Outfit, sans-serif',
+          type: 'bar',
+          toolbar: { show: false },
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '35%',
+            borderRadius: 5,
+            borderRadiusApplication: 'end',
+          },
+        },
+        dataLabels: { enabled: false },
+        xaxis: {
+          categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+        },
+        yaxis: {
+          labels: {
+            formatter: (val) => `$${val.toFixed(0)}`
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: (val) => `$${val.toFixed(2)}`
+          }
+        }
+      }
+    };
+  },
+  unmounted() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+  },
+  computed: {
+    // Transformamos la lista de años en el formato que espera tu DropdownMenu
+    yearMenuItems() {
+      return this.availableYears.map(year => ({
+        label: year.toString(),
+        onClick: () => this.fetchSalesData(year)
+      }));
+    }
+  },
+  methods: {
+    async actualizarSilenciosamente() {
+      try {
+        const response = await API.get(`${this.baseUrl}/dashboard/monthly-sales?year=${this.selectedYear}`);
+        this.series[0].data = response.data.sales_data;
+        this.availableYears = response.data.years;
+        this.selectedYear = response.data.selected_year;
+      } catch (error) {
+        console.warn("Error en actualización silenciosa", error);
+      }
     },
+    async fetchSalesData(year) {
+      this.loading = true;
+      try {
+        const response = await API.get(`${this.baseUrl}/dashboard/monthly-sales?year=${year}`);
+        
+        // Actualizamos los datos del gráfico
+        this.series[0].data = response.data.sales_data;
+        this.availableYears = response.data.years;
+        this.selectedYear = response.data.selected_year;
+      } catch (error) {
+        console.error("Error al obtener datos de ventas:", error);
+      } finally {
+        this.loading = false;
+      }
+    }
   },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: '39%',
-      borderRadius: 5,
-      borderRadiusApplication: 'end',
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    show: true,
-    width: 4,
-    colors: ['transparent'],
-  },
-  xaxis: {
-    categories: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ],
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-  },
-  legend: {
-    show: true,
-    position: 'top',
-    horizontalAlign: 'left',
-    fontFamily: 'Outfit',
-    markers: {
-      radius: 99,
-    },
-  },
-  yaxis: {
-    title: false,
-  },
-  grid: {
-    yaxis: {
-      lines: {
-        show: true,
-      },
-    },
-  },
-  fill: {
-    opacity: 1,
-  },
-  tooltip: {
-    x: {
-      show: false,
-    },
-    y: {
-      formatter: function (val) {
-        return val.toString()
-      },
-    },
-  },
-})
-
-onMounted(() => {
-  // Any additional setup can be done here if needed
-})
+  mounted() {
+    // Carga inicial de datos
+    this.pollingInterval = setInterval(() => {
+      this.actualizarSilenciosamente();
+    }, 10000);
+    this.fetchSalesData(this.selectedYear);
+  }
+};
 </script>
