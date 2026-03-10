@@ -62,7 +62,172 @@ class FacturaController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
         }
     }
+    public function getDashboardStats()
+    {
+        try {
+            // Total de ventas: Suma de facturas pagadas
+            $totalVentas = Factura::where('estado_factura', 'pagada')
+                ->sum('total');
 
+            // Total de pedidos: Conteo de todos los pedidos (excepto cancelados si prefieres)
+            $totalPedidos = Pedido::where('estado_pedido', '!=', 'cancelado')
+                ->count();
+
+            return response()->json([
+                'total_ventas' => (float) $totalVentas,
+                'total_pedidos' => $totalPedidos
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    public function getMonthlySales(Request $request)
+    {
+        $year = $request->input('year', date('Y'));
+
+        // 1. Obtener años disponibles para el dropdown
+        $availableYears = Factura::selectRaw('YEAR(fecha_emision) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // 2. Obtener ventas por mes del año seleccionado
+        $sales = Factura::where('estado_factura', 'pagada')
+            ->whereYear('fecha_emision', $year)
+            ->selectRaw('MONTH(fecha_emision) as month, SUM(total) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // 3. Preparar array de 12 meses inicializado en 0
+        $monthlyData = array_fill(0, 12, 0);
+        foreach ($sales as $sale) {
+            $monthlyData[$sale->month - 1] = (float) $sale->total;
+        }
+
+        return response()->json([
+            'years' => $availableYears,
+            'selected_year' => (int)$year,
+            'sales_data' => $monthlyData
+        ]);
+    }
+    public function getMonthlyTarget()
+    {
+        $target = 20000; // Objetivo mensual
+        $startOfMonth = now()->startOfMonth();
+        $todayStart = now()->startOfDay();
+
+        // Ingresos del mes actual
+        $revenueMonth = Factura::where('estado_factura', 'pagada')
+            ->where('fecha_emision', '>=', $startOfMonth)
+            ->sum('total');
+
+        // Ingresos de hoy
+        $revenueToday = Factura::where('estado_factura', 'pagada')
+            ->where('fecha_emision', '>=', $todayStart)
+            ->sum('total');
+
+        // Cálculo del porcentaje (máximo 100%)
+        $percentage = ($target > 0) ? ($revenueMonth / $target) * 100 : 0;
+
+        return response()->json([
+            'target' => $target,
+            'revenue_month' => (float)$revenueMonth,
+            'revenue_today' => (float)$revenueToday,
+            'percentage' => round($percentage, 2)
+        ]);
+    }
+    public function getStatistics()
+    {
+        $year = now()->year;
+
+        // Obtener ventas mensuales (Suma de totales)
+        $salesData = Factura::where('estado_factura', 'pagada')
+            ->whereYear('fecha_emision', $year)
+            ->selectRaw('MONTH(fecha_emision) as month, SUM(total) as total')
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        // Obtener pedidos mensuales (Conteo de registros)
+        $ordersData = Pedido::where('estado_pedido', '!=', 'cancelado')
+            ->whereYear('fecha_pedido', $year)
+            ->selectRaw('MONTH(fecha_pedido) as month, COUNT(*) as count')
+            ->groupBy('month')
+            ->pluck('count', 'month')
+            ->toArray();
+
+        // Llenar los 12 meses (asegurar que haya datos para cada mes)
+        $sales = [];
+        $orders = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $sales[] = $salesData[$i] ?? 0;
+            $orders[] = $ordersData[$i] ?? 0;
+        }
+
+        return response()->json([
+            'sales' => $sales,
+            'orders' => $orders
+        ]);
+    }
+    public function getStatistics2(Request $request)
+    {
+        $filter = $request->input('filter', 'monthly'); // monthly, quarterly, annually
+        $year = now()->year;
+
+        $querySales = Factura::where('estado_factura', 'pagada')->whereYear('fecha_emision', $year);
+        $queryOrders = Pedido::where('estado_pedido', '!=', 'cancelado')->whereYear('fecha_pedido', $year);
+
+        if ($filter === 'quarterly') {
+            // Agrupar por Trimestre (1, 2, 3, 4)
+            $sales = $querySales->selectRaw('QUARTER(fecha_emision) as period, SUM(total) as total')
+                ->groupBy('period')->pluck('total', 'period')->toArray();
+            $orders = $queryOrders->selectRaw('QUARTER(fecha_pedido) as period, COUNT(*) as count')
+                ->groupBy('period')->pluck('count', 'period')->toArray();
+
+            $limit = 4;
+            $categories = ['T1', 'T2', 'T3', 'T4'];
+        } elseif ($filter === 'annually') {
+            // Mostrar últimos 5 años
+            $sales = Factura::where('estado_factura', 'pagada')
+                ->selectRaw('YEAR(fecha_emision) as period, SUM(total) as total')
+                ->groupBy('period')->orderBy('period', 'desc')->take(5)->pluck('total', 'period')->toArray();
+            $orders = Pedido::where('estado_pedido', '!=', 'cancelado')
+                ->selectRaw('YEAR(fecha_pedido) as period, COUNT(*) as count')
+                ->groupBy('period')->orderBy('period', 'desc')->take(5)->pluck('count', 'period')->toArray();
+
+            ksort($sales);
+            ksort($orders);
+            return response()->json([
+                'sales' => array_values($sales),
+                'orders' => array_values($orders),
+                'categories' => array_map('strval', array_keys($sales))
+            ]);
+        } else {
+            // Mensual (Por defecto)
+            $sales = $querySales->selectRaw('MONTH(fecha_emision) as period, SUM(total) as total')
+                ->groupBy('period')->pluck('total', 'period')->toArray();
+            $orders = $queryOrders->selectRaw('MONTH(fecha_pedido) as period, COUNT(*) as count')
+                ->groupBy('period')->pluck('count', 'period')->toArray();
+
+            $limit = 12;
+            $categories = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        }
+
+        $finalSales = [];
+        $finalOrders = [];
+        for ($i = 1; $i <= $limit; $i++) {
+            $finalSales[] = $sales[$i] ?? 0;
+            $finalOrders[] = $orders[$i] ?? 0;
+        }
+
+        return response()->json([
+            'sales' => $finalSales,
+            'orders' => $finalOrders,
+            'categories' => $categories
+        ]);
+    }
     /**
      * Store a newly created resource in storage.
      */
