@@ -16,9 +16,9 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // IMPORTANTE: Asegúrate de que los nombres coincidan con los que guardas en el login
-    const token = localStorage.getItem('token_rest'); 
+    const token = localStorage.getItem('token_rest');
     const tokenType = localStorage.getItem('token_type_rest') || 'Bearer';
-    
+
     if (token) {
       config.headers.Authorization = `${tokenType} ${token}`;
     }
@@ -37,9 +37,17 @@ export const getMe = async () => {
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 401) {
+      const token = localStorage.getItem("token_rest");
+      await axios.get(
+        `${__API_RESTAURANT__}/restrik/logout`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
       console.error('Error al obtener perfil data:', error);
-        localStorage.clear();
-        window.location.href = '/login';
+      localStorage.clear();
+      window.location.href = '/login';
     }
     throw error;
   }

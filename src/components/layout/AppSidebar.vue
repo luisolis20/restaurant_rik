@@ -165,6 +165,8 @@ import {
   PlateIcon,
   MantenimientoIcon,
   MesaIcon,
+  PedidosIcon,
+  Ventas,
 } from "../../icons";
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
@@ -212,9 +214,19 @@ const menuGroups = [
     ],
   },
   {
-    title: "Others",
+    title: "Administración",
     items: [
-      
+      {
+        icon: PedidosIcon,
+        name: "Pedidos",
+        path: "/pedidos_recientes",
+      },
+      {
+        icon: Ventas,
+        name: "Ventas",
+        path: "/ventas",
+      },
+
       // ... Add other menu items here
     ],
   },

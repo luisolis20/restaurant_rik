@@ -48,6 +48,10 @@ import BarChartIcon from "./BarChartIcon.vue";
 import PlateIcon from "./PlateIcon.vue";
 import MantenimientoIcon from "./MantenimientoIcon.vue";
 import MesaIcon from "./MesaIcon.vue";
+import PedidosIcon from "./PedidosIcon.vue";
+import Ventas from "./VentasIcon.vue";
+
+
 
 export {
   BellIcon,
@@ -100,5 +104,7 @@ export {
   PlateIcon,
   MantenimientoIcon,
   MesaIcon,
+  PedidosIcon,
+  Ventas
 
 };

@@ -28,16 +28,19 @@
     </div>
 
     <div class="max-w-full overflow-x-auto custom-scrollbar">
-      <div id="chartThree" class="-ml-4 min-w-[1000px] xl:min-w-full pl-2">
-        <VueApexCharts 
-          v-if="!loading"
-          type="area" 
-          height="310" 
-          :options="chartOptions" 
-          :series="series" 
-        />
-        <div v-else class="h-[310px] flex items-center justify-center text-gray-400">
-          Cargando datos estadísticos...
+      <div id="chartThreeContainer" class="-ml-4 min-w-[1000px] xl:min-w-full pl-2 relative">
+        <div :class="{ 'opacity-20 pointer-events-none': loading }">
+          <VueApexCharts 
+            ref="statisticsChart"
+            type="area" 
+            height="310" 
+            :options="chartOptions" 
+            :series="series" 
+          />
+        </div>
+        
+        <div v-if="loading" class="absolute inset-0 flex items-center justify-center text-gray-400">
+          <span class="bg-white/50 dark:bg-gray-900/50 px-4 py-2 rounded-lg">Cargando datos...</span>
         </div>
       </div>
     </div>
@@ -56,7 +59,7 @@ export default {
       loading: true,
       baseUrl: "/restrik",
       pollingInterval: null,
-      selected: 'monthly', // Valores: monthly, quarterly, annually
+      selected: 'monthly',
       options: [
         { value: 'monthly', label: 'Mensual' },
         { value: 'quarterly', label: 'Trimestral' },
@@ -69,10 +72,15 @@ export default {
       chartOptions: {
         legend: { show: true, position: 'top', horizontalAlign: 'right' },
         colors: ['#F5B30F', '#D99C0D'],
-        chart: { type: 'area', toolbar: { show: false } },
+        chart: { 
+          id: 'chart-statistics', // ID fijo muy importante
+          type: 'area', 
+          toolbar: { show: false },
+          animations: { enabled: true }
+        },
         stroke: { curve: 'smooth', width: [3, 3] },
         xaxis: {
-          categories: [], // Se llenará dinámicamente
+          categories: [],
           axisBorder: { show: false },
           axisTicks: { show: false },
         },
@@ -87,62 +95,55 @@ export default {
     };
   },
   watch: {
-    // Cada vez que el usuario cambie el filtro, disparamos la petición
     selected(newVal) {
       this.fetchStatistics(newVal);
     }
   },
-  unmounted() {
-    if (this.pollingInterval) clearInterval(this.pollingInterval);
-  },
   methods: {
+    async updateChart(data) {
+      this.series = [
+        { name: 'Ventas ($)', data: data.sales },
+        { name: 'Pedidos (Cant.)', data: data.orders }
+      ];
+
+      // Usamos el método updateOptions de ApexCharts para asegurar que el eje X cambie
+      if (this.$refs.statisticsChart) {
+        this.$refs.statisticsChart.updateOptions({
+          xaxis: { categories: data.categories }
+        }, false, true);
+      }
+    },
+
     async actualizarSilenciosamente() {
       try {
         const response = await API.get(`${this.baseUrl}/dashboard/statistics2?filter=${this.selected}`);
-        this.series[0].data = response.data.sales;
-        this.series[1].data = response.data.orders;
-
-        // Actualizar categorías del eje X dinámicamente
-        this.chartOptions = {
-          ...this.chartOptions,
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: response.data.categories
-          }
-        };
+        await this.updateChart(response.data);
       } catch (error) {
         console.warn("Error en actualización silenciosa", error);
       }
     },
+
     async fetchStatistics(filterType = 'monthly') {
       this.loading = true;
       try {
         const response = await API.get(`${this.baseUrl}/dashboard/statistics2?filter=${filterType}`);
-        
-        // Actualizar datos
-        this.series[0].data = response.data.sales;
-        this.series[1].data = response.data.orders;
-
-        // Actualizar categorías del eje X dinámicamente
-        this.chartOptions = {
-          ...this.chartOptions,
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: response.data.categories
-          }
-        };
+        await this.updateChart(response.data);
       } catch (error) {
         console.error("Error al cargar estadísticas:", error);
       } finally {
-        this.loading = false;
+        // Un pequeño delay para que la transición sea suave
+        setTimeout(() => { this.loading = false; }, 300);
       }
     }
   },
   mounted() {
-     this.pollingInterval = setInterval(() => {
+    this.fetchStatistics();
+    this.pollingInterval = setInterval(() => {
       this.actualizarSilenciosamente();
     }, 10000);
-    this.fetchStatistics();
+  },
+  unmounted() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   }
 };
 </script>

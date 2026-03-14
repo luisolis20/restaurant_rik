@@ -274,7 +274,7 @@ export default {
     async GetObjetoList() {
       this.cargando = true;
       try {
-        const response = await API.get(`${this.baseUrl}/mesas`);
+        const response = await API.get(`${this.baseUrl}/mesas_disponibles`);
 
         this.objetoList = response.data?.data || [];
       } catch (error) {

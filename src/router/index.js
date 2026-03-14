@@ -9,7 +9,8 @@ import RolesAllView from '../views/Mantenimiento/Op_Roles/RolesAllView.vue'
 import PlatosAllView from '../views/Mantenimiento/Op_Plato/PlatosAllView.vue'
 import PageHomeView from '../views/Home/PageHomeView.vue'
 import MesasAllView from '../views/Mesas/MesasAllView.vue'
-
+import PedidosRecientesView from '../views/Admin/PedidosRecientesView.vue'
+import VentasAllView from '../views/Admin/VentasAllView.vue'
 
 
 const routes = [
@@ -63,6 +64,16 @@ const routes = [
     path: '/stock/platos',
     name: 'stockplatos',
     component: StockPlatosAllView
+  },
+  {
+    path: '/pedidos_recientes',
+    name: 'Pedidos',
+    component: PedidosRecientesView
+  },
+  {
+    path: '/ventas',
+    name: 'Ventas',
+    component: VentasAllView
   },
 
 

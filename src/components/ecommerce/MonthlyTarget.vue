@@ -14,22 +14,19 @@
       <div class="relative max-h-[195px]">
         <div id="chartTwo" class="h-full">
           <div class="radial-bar-chart">
-            <VueApexCharts 
-              v-if="!loading"
-              type="radialBar" 
-              height="330" 
-              :options="chartOptions" 
-              :series="[stats.percentage]" 
-            />
+            <VueApexCharts v-if="!loading" type="radialBar" height="330" :options="chartOptions"
+              :series="[stats.percentage]" />
           </div>
         </div>
-        <span class="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-[85%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
+        <span
+          class="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-[85%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
           Activo
         </span>
       </div>
       <p class="mx-auto mt-1.5 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-        Has ganado <span class="font-bold text-gray-800 dark:text-white">${{ stats.revenue_today }}</span> hoy. 
-        {{ stats.percentage >= 100 ? '¡Meta alcanzada!' : '¡Sigue así!' }}
+        Has ganado <span class="font-bold text-gray-800 dark:text-white">${{ formatCurrency(stats.revenue_today)
+        }}</span> hoy.
+        {{ stats.revenue_month >= stats.target ? '¡Meta alcanzada!' : '¡Sigue así!' }}
       </p>
     </div>
 
@@ -41,12 +38,15 @@
       <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
       <div>
         <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">Ingreso Mes</p>
-        <p class="text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">${{ (stats.revenue_month / 1000).toFixed(1) }}K</p>
+        <p class="text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">${{ (stats.revenue_month /
+          1000).toFixed(1) }}K</p>
       </div>
       <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
       <div>
         <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">Hoy</p>
-        <p class="text-base font-semibold text-green-600 sm:text-lg">${{ stats.revenue_today }}</p>
+        <p class="text-base font-semibold text-green-600 sm:text-lg">
+          ${{ formatCurrency(stats.revenue_today) }}
+        </p>
       </div>
     </div>
   </div>
@@ -110,10 +110,16 @@ export default {
       }
     };
   },
-   unmounted() {
+  unmounted() {
     if (this.pollingInterval) clearInterval(this.pollingInterval);
   },
   methods: {
+    formatCurrency(value) {
+      return value.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    },
     async actualizarSilenciosamente() {
       try {
         const response = await API.get(`${this.baseUrl}/dashboard/monthly-target`);

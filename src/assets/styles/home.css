@@ -1840,3 +1840,38 @@ body.pagehome {
     padding-bottom: 20mm; /* Espacio extra para que el usuario pueda cortar el papel */
   }
 }
+/* Estilo del Botón de Factura (Color azul o dorado) */
+.bill-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 110px; /* Ajustado para que no choque con el del carrito */
+    background-color: #0d6efd;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.bill-floating-btn i { font-size: 1.2rem; }
+.bill-floating-btn span { font-size: 0.6rem; text-transform: uppercase; }
+
+/* Sidebar de Factura */
+.bill-sidebar {
+    position: fixed;
+    left: 0; /* Aparece desde la izquierda para diferenciar del carrito */
+    top: 0;
+    width: 380px;
+    height: 100vh;
+    background: white;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #dee2e6;
+}
+.bill-content { overflow-y: auto; flex-grow: 1; }

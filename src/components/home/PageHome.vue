@@ -262,7 +262,7 @@
                                     class="list-group-item d-flex justify-content-between py-1 small">
                                     <span>{{ prod.cantidad }}x {{ prod.producto_nombre }}</span>
                                     <span class="text-muted">${{ (prod.precio_unitario * prod.cantidad).toFixed(2)
-                                        }}</span>
+                                    }}</span>
                                 </li>
                             </ul>
                             <div class="d-flex justify-content-between fw-bold">
@@ -311,6 +311,54 @@
                     <button class="btn btn-primary w-100" @click="confirmarPedido">Confirmar Pedido</button>
                 </div>
             </div>
+            <div class="bill-floating-btn" @click="consultarFactura">
+                <i class="bi bi-receipt"></i>
+                <span class="fw-bold">Cuenta</span>
+            </div>
+
+            <div v-if="mostrarFactura" class="bill-sidebar shadow-lg">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-dark text-white">
+                    <h5 class="mb-0">Mi Cuenta</h5>
+                    <button class="btn-close btn-close-white" @click="mostrarFactura = false"></button>
+                </div>
+
+                <div class="p-3 bill-content">
+                    <div v-if="datosFactura.length > 0">
+                        <div v-for="ped in datosFactura" :key="ped.id_pedido" class="mb-4 border-bottom pb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-secondary">Pedido #{{ ped.id_pedido }}</span>
+                                <small class="text-muted">{{ formatearFecha(ped.fecha_pedido) }}</small>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li v-for="item in ped.detalles" :key="item.id_detalle"
+                                    class="list-group-item d-flex justify-content-between align-items-start border-0 px-0 py-1">
+                                    <div class="ms-2 me-auto">
+                                        <div class="small fw-bold">{{ item.producto_nombre }}</div>
+                                        <small>x{{ item.cantidad }}</small>
+                                    </div>
+                                    <span class="small">${{ (item.precio_unitario * item.cantidad).toFixed(2) }}</span>
+                                </li>
+                            </ul>
+                            <div class="text-end mt-1 fw-bold small">Subtotal: ${{ ped.total }}</div>
+                        </div>
+                    </div>
+                    <div v-else class="text-center py-5">
+                        <i class="bi bi-emoji-smile text-muted" style="font-size: 3rem;"></i>
+                        <p class="mt-3">Aún no tienes pedidos confirmados.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light border-top mt-auto">
+                    <div class="d-flex justify-content-between fs-4 fw-bold mb-3">
+                        <span>Total a Pagar:</span>
+                        <span class="text-success">${{ totalCuenta.toFixed(2) }}</span>
+                    </div>
+                    <button class="btn btn-primary w-100 btn-lg rounded-pill" :disabled="datosFactura.length === 0"
+                        @click="pedirCuenta">
+                        <i class="bi bi-wallet2 me-2"></i> Solicitar Cuenta
+                    </button>
+                </div>
+            </div>
         </div>
     </shadow-root>
 </template>
@@ -347,6 +395,9 @@ export default {
             pedidosAgrupados: [],
             ahora: new Date(),
             mostrarModalListo: false,
+            mostrarFactura: false,
+            datosFactura: [],
+            totalCuenta: 0,
             tiempoMasCercano: "00:00",
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
@@ -617,7 +668,7 @@ export default {
                         this.carrito = [];
                         this.mostrarDetalle = false;
                         this.mostrarTiempo = true; // Mostramos el reloj automáticamente
-                        
+
                         mostraralertas2("Pedido enviado a cocina", "success");
                     }
                 }
@@ -628,6 +679,37 @@ export default {
         formatearFecha(fecha) {
             if (!fecha) return '--:--';
             return new Date(fecha).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+        async consultarFactura() {
+            if (!this.idMesa) return;
+            try {
+                // Obtenemos todos los pedidos de la mesa que NO estén pagados ni cancelados
+                const res = await API.get(`${this.baseUrl}/pedidoslistos/${this.idMesa}`);
+                this.datosFactura = res.data.data; // Se asume que el backend agrupa detalles dentro del pedido
+
+                // Calcular gran total
+                this.totalCuenta = this.datosFactura.reduce((acc, ped) => acc + parseFloat(ped.total), 0);
+
+                this.mostrarFactura = true;
+            } catch (error) {
+                console.error("Error al consultar factura:", error);
+                mostraralertas2("No se pudo cargar el detalle de la cuenta", "error");
+            }
+        },
+
+        async pedirCuenta() {
+            // Aquí puedes disparar una notificación al mesero o redirigir a pasarela de pago
+            const confirmacion = await confimar("¿Deseas solicitar la cuenta final?", "Un mesero se acercará a tu mesa.", "info");
+            if (confirmacion.isConfirmed) {
+                try {
+                    // Ejemplo: llamar a un endpoint que notifique al sistema
+                    await API.post(`${this.baseUrl}/pedidos/solicitar-cuenta/${this.idMesa}`);
+                    mostraralertas2("Solicitud enviada. En breve te atenderemos.", "success");
+                    this.mostrarFactura = false;
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         }
 
     },
