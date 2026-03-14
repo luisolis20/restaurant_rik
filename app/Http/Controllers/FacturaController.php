@@ -23,15 +23,19 @@ class FacturaController extends Controller
 
             $query = Factura::select(
                 'facturas.*',
+                'mesas.*',
                 'pedidos.fecha_pedido as fecha_pedido',
             )
-                ->join('pedidos', 'pedidos.id_pedido', '=', 'facturas.id_pedido');
+                ->join('pedidos', 'pedidos.id_pedido', '=', 'facturas.id_pedido')
+                ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa');
             if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
-                    $q->where('facturas.numero_factura', 'LIKE', "%{$searchQuery}%");
+                    $q->where('mesas.codigo_mesa', 'LIKE', "%{$searchQuery}%");
                 });
             }
-
+            if (! empty($status)) {
+                $query->where('facturas.estado_factura', $status);
+            }
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -113,9 +117,9 @@ class FacturaController extends Controller
     }
     public function getMonthlyTarget()
     {
-        $target = 20000; // Objetivo mensual
-        $startOfMonth = now()->startOfMonth();
-        $todayStart = now()->startOfDay();
+        $target = 1000; // Objetivo mensual
+        $startOfMonth = now()->startOfMonth()->toDateTimeString();
+        $todayStart = now()->startOfDay()->toDateTimeString();
 
         // Ingresos del mes actual
         $revenueMonth = Factura::where('estado_factura', 'pagada')
@@ -128,13 +132,15 @@ class FacturaController extends Controller
             ->sum('total');
 
         // Cálculo del porcentaje (máximo 100%)
-        $percentage = ($target > 0) ? ($revenueMonth / $target) * 100 : 0;
+        $rawPercentage = ($target > 0) ? ($revenueMonth / $target) * 100 : 0;
+        $percentage = min($rawPercentage, 100);
 
         return response()->json([
             'target' => $target,
             'revenue_month' => (float)$revenueMonth,
             'revenue_today' => (float)$revenueToday,
-            'percentage' => round($percentage, 2)
+            'percentage' => round($percentage, 2),
+            'raw_percentage' => round($rawPercentage, 2)
         ]);
     }
     public function getStatistics()

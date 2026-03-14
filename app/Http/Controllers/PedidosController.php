@@ -111,6 +111,27 @@ class PedidosController extends Controller
             'mensaje' => $res ? 'Pedido cocinando encontrado' : 'No hay pedidos cocinando',
         ]);
     }
+    public function getConsultarFacturaCLI(string $id)
+    {
+        // Usamos first() para obtener el pedido pendiente más reciente de esa mesa
+        $res = Pedido::select('pedidos.*', 'mesas.*', 'tiempos_preparacion.*', 'usuarios.*', 
+            'detalle_pedidos.*','productos.nombre as producto_nombre','productos.id_producto')
+            ->join('tiempos_preparacion', 'tiempos_preparacion.id_pedido', '=', 'pedidos.id_pedido')
+            ->join('usuarios', 'usuarios.id_usuario', '=', 'tiempos_preparacion.id_usuario_chef')
+            ->join('mesas', 'mesas.id_mesa', '=', 'pedidos.id_mesa')
+            ->join('detalle_pedidos', 'detalle_pedidos.id_pedido', '=', 'pedidos.id_pedido')
+            ->join('productos', 'productos.id_producto', '=', 'detalle_pedidos.id_producto')
+            ->where('estado_pedido', '=', 'listo')
+            ->where('mesas.id_mesa', $id)
+            ->orderBy('fecha_pedido', 'desc') // El más nuevo
+            ->get();
+
+        return response()->json([
+            // Si no hay, enviamos null explícito para que el frontend sepa que debe crear uno
+            'data' => $res,
+            'mensaje' => $res ? 'Pedido cocinando encontrado' : 'No hay pedidos cocinando',
+        ]);
+    }
 
     public function obtenerPedidosEnPreparacion()
     {

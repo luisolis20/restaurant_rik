@@ -68,6 +68,60 @@ class MesaController extends Controller
             return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
+    public function getMesaDisponibles(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 20);
+            $perPage = min($perPage, 50);
+            $searchQuery = $request->input('search_query');
+            $status = $request->input('status');
+
+            $query = Mesa::select('mesas.*','qr_mesas.codigo_qr')
+            
+                ->leftJoin('qr_mesas', 'qr_mesas.id_mesa', '=', 'mesas.id_mesa')
+                ->where('mesas.estado', '=', 'libre');
+            if (! empty($searchQuery)) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('mesas.codigo_mesa', 'LIKE', "%{$searchQuery}%");
+
+                });
+            }
+            if (! empty($status)) {
+                $query->where(function ($q) use ($status) {
+                    $q->where('mesas.estado', 'LIKE', "{$status}");
+                });
+            }
+
+            $data = $query->paginate($perPage);
+
+            if ($data->isEmpty()) {
+                return response()->json(['data' => [], 'message' => 'No se encontraron datos'], 200);
+            }
+            $data->getCollection()->transform(function ($item) {
+                $attributes = $item->getAttributes();
+                foreach ($attributes as $key => $value) {
+                    if (is_string($value)) {
+                        $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+
+                return $attributes;
+            });
+
+            return response()->json([
+                'data' => $data->items(),
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'last_page' => $data->lastPage(),
+                ],
+
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
