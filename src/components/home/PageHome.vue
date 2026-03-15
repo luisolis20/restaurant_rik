@@ -262,7 +262,7 @@
                                     class="list-group-item d-flex justify-content-between py-1 small">
                                     <span>{{ prod.cantidad }}x {{ prod.producto_nombre }}</span>
                                     <span class="text-muted">${{ (prod.precio_unitario * prod.cantidad).toFixed(2)
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                             <div class="d-flex justify-content-between fw-bold">
@@ -311,15 +311,16 @@
                     <button class="btn btn-primary w-100" @click="confirmarPedido">Confirmar Pedido</button>
                 </div>
             </div>
-            <div class="bill-floating-btn" @click="consultarFactura">
+            <div v-if="datosFactura.length > 0" class="bill-floating-btn" @click="consultarFactura">
                 <i class="bi bi-receipt"></i>
                 <span class="fw-bold">Cuenta</span>
+                <span class="cart-badge">{{ datosFactura.length }}</span>
             </div>
 
             <div v-if="mostrarFactura" class="bill-sidebar shadow-lg">
-                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-dark text-white">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-white text-white">
                     <h5 class="mb-0">Mi Cuenta</h5>
-                    <button class="btn-close btn-close-white" @click="mostrarFactura = false"></button>
+                    <button class="btn-close btn-close-black" @click="mostrarFactura = false"></button>
                 </div>
 
                 <div class="p-3 bill-content">
@@ -357,6 +358,51 @@
                         @click="pedirCuenta">
                         <i class="bi bi-wallet2 me-2"></i> Solicitar Cuenta
                     </button>
+                </div>
+            </div>
+            <div v-if="mostrarConfirmarEntrega" class="delivery-check-btn floating-anim" @click="abrirCalificacion">
+                <div class="icon-sphere">
+                    <i class="bi bi- megaphone-fill"></i>
+                </div>
+                <div class="text-stack">
+                    <span class="main-txt">¿Llegó tu pedido?</span>
+                    <span class="sub-txt">¡Queremos saber tu opinión!</span>
+                </div>
+                <i class="bi bi-chevron-right ms-2 arrow-icon"></i>
+            </div>
+
+            <div v-if="mostrarModalCalificacion" class="rating-overlay">
+                <div class="rating-card shadow-lg">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold">¡Buen provecho!</h3>
+                        <p class="text-muted">¿Qué te pareció tu pedido #{{ idPedidoCalificar }}?</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Tu Nombre (Opcional):</label>
+                        <input type="text" v-model="nombreCliente" class="form-control rounded-pill"
+                            placeholder="Escribe tu nombre aquí...">
+                    </div>
+                    <div class="stars-container mb-4">
+                        <i v-for="star in 5" :key="star" class="bi"
+                            :class="star <= puntuacion ? 'bi-star-fill text-warning' : 'bi-star text-muted'"
+                            @click="puntuacion = star" style="font-size: 2.5rem; cursor: pointer; padding: 0 5px;">
+                        </i>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Cuéntanos más (opcional):</label>
+                        <textarea v-model="comentario" class="form-control" rows="3"
+                            placeholder="El sabor, la temperatura..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light w-100 rounded-pill"
+                            @click="mostrarModalCalificacion = false">Cerrar</button>
+                        <button class="btn btn-primary w-100 rounded-pill" :disabled="puntuacion === 0"
+                            @click="guardarCalificacion">
+                            Enviar Opinión
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -399,6 +445,12 @@ export default {
             datosFactura: [],
             totalCuenta: 0,
             tiempoMasCercano: "00:00",
+            mostrarConfirmarEntrega: false,
+            mostrarModalCalificacion: false,
+            idPedidoCalificar: null,
+            puntuacion: 0,
+            comentario: "",
+            nombreCliente: "",
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
@@ -467,6 +519,7 @@ export default {
             this.idMesa = usuario.id_mesa; // Ajusta según tu objeto user
             this.cargarPedidoPendiente();
             await this.verificarPedidoEnCocina();
+            await this.consultarFactura();
         }
         this.intervaloReloj = setInterval(() => {
             this.ahora = new Date();
@@ -533,6 +586,8 @@ export default {
                         this.mostrarModalListo = true;
                         pedido.yaNotificado = true;
                         // Opcional: Sonido de notificación
+                        this.mostrarConfirmarEntrega = true;
+                        this.idPedidoCalificar = pedido.id_pedido;
                     }
                 } else {
                     const totalSegundos = Math.floor(restanteMs / 1000);
@@ -686,11 +741,13 @@ export default {
                 // Obtenemos todos los pedidos de la mesa que NO estén pagados ni cancelados
                 const res = await API.get(`${this.baseUrl}/pedidoslistos/${this.idMesa}`);
                 this.datosFactura = res.data.data; // Se asume que el backend agrupa detalles dentro del pedido
-
+                this.idPedidoCalificar = this.datosFactura[0]?.id_pedido;
                 // Calcular gran total
                 this.totalCuenta = this.datosFactura.reduce((acc, ped) => acc + parseFloat(ped.total), 0);
-
-                this.mostrarFactura = true;
+                if (this.datosFactura && this.datosFactura.length > 0) {
+                    this.mostrarFactura = true;
+                    this.mostrarConfirmarEntrega = true;
+                }
             } catch (error) {
                 console.error("Error al consultar factura:", error);
                 mostraralertas2("No se pudo cargar el detalle de la cuenta", "error");
@@ -709,6 +766,34 @@ export default {
                 } catch (e) {
                     console.error(e);
                 }
+            }
+        },
+        abrirCalificacion() {
+            this.mostrarConfirmarEntrega = false; // Quitamos el flotante
+            this.mostrarModalCalificacion = true; // Abrimos el modal
+        },
+
+        async guardarCalificacion() {
+            try {
+                const payload = {
+                    id_pedido: this.idPedidoCalificar,
+                    cliente: this.nombreCliente.trim() !== "" ? this.nombreCliente : "Anónimo",
+                    puntuacion: this.puntuacion,
+                    comentario: this.comentario
+                };
+
+                const response = await API.post(`${this.baseUrl}/calificaciones`, payload);
+
+                if (response.status === 201 || response.status === 200) {
+                    mostraralertas2("¡Gracias por tu opinión!", "success");
+                    this.mostrarModalCalificacion = false;
+                    // Limpiar datos
+                    this.puntuacion = 0;
+                    this.comentario = "";
+                }
+            } catch (error) {
+                console.error("Error al calificar:", error);
+                mostraralertas2("No se pudo guardar la calificación", "error");
             }
         }
 
