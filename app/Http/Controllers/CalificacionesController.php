@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Calificacion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 
 class CalificacionesController extends Controller
 {
@@ -24,14 +25,13 @@ class CalificacionesController extends Controller
                 'pedidos.fecha_pedido as fecha_pedido',
             )
                 ->join('pedidos', 'pedidos.id_pedido', '=', 'calificaciones.id_pedido');
-             if (! empty($searchQuery)) {
+            if (! empty($searchQuery)) {
                 $query->where(function ($q) use ($searchQuery) {
                     $q->where('calificaciones.fecha', 'LIKE', "%{$searchQuery}%");
-                   
-            
+
                 });
             }
-        
+
             $data = $query->paginate($perPage);
 
             if ($data->isEmpty()) {
@@ -44,6 +44,7 @@ class CalificacionesController extends Controller
                         $attributes[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }
+
                 return $attributes;
             });
 
@@ -55,10 +56,42 @@ class CalificacionesController extends Controller
                     'total' => $data->total(),
                     'last_page' => $data->lastPage(),
                 ],
-                
+
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
+        }
+    }
+
+    public function getCalificacionesRecientes()
+    {
+        try {
+            $calificaciones = Calificacion::where('puntuacion', '>=', 4)
+                ->orderBy('fecha', 'desc') // Usamos tu columna 'fecha'
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id_calificacion, // Tu PK es id_calificacion
+                        'nombre_cliente' => $item->cliente ?? 'Cliente Rico Rico',
+                        'comentario' => $item->comentario,
+                        'puntuacion' => (int) $item->puntuacion,
+                        // Convertimos el string de la DB a objeto Carbon para usar diffForHumans
+                        'fecha_formateada' => $item->fecha ? Carbon::parse($item->fecha)->diffForHumans() : 'Recientemente',
+                        'foto' => null, // Por ahora null según tu tabla
+                    ];
+                });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $calificaciones,
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al cargar testimonios',
+                'message' => $e->getMessage(), // Útil para debuggear
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -68,11 +101,12 @@ class CalificacionesController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->input();
-        //$inputs["password"] = md5($request->password);
+        // $inputs["password"] = md5($request->password);
         $res = Calificacion::create($inputs);
+
         return response()->json([
             'data' => $res,
-            'mensaje' => "Agregado con Éxito!!",
+            'mensaje' => 'Agregado con Éxito!!',
         ]);
     }
 
@@ -88,7 +122,7 @@ class CalificacionesController extends Controller
 
             return response()->json([
                 'data' => $res,
-                'mensaje' => "Encontrado con Éxito!!",
+                'mensaje' => 'Encontrado con Éxito!!',
             ]);
         } else {
             return response()->json([
@@ -109,16 +143,16 @@ class CalificacionesController extends Controller
             $res->puntuacion = $request->puntuacion;
             $res->comentario = $request->comentario;
             $res->fecha = $request->fecha;
-            
+
             if ($res->save()) {
                 return response()->json([
                     'data' => $res,
-                    'mensaje' => "Actualizado con Éxito!!",
+                    'mensaje' => 'Actualizado con Éxito!!',
                 ]);
             } else {
                 return response()->json([
                     'error' => true,
-                    'mensaje' => "Error al Actualizar",
+                    'mensaje' => 'Error al Actualizar',
                 ]);
             }
         } else {
@@ -132,7 +166,4 @@ class CalificacionesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   
-    
-    
 }

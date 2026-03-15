@@ -23,10 +23,7 @@ class Calificacion extends Model
         'fecha',
     ];
 
-    protected $casts = [
-        'fecha' => 'datetime',
-        'puntuacion' => 'integer',
-    ];
+    
 
     // Relación: una calificación pertenece a un pedido
     public function pedido()
