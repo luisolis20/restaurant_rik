@@ -87,201 +87,204 @@
   </div>
 </template>
 
-<script setup>
-import script3 from "@/assets/js/login";
-import { onMounted, onUnmounted, ref, watch } from 'vue';
-import { Html5Qrcode } from "html5-qrcode";
-import { useRouter } from "vue-router";
-import API from "@/assets/js/services/axios"
 
-let html5QrCode = null;
-const qrResult = ref("");
-const isScanning = ref(false);
-const manualMode = ref(false); // Nueva variable
-const selectedTable = ref(""); // Datos de la mesa
-const waiterCode = ref("");
-const email = ref("");
-const password = ref("");
-const mesaQr = ref("");
-
-const router = useRouter();
-
-const loginInstance = {
-  ...script3.data(),
-  $router: router,
-  ...script3.methods,
-};
-const mesaInsance = {
-  ...script3.data(),
-  $router: router,
-  ...script3.methods,
-};
-const mesaQrInsance = {
-  ...script3.data(),
-  $router: router,
-  ...script3.methods,
-};
-// Sincronizar valores
-watch(email, (val) => (loginInstance.email = val));
-watch(password, (val) => (loginInstance.password = val));
-
-// Sincronizar valores
-watch(selectedTable, (val) => (mesaInsance.email = val));
-watch(waiterCode, (val) => (mesaInsance.password = val));
-
-const handleSubmit = () => {
-  loginInstance.login.call(loginInstance);
-};
-const handleSubmit2 = () => {
-  mesaInsance.login.call(mesaInsance);
-};
-const startScanner = async () => {
-  html5QrCode = new Html5Qrcode("reader");
-
-  const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
-    // Aquí manejas el éxito del escaneo
-    await stopScanner();
-    console.log(`Código detectado: ${decodedText}`);
-    qrResult.value = decodedText;
-    try {
-      
-      const responseVerif = await API.get(`/restrik/verificar_qr/${decodedText}`);
-      
-      if (responseVerif.data) {
-        console.log("Datos de verificación:", responseVerif.data.data.codigo_mesa);
-        await loginAutomaticoPorQR(decodedText, responseVerif.data.data.codigo_mesa);
-      } else {
-        alert("Código QR no válido o mesa inactiva");
-        startScanner(); // Reiniciar si falló
-      }
-    } catch (err) {
-      console.error("Error al validar QR:", err);
-      alert("Error de conexión al validar el código");
-      startScanner();
-    }
-  };
-  
-
-  const config = {
-    fps: 10,
-    qrbox: { width: 250, height: 250 },
-    // Esto ayuda a que se vea bien en el contenedor pequeño
-    aspectRatio: 1.0
-  };
-
-  try {
-    await html5QrCode.start(
-      { facingMode: "environment" },
-      config,
-      qrCodeSuccessCallback
-    );
-    isScanning.value = true; // Actualizamos estado al tener éxito
-  } catch (err) {
-    console.error("Error al iniciar cámara:", err);
-    isScanning.value = false;
-  }
-};
-
-const stopScanner = async () => {
-  if (html5QrCode && html5QrCode.isScanning) {
-    try {
-      await html5QrCode.stop();
-      html5QrCode.clear();
-      isScanning.value = false; // Actualizamos estado al detener
-    } catch (err) {
-      console.error("Error al detener:", err);
-    }
-  }
-};
-const toggleManual = (value) => {
-  manualMode.value = value;
-  if (value) {
-    stopScanner(); // Detenemos la cámara si pasamos a modo manual
-  } else {
-    // Si volvemos a modo scanner, esperamos un tick de Vue y reiniciamos
-    setTimeout(() => startScanner(), 100);
-  }
-};
-
-const setActive = () => {
-  const container = document.getElementById('contenedor');
-  container.className = 'active';
-};
-
-const setClose = () => {
-  const container = document.getElementById('contenedor');
-  container.className = 'close';
-};
-
-const togglePassword = (inputId) => {
-  const input = document.getElementById(inputId);
-  const iconSpan = document.getElementById(`icon-${inputId}`);
-
-  if (input.type === 'password') {
-    input.type = 'text';
-    // SVG Ojo tachado
-    iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
-  } else {
-    input.type = 'password';
-    // SVG Ojo abierto
-    iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-  }
-};
-const loginAutomaticoPorQR = async (codigoqr, codigoMesa) => {
-  try {
-    
-    mesaQrInsance.email = codigoMesa; 
-    mesaQrInsance.password = codigoqr; 
-    
-    await mesaQrInsance.login.call(mesaQrInsance);
-    
-  } catch (error) {
-    console.error("Error en login automático:", error);
-  }
-};
-
-onMounted(() => {
-  startScanner();
-  // Inicializar en modo close para que se vea el login en móviles
-  if (window.innerWidth <= 768) {
-    document.getElementById('contenedor').classList.add('close');
-  }
-});
-onUnmounted(() => {
-  stopScanner();
-});
-</script>
 
 <script>
+import script3 from "@/assets/js/login";
+import { Html5Qrcode } from "html5-qrcode";
 import API from "@/assets/js/services/axios";
-import { useRoute } from "vue-router";
-import debounce from "lodash.debounce";
+import {
+    mostraralertas2,
+} from "@/assets/js/function/funciones";
+
 export default {
   name: 'Login',
   data() {
     return {
+      // Variables originales del script setup
+      html5QrCode: null,
+      qrResult: "",
+      isScanning: false,
+      manualMode: false,
+      selectedTable: "",
+      waiterCode: "",
+      email: "",
+      password: "",
+
+      // Variables del script previo
       objetoList: [],
       idus: 0,
       baseUrl: "/restrik",
 
+      // Instancias de login (clonadas de script3)
+      loginInstance: null,
+      mesaInstance: null,
+      mesaQrInstance: null
     };
   },
-  async mounted() {
-    const ruta = useRoute();
-    this.GetObjetoList();
+  unmounted() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   },
+  created() {
+    // Inicializamos las instancias de login al crear el componente
+    this.loginInstance = { ...script3.data(), $router: this.$router, ...script3.methods };
+    this.mesaInstance = { ...script3.data(), $router: this.$router, ...script3.methods };
+    this.mesaQrInstance = { ...script3.data(), $router: this.$router, ...script3.methods };
+  },
+
+  watch: {
+    // Sincronización de inputs con las instancias de login
+    email(val) { this.loginInstance.email = val; },
+    password(val) { this.loginInstance.password = val; },
+    selectedTable(val) { this.mesaInstance.email = val; },
+    waiterCode(val) { this.mesaInstance.password = val; }
+  },
+
+  async mounted() {
+    this.GetObjetoList();
+    this.startScanner();
+
+    // Responsive: Inicializar en modo close para móviles
+    if (window.innerWidth <= 768) {
+      const container = document.getElementById('contenedor');
+      if (container) container.classList.add('close');
+    }
+    this.pollingInterval = setInterval(() => {
+      this.actualizarSilenciosamente();
+    }, 10000);
+  },
+
+  beforeUnmount() {
+    this.stopScanner();
+  },
+
   methods: {
+    // --- MÉTODOS DE DATOS ---
     async GetObjetoList() {
-      this.cargando = true;
       try {
         const response = await API.get(`${this.baseUrl}/mesas_disponibles`);
-
         this.objetoList = response.data?.data || [];
       } catch (error) {
-        console.error("❌ Error al obtener carreras:", error);
+        console.error("❌ Error al obtener mesas:", error);
         this.objetoList = [];
       }
     },
-  },
+    async actualizarSilenciosamente() {
+      try {
+        const response = await API.get(`${this.baseUrl}/mesas_disponibles`);
+        this.objetoList = response.data?.data || [];
+      } catch (error) {
+        console.warn("Error en actualización silenciosa", error);
+      }
+    },
+
+    // --- MÉTODOS DE LOGIN ---
+    handleSubmit() {
+      this.loginInstance.login.call(this.loginInstance);
+    },
+
+    handleSubmit2() {
+      this.mesaInstance.login.call(this.mesaInstance);
+    },
+
+    async loginAutomaticoPorQR(codigoqr, codigoMesa) {
+      try {
+        this.mesaQrInstance.email = codigoMesa;
+        this.mesaQrInstance.password = codigoqr;
+        await this.mesaQrInstance.login.call(this.mesaQrInstance);
+      } catch (error) {
+        console.error("Error en login automático:", error);
+      }
+    },
+
+    // --- MÉTODOS DEL SCANNER ---
+    async startScanner() {
+      this.html5QrCode = new Html5Qrcode("reader");
+
+      const qrCodeSuccessCallback = async (decodedText) => {
+        await this.stopScanner();
+        console.log(`Código detectado: ${decodedText}`);
+        this.qrResult = decodedText;
+
+        try {
+          const responseVerif = await API.get(`/restrik/verificar_qr/${decodedText}`);
+          if (responseVerif.data) {
+            
+            if (responseVerif.data.data.estado === 'ocupada') {
+              mostraralertas2("La mesa ya está ocupada", "error");
+              this.startScanner();
+            } else {
+              await this.loginAutomaticoPorQR(decodedText, responseVerif.data.data.codigo_mesa);
+            }
+            
+          } else {
+            mostraralertas2("Código QR no válido o mesa inactiva", "error");
+            this.startScanner();
+          }
+        } catch (err) {
+          console.error("Error al validar QR:", err);
+          mostraralertas2("Error de conexión al validar el código", "error");
+          this.startScanner();
+        }
+      };
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+      };
+
+      try {
+        await this.html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+        this.isScanning = true;
+      } catch (err) {
+        console.error("Error al iniciar cámara:", err);
+        this.isScanning = false;
+      }
+    },
+
+    async stopScanner() {
+      if (this.html5QrCode && this.html5QrCode.isScanning) {
+        try {
+          await this.html5QrCode.stop();
+          this.html5QrCode.clear();
+          this.isScanning = false;
+        } catch (err) {
+          console.error("Error al detener scanner:", err);
+        }
+      }
+    },
+
+    toggleManual(value) {
+      this.manualMode = value;
+      if (value) {
+        this.stopScanner();
+      } else {
+        setTimeout(() => this.startScanner(), 100);
+      }
+    },
+
+    // --- MÉTODOS DE INTERFAZ ---
+    setActive() {
+      document.getElementById('contenedor').className = 'active';
+    },
+
+    setClose() {
+      document.getElementById('contenedor').className = 'close';
+    },
+
+    togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const iconSpan = document.getElementById(`icon-${inputId}`);
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+      } else {
+        input.type = 'password';
+        iconSpan.parentElement.innerHTML = `<svg id="icon-${inputId}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+      }
+    }
+  }
 };
 </script>

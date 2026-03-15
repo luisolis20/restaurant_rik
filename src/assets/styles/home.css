@@ -12,29 +12,41 @@
 --------------------------------------------------------------*/
 /* Fonts */
 .pagehome {
-  --default-font: "Roboto",  system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --heading-font: "Amatic SC",  sans-serif;
-  --nav-font: "Inter",  sans-serif;
+  --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --heading-font: "Amatic SC", sans-serif;
+  --nav-font: "Inter", sans-serif;
 }
 
 /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
-.pagehome { 
-  --background-color: #ffffff; /* Background color for the entire website, including individual sections */
-  --default-color: #212529; /* Default color used for the majority of the text content across the entire website */
-  --heading-color: #37373f; /* Color for headings, subheadings and title throughout the website */
-  --accent-color: #F5B30F; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
-  --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
-  --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
+.pagehome {
+  --background-color: #ffffff;
+  /* Background color for the entire website, including individual sections */
+  --default-color: #212529;
+  /* Default color used for the majority of the text content across the entire website */
+  --heading-color: #37373f;
+  /* Color for headings, subheadings and title throughout the website */
+  --accent-color: #F5B30F;
+  /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
+  --surface-color: #ffffff;
+  /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
+  --contrast-color: #ffffff;
+  /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
 }
 
 /* Nav Menu Colors - The following color variables are used specifically for the navigation menu. They are separate from the global colors to allow for more customization options */
 .pagehome {
-  --nav-color: #7f7f90;  /* The default color of the main navmenu links */
-  --nav-hover-color: #F5B30F; /* Applied to main navmenu links when they are hovered over or active */
-  --nav-mobile-background-color: #ffffff; /* Used as the background color for mobile navigation menu */
-  --nav-dropdown-background-color: #ffffff; /* Used as the background color for dropdown items that appear when hovering over primary navigation items */
-  --nav-dropdown-color: #7f7f90; /* Used for navigation links of the dropdown items in the navigation menu. */
-  --nav-dropdown-hover-color: #F5B30F; /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
+  --nav-color: #7f7f90;
+  /* The default color of the main navmenu links */
+  --nav-hover-color: #F5B30F;
+  /* Applied to main navmenu links when they are hovered over or active */
+  --nav-mobile-background-color: #ffffff;
+  /* Used as the background color for mobile navigation menu */
+  --nav-dropdown-background-color: #ffffff;
+  /* Used as the background color for dropdown items that appear when hovering over primary navigation items */
+  --nav-dropdown-color: #7f7f90;
+  /* Used for navigation links of the dropdown items in the navigation menu. */
+  --nav-dropdown-hover-color: #F5B30F;
+  /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
 }
 
 /* Color Presets - These classes override global colors when applied to any section or element, providing reuse of the sam color scheme. */
@@ -1164,19 +1176,24 @@ body.pagehome {
   padding: 0 60px;
   margin-bottom: 15px;
 }
+
 .pagehome .mensu .tab-content .mensu-item a {
   display: block;
   overflow: hidden;
   margin-bottom: 15px;
-  border-radius: 8px; /* Opcional: bordes redondeados */
+  border-radius: 8px;
+  /* Opcional: bordes redondeados */
 }
 
 /* Fuerza el tamaño de la imagen */
 .pagehome .mensu .tab-content .mensu-item .mensu-img {
   width: 100%;
-  height: 250px; /* Ajusta esta altura según tu preferencia */
-  object-fit: cover; /* Corta la imagen para llenar el espacio sin estirarse */
-  object-position: center; /* Centra el recorte */
+  height: 250px;
+  /* Ajusta esta altura según tu preferencia */
+  object-fit: cover;
+  /* Corta la imagen para llenar el espacio sin estirarse */
+  object-position: center;
+  /* Centra el recorte */
   transition: transform 0.3s ease;
 }
 
@@ -1203,18 +1220,20 @@ body.pagehome {
   font-weight: 700;
   color: var(--accent-color);
 }
+
 .badge-disponible {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #28a745; /* Verde éxito */
+  background-color: #28a745;
+  /* Verde éxito */
   color: white;
   padding: 5px 12px;
   border-radius: 50px;
   font-size: 0.75rem;
   font-weight: bold;
   text-transform: uppercase;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 2;
 }
 
@@ -1222,14 +1241,15 @@ body.pagehome {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #dc3545; /* Rojo peligro */
+  background-color: #dc3545;
+  /* Rojo peligro */
   color: white;
   padding: 5px 12px;
   border-radius: 50px;
   font-size: 0.75rem;
   font-weight: bold;
   text-transform: uppercase;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 2;
 }
 
@@ -1275,6 +1295,7 @@ body.pagehome {
   font-size: 26px;
   line-height: 0;
 }
+
 .pagehome .testimonials .testimonial-item .quote-icon-right {
   color: color-mix(in srgb, var(--accent-color), transparent 50%);
   font-size: 26px;
@@ -1317,6 +1338,106 @@ body.pagehome {
 
 .pagehome .testimonials .swiper-pagination .swiper-pagination-bullet-active {
   background-color: var(--accent-color);
+}
+.pagehome .testimonials .avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  background-color: #feba00; /* Amarillo Rico Rico */
+  color: #8b5a2b; /* Marrón Rico Rico */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  margin: 0 auto;
+  border: 4px solid white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.pagehome .testimonials .testimonial-item .stars i {
+  color: #ffc107;
+  margin: 0 2px;
+  font-size: 1.2rem;
+}
+
+/* --- NUEVA ANIMACIÓN DE DESLIZAMIENTO Hacia la DERECHA (Next) --- */
+.slide-right-enter-active, .slide-right-leave-active {
+  transition: all 0.6s ease;
+  position: absolute; /* Vital para que no haya saltos */
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+/* Entra desde la derecha (fuera de pantalla) */
+.slide-right-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+/* Sale hacia la izquierda (fuera de pantalla) */
+.slide-right-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* --- NUEVA ANIMACIÓN DE DESLIZAMIENTO Hacia la IZQUIERDA (Prev/Bullets) --- */
+.slide-left-enter-active, .slide-left-leave-active {
+  transition: all 0.6s ease;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+/* Entra desde la izquierda */
+.slide-left-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+/* Sale hacia la derecha */
+.slide-left-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* --- Estilos base del carrusel --- */
+.vue-carousel {
+  position: relative;
+  overflow: hidden;
+  min-height: 350px; /* Ajusta según el contenido */
+}
+
+.vue-carousel-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.vue-slide {
+  width: 100%;
+}
+
+/* Paginación personalizada */
+.vue-pagination {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.vue-bullet {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 5px;
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.vue-bullet.active {
+  background-color: #feba00; /* Amarillo Rico Rico */
+}
+
+/* Animación suave para el cambio de slide */
+.pagehome .testimonials .swiper-slide {
+  transition: opacity 0.3s ease;
 }
 
 /*--------------------------------------------------------------
@@ -1708,76 +1829,172 @@ body.pagehome {
 .pagehome .starter-section {
   /* Add your styles here */
 }
+.floating-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column-reverse; /* El último botón en el HTML queda abajo */
+    align-items: flex-end;
+    gap: 15px; /* Espacio automático entre botones para que no se monten */
+    z-index: 9999;
+    pointer-events: none; /* Permite clicks a través del contenedor vacío */
+}
+
+.floating-container > div {
+    pointer-events: auto; /* Reactiva clicks en los botones */
+    position: relative !important; /* Anulamos el fixed individual */
+    bottom: auto !important;
+    right: auto !important;
+}
+/* Estilos del Carrito Flotante */
+.cart-floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #ce1212;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: white;
+  color: #ce1212;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.cart-sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 350px;
+  height: 100vh;
+  background: white;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #dee2e6;
+}
+
+.cart-items {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
 /* Botón flotante de tiempo */
 .timer-floating-btn {
-    position: fixed;
-    bottom: 100px; /* Arriba del carrito */
-    right: 30px;
-    background-color: #198754;
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    font-size: 10px;
+  position: fixed;
+  bottom: 100px;
+  /* Arriba del carrito */
+  right: 30px;
+  background-color: #198754;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  font-size: 10px;
 }
-.timer-floating-btn i { font-size: 20px; }
+
+.timer-floating-btn i {
+  font-size: 20px;
+}
 
 /* Sidebar de Tiempos */
 .timer-sidebar {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 400px;
-    height: 100vh;
-    background: white;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid #dee2e6;
-    overflow-y: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 100vh;
+  background: white;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #dee2e6;
+  overflow-y: auto;
 }
 
 /* Animación de pedido listo */
 .ready-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255,255,255,0.95);
-    z-index: 11000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 11000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
+
 .ready-card {
-    animation: bounceIn 0.8s ease;
-    color: #198754;
+  animation: bounceIn 0.8s ease;
+  color: #198754;
 }
+
 @keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
+
 /* Estilos para pantalla */
-#print-section { display: none; }
+#print-section {
+  display: none;
+}
 
 @media print {
+
   /* Configuración de página para ticket (80mm es el estándar) */
   @page {
     margin: 0;
-    size: 80mm auto; /* 'auto' permite que el largo crezca según el contenido */
+    size: 80mm auto;
+    /* 'auto' permite que el largo crezca según el contenido */
   }
 
-  body * { visibility: hidden; }
+  body * {
+    visibility: hidden;
+  }
 
-  #print-section, #print-section * {
+  #print-section,
+  #print-section * {
     visibility: visible;
     color: #000 !important;
     background: #fff !important;
@@ -1788,26 +2005,46 @@ body.pagehome {
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm; /* Ajustar a 58mm si tu impresora es más pequeña */
+    width: 80mm;
+    /* Ajustar a 58mm si tu impresora es más pequeña */
     padding: 2mm;
-    font-family: 'Courier New', Courier, monospace; /* Fuente mono para alineación perfecta */
+    font-family: 'Courier New', Courier, monospace;
+    /* Fuente mono para alineación perfecta */
     font-size: 12px;
   }
 
-  .ticket-wrapper { width: 100%; }
+  .ticket-wrapper {
+    width: 100%;
+  }
 
   .ticket-logo {
     width: 60%;
     display: block;
     margin: 0 auto 10px;
-    filter: grayscale(1); /* Forzar blanco y negro */
+    filter: grayscale(1);
+    /* Forzar blanco y negro */
   }
 
-  .ticket-header { text-align: center; margin-bottom: 10px; }
-  .ticket-title { font-size: 16px; font-weight: bold; margin: 0; }
-  .ticket-number { font-size: 14px; margin: 2px 0; }
+  .ticket-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
 
-  .ticket-info p { margin: 2px 0; font-size: 11px; }
+  .ticket-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .ticket-number {
+    font-size: 14px;
+    margin: 2px 0;
+  }
+
+  .ticket-info p {
+    margin: 2px 0;
+    font-size: 11px;
+  }
 
   .ticket-table {
     width: 100%;
@@ -1820,9 +2057,17 @@ body.pagehome {
     padding-bottom: 5px;
   }
 
-  .desc-col { max-width: 40mm; overflow: hidden; } /* Evita que nombres largos rompan el ticket */
+  .desc-col {
+    max-width: 40mm;
+    overflow: hidden;
+  }
 
-  .ticket-divider { text-align: center; margin: 10px 0; }
+  /* Evita que nombres largos rompan el ticket */
+
+  .ticket-divider {
+    text-align: center;
+    margin: 10px 0;
+  }
 
   .total-row {
     display: flex;
@@ -1830,128 +2075,172 @@ body.pagehome {
     margin: 3px 0;
   }
 
-  .bold { font-weight: bold; }
-  .Large { font-size: 16px; border-top: 1px solid #000; padding-top: 5px; }
+  .bold {
+    font-weight: bold;
+  }
+
+  .Large {
+    font-size: 16px;
+    border-top: 1px solid #000;
+    padding-top: 5px;
+  }
 
   .ticket-footer {
     text-align: center;
     margin-top: 20px;
     font-size: 11px;
-    padding-bottom: 20mm; /* Espacio extra para que el usuario pueda cortar el papel */
+    padding-bottom: 20mm;
+    /* Espacio extra para que el usuario pueda cortar el papel */
   }
 }
+
 /* Estilo del Botón de Factura (Color azul o dorado) */
 .bill-floating-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 110px; /* Ajustado para que no choque con el del carrito */
-    background-color: #0d6efd;
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  position: fixed;
+  bottom: 30px;
+  right: 110px;
+  /* Ajustado para que no choque con el del carrito */
+  background-color: #0d6efd;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
-.bill-floating-btn i { font-size: 1.2rem; }
-.bill-floating-btn span { font-size: 0.6rem; text-transform: uppercase; }
+
+.bill-floating-btn i {
+  font-size: 1.2rem;
+}
+
+.bill-floating-btn span {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
 
 /* Sidebar de Factura */
 .bill-sidebar {
-    position: fixed;
-    left: 0; /* Aparece desde la izquierda para diferenciar del carrito */
-    top: 0;
-    width: 380px;
-    height: 100vh;
-    background: white;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #dee2e6;
+  position: fixed;
+  left: 0;
+  /* Aparece desde la izquierda para diferenciar del carrito */
+  top: 0;
+  width: 380px;
+  height: 100vh;
+  background: white;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #dee2e6;
 }
-.bill-content { overflow-y: auto; flex-grow: 1; }
+
+.bill-content {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
 /* Animación de flotado suave */
 @keyframes floating {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-12px) rotate(1deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 }
 
 .floating-anim {
-    animation: floating 3.5s ease-in-out infinite;
+  animation: floating 3.5s ease-in-out infinite;
 }
 
 .delivery-check-btn {
-    position: fixed;
-    bottom: 30px; /* Ajustado para que no estorbe */
-    right: 230px;  /* Posicionado a la derecha */
-    background: #feba00; /* Amarillo Rico Rico */
-    color: #8b5a2b;      /* Marrón Rico Rico */
-    padding: 10px 18px;
-    border-radius: 60px 20px 60px 60px; /* Forma orgánica irregular */
-    cursor: pointer;
-    z-index: 9999;
-    box-shadow: 0 10px 25px rgba(254, 186, 0, 0.4);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 2px solid white;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: fixed;
+  bottom: 30px;
+  /* Ajustado para que no estorbe */
+  right: 230px;
+  /* Posicionado a la derecha */
+  background: #feba00;
+  /* Amarillo Rico Rico */
+  color: #8b5a2b;
+  /* Marrón Rico Rico */
+  padding: 10px 18px;
+  border-radius: 60px 20px 60px 60px;
+  /* Forma orgánica irregular */
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 10px 25px rgba(254, 186, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid white;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .delivery-check-btn:hover {
-    transform: scale(1.08) translateX(-5px);
-    background: #fdb100;
-    box-shadow: 0 15px 30px rgba(254, 186, 0, 0.5);
+  transform: scale(1.08) translateX(-5px);
+  background: #fdb100;
+  box-shadow: 0 15px 30px rgba(254, 186, 0, 0.5);
 }
-.delivery-check-btn .content { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+
+.delivery-check-btn .content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+}
+
 /* Contenedor del icono */
 .delivery-check-btn .icon-sphere {
-    background: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: #feba00;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #feba00;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Columna de texto */
 .delivery-check-btn .text-stack {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
 .delivery-check-btn .main-txt {
-    font-weight: 800;
-    font-size: 0.95rem;
-    text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-transform: uppercase;
 }
 
 .delivery-check-btn .sub-txt {
-    font-size: 0.75rem;
-    font-weight: 500;
-    opacity: 0.9;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .delivery-check-btn .arrow-icon {
-    font-size: 0.8rem;
-    opacity: 0.6;
+  font-size: 0.8rem;
+  opacity: 0.6;
 }
+
 /* Overlay de Calificación */
 .rating-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1967,19 +2256,75 @@ body.pagehome {
   max-width: 450px;
   animation: fadeInScale 0.4s ease-out;
 }
+
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Ajuste para dispositivos móviles */
+/* Sidebars adaptables */
+.cart-sidebar, .timer-sidebar, .bill-sidebar {
+    width: 100% !important; /* Por defecto ocupa todo en móvil */
+    max-width: 400px; /* Pero no más de 400px en PC */
+}
+
 @media (max-width: 576px) {
-    .delivery-check-btn {
+    .floating-container {
         right: 15px;
-        bottom: 20px;
-        padding: 8px 14px;
+        bottom: 15px;
+        gap: 10px;
     }
-    .delivery-check-btn .sub-txt {
-        display: none; /* Escondemos el texto pequeño en móviles */
+
+    /* Ajuste para que el botón de delivery sea circular como los otros */
+    .delivery-check-btn {
+        width: 55px;  /* Forzamos ancho igual al alto */
+        height: 55px; /* Forzamos alto */
+        padding: 0;   /* Quitamos el padding para centrar el icono */
+        border-radius: 50%; /* Lo hacemos circular */
+        justify-content: center; /* Centramos el contenido */
     }
+
+    /* OCULTAR TODO EL TEXTO (Main y Sub) */
+    .delivery-check-btn .text-stack {
+        display: none !important; 
+    }
+
+    /* Ocultar la flecha si la tienes */
+    .delivery-check-btn .arrow-icon {
+        display: none !important;
+    }
+
+    /* El ícono se mantiene, pero quitamos el gap de la caja principal */
+    .delivery-check-btn {
+        gap: 0;
+    }
+    
+    .cart-floating-btn, .timer-floating-btn, .bill-floating-btn {
+        width: 55px;
+        height: 55px;
+    }
+}
+.rating-card img {
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Opcional: Un efecto de pulso al botón de 'SÍ' para que resalte */
+@keyframes pulse-yellow {
+    0% { box-shadow: 0 0 0 0 rgba(254, 186, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(254, 186, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(254, 186, 0, 0); }
+}
+
+.btn-warning.fw-bold {
+    animation: pulse-yellow 2s infinite;
 }

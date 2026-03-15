@@ -225,14 +225,38 @@
 
 
                 </section><!-- /Menu Section -->
+                <!-- Testimonials Section -->
+                <section id="testimonials" class="testimonials section light-background">
+                    <Testimonial />
+                    
+
+                </section><!-- /Testimonials Section -->
             </main>
-            <div v-if="carrito.length > 0" class="cart-floating-btn" @click="mostrarDetalle = !mostrarDetalle">
-                <i class="bi bi-cart-fill"></i>
-                <span class="cart-badge">{{ carrito.length }}</span>
-            </div>
-            <div v-if="pedidosAgrupados.length > 0" class="timer-floating-btn" @click="mostrarTiempo = !mostrarTiempo">
-                <i class="bi bi-hourglass-split"></i>
-                <span class="fw-bold">{{ tiempoMasCercano }}</span>
+            <div class="floating-container">
+                <div v-if="mostrarConfirmarEntrega" class="delivery-check-btn floating-anim" @click="abrirCalificacion">
+                    <div class="icon-sphere">
+                        <i class="bi bi-megaphone-fill"></i>
+                    </div>
+                    <div class="text-stack">
+                        <span class="main-txt">¿Llegó tu pedido?</span>
+                        <span class="sub-txt">¡Queremos saber tu opinión!</span>
+                    </div>
+                    <i class="bi bi-chevron-right ms-2 arrow-icon"></i>
+                </div>
+                <div v-if="datosFactura.length > 0" class="bill-floating-btn" @click="consultarFactura">
+                    <i class="bi bi-receipt"></i>
+                    <span class="fw-bold">Cuenta</span>
+                    <span class="cart-badge">{{ datosFactura.length }}</span>
+                </div>
+                <div v-if="pedidosAgrupados.length > 0" class="timer-floating-btn"
+                    @click="mostrarTiempo = !mostrarTiempo">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span class="fw-bold">{{ tiempoMasCercano }}</span>
+                </div>
+                <div v-if="carrito.length > 0" class="cart-floating-btn" @click="mostrarDetalle = !mostrarDetalle">
+                    <i class="bi bi-cart-fill"></i>
+                    <span class="cart-badge">{{ carrito.length }}</span>
+                </div>
             </div>
 
             <div v-if="mostrarTiempo" class="timer-sidebar shadow-lg">
@@ -262,7 +286,7 @@
                                     class="list-group-item d-flex justify-content-between py-1 small">
                                     <span>{{ prod.cantidad }}x {{ prod.producto_nombre }}</span>
                                     <span class="text-muted">${{ (prod.precio_unitario * prod.cantidad).toFixed(2)
-                                        }}</span>
+                                    }}</span>
                                 </li>
                             </ul>
                             <div class="d-flex justify-content-between fw-bold">
@@ -273,16 +297,6 @@
                     </div>
                 </div>
             </div>
-
-            <div v-if="mostrarModalListo" class="ready-overlay" @click="mostrarModalListo = false">
-                <div class="ready-card">
-                    <i class="bi bi-check-circle-fill" style="font-size: 8rem;"></i>
-                    <h1 class="display-3 fw-bold">¡PEDIDO LISTO!</h1>
-                    <p class="fs-4">Tu deliciosa orden está saliendo de la cocina hacia tu mesa.</p>
-                    <button class="btn btn-success btn-lg mt-4 px-5 rounded-pill">¡Genial!</button>
-                </div>
-            </div>
-
             <div v-if="mostrarDetalle" class="cart-sidebar shadow-lg">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                     <h5 class="mb-0">Mis Pedidos</h5>
@@ -311,12 +325,6 @@
                     <button class="btn btn-primary w-100" @click="confirmarPedido">Confirmar Pedido</button>
                 </div>
             </div>
-            <div v-if="datosFactura.length > 0" class="bill-floating-btn" @click="consultarFactura">
-                <i class="bi bi-receipt"></i>
-                <span class="fw-bold">Cuenta</span>
-                <span class="cart-badge">{{ datosFactura.length }}</span>
-            </div>
-
             <div v-if="mostrarFactura" class="bill-sidebar shadow-lg">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-white text-white">
                     <h5 class="mb-0">Mi Cuenta</h5>
@@ -354,26 +362,48 @@
                         <span>Total a Pagar:</span>
                         <span class="text-success">${{ totalCuenta.toFixed(2) }}</span>
                     </div>
-                    <button class="btn btn-primary w-100 btn-lg rounded-pill" :disabled="datosFactura.length === 0"
+                    <button class="btn btn-warning w-100 btn-lg rounded-pill" :disabled="datosFactura.length === 0"
                         @click="pedirCuenta">
-                        <i class="bi bi-wallet2 me-2"></i> Solicitar Cuenta
+                        <i class="bi bi-wallet2 me-2"></i> Acércate a caja a cancelar
                     </button>
                 </div>
             </div>
-            <div v-if="mostrarConfirmarEntrega" class="delivery-check-btn floating-anim" @click="abrirCalificacion">
-                <div class="icon-sphere">
-                    <i class="bi bi- megaphone-fill"></i>
+            <div v-if="mostrarModalPreguntaEntrega" class="rating-overlay">
+                <div class="rating-card shadow-lg text-center">
+                    <img src="@/assets/img/dudasin.png" class="img-fluid mb-3 rounded" style="max-height: 150px;"
+                        alt="Consulta">
+
+                    <h3 class="fw-bold">¿Ya estás disfrutando?</h3>
+                    <p class="text-muted fs-5">¿Tu pedido llegó correctamente a tu mesa?</p>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button class="btn btn-outline-danger w-100 rounded-pill py-2" @click="pedidoNoLlego">
+                            <i class="bi bi-x-circle me-2"></i>No, aún no
+                        </button>
+                        <button class="btn btn-warning w-100 rounded-pill py-2 fw-bold" @click="pedidoSiLlego">
+                            <i class="bi bi-check-lg me-2"></i>¡Sí, llegó!
+                        </button>
+                    </div>
                 </div>
-                <div class="text-stack">
-                    <span class="main-txt">¿Llegó tu pedido?</span>
-                    <span class="sub-txt">¡Queremos saber tu opinión!</span>
-                </div>
-                <i class="bi bi-chevron-right ms-2 arrow-icon"></i>
             </div>
 
+            <div v-if="mostrarModalDisculpas" class="rating-overlay">
+                <div class="rating-card shadow-lg text-center">
+                    <img src="@/assets/img/loses.png" class="img-fluid mb-3" style="max-height: 150px;" alt="Disculpas">
+
+                    <h3 class="fw-bold text-danger">¡Mil disculpas!</h3>
+                    <p class="text-muted">Estamos agilizando todo en cocina para que tu pedido llegue de inmediato.
+                        ¡Gracias por tu paciencia!</p>
+
+                    <button class="btn btn-dark w-100 rounded-pill mt-3" @click="mostrarModalDisculpas = false">
+                        Entendido </button>
+                </div>
+            </div>
             <div v-if="mostrarModalCalificacion" class="rating-overlay">
                 <div class="rating-card shadow-lg">
                     <div class="text-center mb-4">
+                        <img src="@/assets/img/biens.png" class="img-fluid mb-2" style="max-height: 120px;"
+                            alt="Rico Rico">
                         <h3 class="fw-bold">¡Buen provecho!</h3>
                         <p class="text-muted">¿Qué te pareció tu pedido #{{ idPedidoCalificar }}?</p>
                     </div>
@@ -398,11 +428,19 @@
                     <div class="d-flex gap-2">
                         <button class="btn btn-light w-100 rounded-pill"
                             @click="mostrarModalCalificacion = false">Cerrar</button>
-                        <button class="btn btn-primary w-100 rounded-pill" :disabled="puntuacion === 0"
+                        <button class="btn btn-warning w-100 rounded-pill" :disabled="puntuacion === 0"
                             @click="guardarCalificacion">
                             Enviar Opinión
                         </button>
                     </div>
+                </div>
+            </div>
+            <div v-if="mostrarModalListo" class="ready-overlay" @click="mostrarModalListo = false">
+                <div class="ready-card">
+                    <i class="bi bi-check-circle-fill" style="font-size: 8rem;"></i>
+                    <h1 class="display-3 fw-bold">¡PEDIDO LISTO!</h1>
+                    <p class="fs-4">Tu deliciosa orden está saliendo de la cocina hacia tu mesa.</p>
+                    <button class="btn btn-success btn-lg mt-4 px-5 rounded-pill">¡Genial!</button>
                 </div>
             </div>
         </div>
@@ -411,6 +449,7 @@
 <script>
 import { initYummyEffects } from "@/assets/js/function/yummyEffects.js";
 import SectionMenu from "@/components/home/section_menu/SectionMenu.vue";
+import Testimonial from '@/components/home/testimonial/Testimonial.vue';
 import { getMe } from '@/store/auth';
 import API from "@/assets/js/services/axios";
 import {
@@ -425,6 +464,7 @@ export default {
     name: "PageHome",
     components: {
         SectionMenu,
+        Testimonial
     },
 
     data() {
@@ -451,51 +491,14 @@ export default {
             puntuacion: 0,
             comentario: "",
             nombreCliente: "",
+            pollingInterval: null,
+            mostrarModalPreguntaEntrega: false,
+            mostrarModalDisculpas: false,
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
         @import url("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css");
-        /* Estilos del Carrito Flotante */
-                .cart-floating-btn {
-                    position: fixed;
-                    bottom: 30px;
-                    right: 30px;
-                    background-color: #ce1212;
-                    color: white;
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    cursor: pointer;
-                    z-index: 9999;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                }
-                .cart-badge {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    background: white;
-                    color: #ce1212;
-                    border-radius: 50%;
-                    padding: 2px 7px;
-                    font-size: 12px;
-                    font-weight: bold;
-                }
-                .cart-sidebar {
-                    position: fixed;
-                    right: 0;
-                    top: 0;
-                    width: 350px;
-                    height: 100vh;
-                    background: white;
-                    z-index: 10000;
-                    display: flex;
-                    flex-direction: column;
-                    border-left: 1px solid #dee2e6;
-                }
-                .cart-items { overflow-y: auto; flex-grow: 1; }
+        
         
       `,
         };
@@ -530,6 +533,12 @@ export default {
         this.intervaloServidor = setInterval(() => {
             this.verificarPedidoEnCocina();
         }, 30000);
+        this.pollingInterval = setInterval(() => {
+            this.actualizarSilenciosamente();
+        }, 30000);
+    },
+    unmounted() {
+        if (this.pollingInterval) clearInterval(this.pollingInterval);
     },
     beforeUnmount() {
         clearInterval(this.intervaloReloj);
@@ -547,6 +556,24 @@ export default {
                     this.pedidosAgrupados = [];
                 }
             } catch (e) { console.error(e); }
+        },
+        async actualizarSilenciosamente() {
+            try {
+                const res = await API.get(`${this.baseUrl}/pedidoslistos/${this.idMesa}`);
+                this.datosFactura = res.data.data; // Se asume que el backend agrupa detalles dentro del pedido
+                this.idPedidoCalificar = this.datosFactura[0]?.id_pedido;
+                // Calcular gran total
+                this.totalCuenta = this.datosFactura.reduce((acc, ped) => acc + parseFloat(ped.total), 0);
+                if (this.datosFactura && this.datosFactura.length > 0) {
+                    this.mostrarFactura = true;
+                    this.mostrarConfirmarEntrega = true;
+                } else {
+                    this.mostrarFactura = false;
+                    this.mostrarConfirmarEntrega = false;
+                }
+            } catch (error) {
+                console.warn("Error en actualización silenciosa", error);
+            }
         },
 
         agruparPedidos(dataRaw) {
@@ -586,8 +613,7 @@ export default {
                         this.mostrarModalListo = true;
                         pedido.yaNotificado = true;
                         // Opcional: Sonido de notificación
-                        this.mostrarConfirmarEntrega = true;
-                        this.idPedidoCalificar = pedido.id_pedido;
+                        this.consultarFactura();
                     }
                 } else {
                     const totalSegundos = Math.floor(restanteMs / 1000);
@@ -747,6 +773,9 @@ export default {
                 if (this.datosFactura && this.datosFactura.length > 0) {
                     this.mostrarFactura = true;
                     this.mostrarConfirmarEntrega = true;
+                } else {
+                    this.mostrarFactura = false;
+                    this.mostrarConfirmarEntrega = false;
                 }
             } catch (error) {
                 console.error("Error al consultar factura:", error);
@@ -756,21 +785,25 @@ export default {
 
         async pedirCuenta() {
             // Aquí puedes disparar una notificación al mesero o redirigir a pasarela de pago
-            const confirmacion = await confimar("¿Deseas solicitar la cuenta final?", "Un mesero se acercará a tu mesa.", "info");
-            if (confirmacion.isConfirmed) {
-                try {
-                    // Ejemplo: llamar a un endpoint que notifique al sistema
-                    await API.post(`${this.baseUrl}/pedidos/solicitar-cuenta/${this.idMesa}`);
-                    mostraralertas2("Solicitud enviada. En breve te atenderemos.", "success");
-                    this.mostrarFactura = false;
-                } catch (e) {
-                    console.error(e);
-                }
-            }
+            //const confirmacion = await confimar("¿Deseas solicitar la cuenta final?", "Un mesero se acercará a tu mesa.", "info");
+            this.mostrarFactura = false;
+
         },
         abrirCalificacion() {
-            this.mostrarConfirmarEntrega = false; // Quitamos el flotante
-            this.mostrarModalCalificacion = true; // Abrimos el modal
+            //this.mostrarConfirmarEntrega = false; // Quitamos el flotante
+            this.mostrarModalPreguntaEntrega = true; // Abrimos el modal
+        },
+        pedidoSiLlego() {
+            this.mostrarModalPreguntaEntrega = false;
+            this.mostrarModalCalificacion = true;
+            this.mostrarConfirmarEntrega = false; // Ocultamos el botón flotante definitivamente
+        },
+
+        // 3. Si el cliente dice que NO llegó
+        pedidoNoLlego() {
+            this.mostrarModalPreguntaEntrega = false;
+            this.mostrarModalDisculpas = true;
+            // El botón flotante se mantiene visible para que lo intente más tarde
         },
 
         async guardarCalificacion() {

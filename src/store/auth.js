@@ -2,6 +2,9 @@
 import { ref } from 'vue';// Librería para poder usar el ref
 import axios from 'axios'; //Librería para poder usar el axios
 import store from "@/store";
+import {
+    mostraralertas2,
+} from "@/assets/js/function/funciones";
 // Importación de la librería para poder usar el ref
 const logged = ref(false); // Variable para almacenar si el usuario está logueado o no
 const user = ref('');// Variable para almacenar el usuario logueado
@@ -26,6 +29,29 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+export const logout = async (showMsg = false) => {
+  try {
+    // Intentamos avisar al servidor para que libere la mesa
+    await apiClient.get('/logout');
+  } catch (error) {
+    // Si falla el logout (ej. token ya expiró), procedemos igual con la limpieza local
+    console.warn("No se pudo completar el logout en el servidor:", error);
+  } finally {
+    if (showMsg) {
+      // Usamos una alerta nativa o puedes cambiarlo por SweetAlert: Swal.fire(...)
+      mostraralertas2("Tu sesión ha expirado por seguridad", "success");
+    }
+    // Limpieza absoluta del cliente
+    localStorage.removeItem('token_rest');
+    localStorage.removeItem('token_type_rest');
+    localStorage.removeItem('user_rest');
+    logged.value = false;
+    user.value = null;
+    
+    // Redirección
+    window.location.href = '/login';
+  }
+};
 // Función para obtener el usuario logueado
 export const getMe = async () => {
   try {
@@ -38,8 +64,7 @@ export const getMe = async () => {
   } catch (error) {
     if (error.response && error.response.status === 401) {
         console.error('Error al obtener perfil data:', error);
-        localStorage.clear();
-        window.location.href = '/login';
+       await logout(true);
     }
     throw error;
   }
