@@ -17,6 +17,7 @@ class Calificacion extends Model
 
     protected $fillable = [
         'id_pedido',
+        'cliente',
         'puntuacion',
         'comentario',
         'fecha',
