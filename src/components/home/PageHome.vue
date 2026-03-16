@@ -228,7 +228,7 @@
                 <!-- Testimonials Section -->
                 <section id="testimonials" class="testimonials section light-background">
                     <Testimonial />
-                    
+
 
                 </section><!-- /Testimonials Section -->
             </main>
@@ -286,7 +286,7 @@
                                     class="list-group-item d-flex justify-content-between py-1 small">
                                     <span>{{ prod.cantidad }}x {{ prod.producto_nombre }}</span>
                                     <span class="text-muted">${{ (prod.precio_unitario * prod.cantidad).toFixed(2)
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                             <div class="d-flex justify-content-between fw-bold">
@@ -452,6 +452,7 @@ import SectionMenu from "@/components/home/section_menu/SectionMenu.vue";
 import Testimonial from '@/components/home/testimonial/Testimonial.vue';
 import { getMe } from '@/store/auth';
 import API from "@/assets/js/services/axios";
+import sonidoNotificacion from '@/assets/sounds/notificacion.mp3';
 import {
     mostraralertas2,
     enviaractualizacionpedido,
@@ -494,6 +495,7 @@ export default {
             pollingInterval: null,
             mostrarModalPreguntaEntrega: false,
             mostrarModalDisculpas: false,
+            audio: new Audio(sonidoNotificacion),
             bootstrapStyles: `
         @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
         /* Importamos home.css. Nota: Asegúrate que la ruta sea accesible desde la URL pública */
@@ -522,7 +524,6 @@ export default {
             this.idMesa = usuario.id_mesa; // Ajusta según tu objeto user
             this.cargarPedidoPendiente();
             await this.verificarPedidoEnCocina();
-            await this.consultarFactura();
         }
         this.intervaloReloj = setInterval(() => {
             this.ahora = new Date();
@@ -532,10 +533,10 @@ export default {
         // Consultar al servidor cada 30 segundos por si hay cambios de estado
         this.intervaloServidor = setInterval(() => {
             this.verificarPedidoEnCocina();
-        }, 30000);
+        }, 10000);
         this.pollingInterval = setInterval(() => {
             this.actualizarSilenciosamente();
-        }, 30000);
+        }, 10000);
     },
     unmounted() {
         if (this.pollingInterval) clearInterval(this.pollingInterval);
@@ -614,6 +615,7 @@ export default {
                         pedido.yaNotificado = true;
                         // Opcional: Sonido de notificación
                         this.consultarFactura();
+                        this.playNotificacion();
                     }
                 } else {
                     const totalSegundos = Math.floor(restanteMs / 1000);
@@ -637,6 +639,16 @@ export default {
             } else {
                 this.tiempoMasCercano = "LISTO";
             }
+        },
+        playNotificacion() {
+            // Reiniciamos el audio por si suena dos veces seguidas rápido
+            this.audio.pause();
+            this.audio.currentTime = 0;
+
+            // Intentamos reproducir (el navegador requiere interacción previa del usuario)
+            this.audio.play().catch(error => {
+                console.warn("El navegador bloqueó el audio. Se requiere un clic previo en la página.", error);
+            });
         },
         async cerrarSesion() {
             try {

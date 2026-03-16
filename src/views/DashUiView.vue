@@ -12,6 +12,9 @@
       <div class="col-span-12">
         <statistics-chart />
       </div>
+      <div class="col-span-12">
+        <plato-mas-vendido />
+      </div>
 
       <div class="col-span-12">
         <recent-orders />
@@ -28,6 +31,7 @@ import MonthlySale from '../components/ecommerce/MonthlyTarget.vue'
 import CustomerDemographic from '../components/ecommerce/CustomerDemographic.vue'
 import StatisticsChart from '../components/ecommerce/StatisticsChart.vue'
 import RecentOrders from '../components/ecommerce/RecentOrders.vue'
+import PlatoMasVendido from '../components/ecommerce/Platomasvendido.vue'
 export default {
   components: {
     AdminLayout,
@@ -37,6 +41,7 @@ export default {
     CustomerDemographic,
     StatisticsChart,
     RecentOrders,
+    PlatoMasVendido
   },
   name: 'DashUiView',
 }

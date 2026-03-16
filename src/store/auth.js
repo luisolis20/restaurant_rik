@@ -30,26 +30,38 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 export const logout = async (showMsg = false) => {
+  // 1. Obtener tokens antes de borrar localstorage
+  const token = localStorage.getItem('token_rest');
+  const tokenType = localStorage.getItem('token_type_rest') || 'Bearer';
+
   try {
-    // Intentamos avisar al servidor para que libere la mesa
-    await apiClient.get('/logout');
-  } catch (error) {
-    // Si falla el logout (ej. token ya expiró), procedemos igual con la limpieza local
-    console.warn("No se pudo completar el logout en el servidor:", error);
-  } finally {
-    if (showMsg) {
-      // Usamos una alerta nativa o puedes cambiarlo por SweetAlert: Swal.fire(...)
-      mostraralertas2("Tu sesión ha expirado por seguridad", "success");
+    if (token) {
+      // Forzamos el envío del token manualmente por si el interceptor falla en el cierre
+      await apiClient.get('/logout', {
+        headers: {
+          'Authorization': `${tokenType} ${token}`
+        }
+      });
     }
-    // Limpieza absoluta del cliente
+  } catch (error) {
+    console.warn("El servidor no pudo liberar la mesa, procediendo a limpiar local:", error);
+  } finally {
+    // 2. Limpieza local (Siempre se ejecuta)
     localStorage.removeItem('token_rest');
     localStorage.removeItem('token_type_rest');
     localStorage.removeItem('user_rest');
+    
     logged.value = false;
     user.value = null;
-    
-    // Redirección
-    window.location.href = '/login';
+
+    if (showMsg) {
+      mostraralertas2("Sesión finalizada. ¡Vuelve pronto!", "success");
+    }
+
+    // 3. Redirección con un pequeño delay si hay mensaje
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, showMsg ? 1500 : 0);
   }
 };
 // Función para obtener el usuario logueado
