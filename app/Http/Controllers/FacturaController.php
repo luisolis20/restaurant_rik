@@ -63,9 +63,10 @@ class FacturaController extends Controller
 
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al codificar los datos a JSON: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al codificar los datos a JSON: '.$e->getMessage()], 500);
         }
     }
+
     public function getDashboardStats()
     {
         try {
@@ -79,12 +80,13 @@ class FacturaController extends Controller
 
             return response()->json([
                 'total_ventas' => (float) $totalVentas,
-                'total_pedidos' => $totalPedidos
+                'total_pedidos' => $totalPedidos,
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
     public function getMonthlySales(Request $request)
     {
         $year = $request->input('year', date('Y'));
@@ -111,10 +113,11 @@ class FacturaController extends Controller
 
         return response()->json([
             'years' => $availableYears,
-            'selected_year' => (int)$year,
-            'sales_data' => $monthlyData
+            'selected_year' => (int) $year,
+            'sales_data' => $monthlyData,
         ]);
     }
+
     public function getMonthlyTarget()
     {
         $target = 1000; // Objetivo mensual
@@ -137,12 +140,13 @@ class FacturaController extends Controller
 
         return response()->json([
             'target' => $target,
-            'revenue_month' => (float)$revenueMonth,
-            'revenue_today' => (float)$revenueToday,
+            'revenue_month' => (float) $revenueMonth,
+            'revenue_today' => (float) $revenueToday,
             'percentage' => round($percentage, 2),
-            'raw_percentage' => round($rawPercentage, 2)
+            'raw_percentage' => round($rawPercentage, 2),
         ]);
     }
+
     public function getStatistics()
     {
         $year = now()->year;
@@ -174,9 +178,10 @@ class FacturaController extends Controller
 
         return response()->json([
             'sales' => $sales,
-            'orders' => $orders
+            'orders' => $orders,
         ]);
     }
+
     public function getStatistics2(Request $request)
     {
         $filter = $request->input('filter', 'monthly'); // monthly, quarterly, annually
@@ -205,10 +210,11 @@ class FacturaController extends Controller
 
             ksort($sales);
             ksort($orders);
+
             return response()->json([
                 'sales' => array_values($sales),
                 'orders' => array_values($orders),
-                'categories' => array_map('strval', array_keys($sales))
+                'categories' => array_map('strval', array_keys($sales)),
             ]);
         } else {
             // Mensual (Por defecto)
@@ -231,9 +237,10 @@ class FacturaController extends Controller
         return response()->json([
             'sales' => $finalSales,
             'orders' => $finalOrders,
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -327,7 +334,7 @@ class FacturaController extends Controller
             // 3. Crear la factura
             $factura = Factura::create([
                 'id_pedido' => $pedido->id_pedido,
-                'numero_factura' => 'FAC-' . strtoupper(uniqid()),
+                'numero_factura' => 'FAC-'.strtoupper(uniqid()),
                 'tipo_comprobante' => 'factura',
                 'subtotal' => $pedido->total,
                 'total' => $pedido->total,
@@ -355,9 +362,10 @@ class FacturaController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json(['error' => 'Error en servidor: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error en servidor: '.$e->getMessage()], 500);
         }
     }
+
     public function getFacturaByPedido($id_pedido)
     {
         try {
@@ -367,38 +375,110 @@ class FacturaController extends Controller
                 ->where('id_pedido', $id_pedido)
                 ->first();
 
-            if (!$factura) {
+            if (! $factura) {
                 return response()->json([
-                    'message' => 'No se encontró factura para el pedido #' . $id_pedido
+                    'message' => 'No se encontró factura para el pedido #'.$id_pedido,
                 ], 404);
             }
 
             // Formateamos la respuesta para el modal de Vue
             return response()->json([
                 'factura' => [
-                    'id_factura'      => $factura->id_factura,
-                    'id_pedido'       => $factura->id_pedido,
-                    'numero_factura'  => $factura->numero_factura,
+                    'id_factura' => $factura->id_factura,
+                    'id_pedido' => $factura->id_pedido,
+                    'numero_factura' => $factura->numero_factura,
                     'tipo_comprobante' => ucfirst(str_replace('_', ' ', $factura->tipo_comprobante)),
-                    'subtotal'        => number_format($factura->subtotal, 2, '.', ''),
-                    'total'           => number_format($factura->total, 2, '.', ''),
-                    'fecha_emision'   => $factura->fecha_emision->format('d/m/Y H:i'),
-                    'estado_factura'   => $factura->estado_factura,
+                    'subtotal' => number_format($factura->subtotal, 2, '.', ''),
+                    'total' => number_format($factura->total, 2, '.', ''),
+                    'fecha_emision' => $factura->fecha_emision->format('d/m/Y H:i'),
+                    'estado_factura' => $factura->estado_factura,
 
                     // --- Datos de la Mesa extraídos a través del pedido ---
                     'mesa' => [
-                        'id_mesa'     => $factura->pedido->mesa->id_mesa ?? null,
+                        'id_mesa' => $factura->pedido->mesa->id_mesa ?? null,
                         'codigo_mesa' => $factura->pedido->mesa->codigo_mesa ?? 'N/A',
-                        'capacidad'   => $factura->pedido->mesa->capacidad ?? 0,
-                    ]
+                        'capacidad' => $factura->pedido->mesa->capacidad ?? 0,
+                    ],
                 ],
-                'detalles' => $factura->detalles // Esto trae el array de detalle_facturas
+                'detalles' => $factura->detalles, // Esto trae el array de detalle_facturas
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al obtener la factura',
-                'details' => $e->getMessage()
+                'details' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getPlatomasvendido(Request $request)
+    {
+        $year = $request->query('year', date('Y'));
+
+        // 1. Obtener total de ventas de facturas por mes
+        $sales = DB::table('facturas')
+            ->selectRaw('MONTH(fecha_emision) as mes, SUM(total) as total')
+            ->whereYear('fecha_emision', $year)
+            ->groupBy('mes')
+            ->pluck('total', 'mes')
+            ->all();
+
+        // 2. Obtener el plato más vendido y su cantidad por mes
+        $topProductsQuery = DB::table('detalle_pedidos as dp')
+            ->join('pedidos as p', 'dp.id_pedido', '=', 'p.id_pedido')
+            ->join('productos as pr', 'dp.id_producto', '=', 'pr.id_producto')
+            ->selectRaw('
+            MONTH(p.fecha_pedido) as mes, 
+            pr.nombre as producto,
+            SUM(dp.cantidad) as total_unidades
+        ')
+            ->whereYear('p.fecha_pedido', $year)
+            ->whereIn('p.estado_pedido', ['listo', 'pagado']) // Solo contar pedidos confirmados/pagados
+            ->groupBy('mes', 'pr.id_producto', 'pr.nombre')
+            ->orderBy('mes')
+            ->orderByDesc('total_unidades')
+            ->get()
+            ->groupBy('mes')
+            ->map(function ($items) {
+                // Obtenemos el primer registro de cada mes (el de mayor cantidad)
+                $top = $items->first();
+
+                return [
+                    'nombre' => $top->producto,
+                    'cantidad' => $top->total_unidades,
+                ];
+            });
+
+        // 3. Formatear para ApexCharts y Reporte PDF (12 meses fijos)
+        $salesData = [];
+        $productsData = [];
+        $quantitiesData = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            // Dinero vendido en el mes
+            $salesData[] = isset($sales[$i]) ? (float) $sales[$i] : 0;
+
+            // Datos del producto estrella
+            if (isset($topProductsQuery[$i])) {
+                $productsData[] = $topProductsQuery[$i]['nombre'];
+                $quantitiesData[] = (int) $topProductsQuery[$i]['cantidad'];
+            } else {
+                $productsData[] = 'Sin ventas';
+                $quantitiesData[] = 0;
+            }
+        }
+
+        // 4. Obtener años disponibles para el filtro del Dropdown
+        $availableYears = DB::table('facturas')
+            ->selectRaw('DISTINCT YEAR(fecha_emision) as year')
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return response()->json([
+            'sales_data' => $salesData,      // Para las barras del gráfico
+            'top_products' => $productsData,   // Nombres para el reporte
+            'top_quantities' => $quantitiesData, // Unidades para la nueva columna del PDF
+            'years' => $availableYears,
+            'selected_year' => (int) $year,
+        ]);
     }
 }

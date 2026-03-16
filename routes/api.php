@@ -61,6 +61,7 @@ Route::prefix('restrik')->group(function () {
     Route::get('dashboard/statistics', [FacturaController::class, 'getStatistics'])->middleware('throttle:55000,1');
     Route::get('dashboard/statistics2', [FacturaController::class, 'getStatistics2'])->middleware('throttle:55000,1');
     Route::post('finalizar-facturar/{id}', [FacturaController::class, 'finalizarYFacturar'])->middleware('throttle:55000,1');
+    Route::get('dashboard/platomasvendido', [FacturaController::class, 'getPlatomasvendido'])->middleware('throttle:55000,1');
     Route::apiResource("detalle_facturas", DetalleFacturaController::class)->middleware('throttle:55000,1');
     Route::apiResource("inventarios", InventarioController::class)->middleware('throttle:55000,1');
     Route::apiResource("qr_mesas", QrMesaController::class)->middleware('throttle:55000,1');

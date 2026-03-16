@@ -115,16 +115,27 @@ class AuthController extends Controller
             if (! $token) {
                 return response()->json(['error' => 'No hay token'], Response::HTTP_BAD_REQUEST);
             }
-            // Intentamos obtener el usuario del token antes de invalidarlo
-            $user = JWTAuth::toUser($token);
-            
-            // Si el usuario que cierra sesión es una instancia del modelo Mesa
-            if ($user instanceof \App\Models\Mesa) {
+
+            // 1. Intentamos obtener el usuario de forma segura
+            $user = null;
+            try {
+                $user = JWTAuth::authenticate($token);
+            } catch (\Exception $e) {
+                // Si el token falló pero podemos parsearlo, intentamos sacar el ID (sub)
+                $payload = JWTAuth::setToken($token)->getPayload();
+                $userId = $payload->get('sub');
+                $user = \App\Models\Mesa::find($userId);
+            }
+
+            // 2. Liberar la mesa si logramos identificarla
+            if ($user && $user instanceof \App\Models\Mesa) {
                 $user->update(['estado' => 'libre']);
             }
+
+            // 3. Invalidar el token
             JWTAuth::invalidate($token);
 
-            return response()->json(['message' => 'Has cerrado sesion'], Response::HTTP_OK);
+            return response()->json(['message' => 'Mesa liberada y sesión cerrada'], Response::HTTP_OK);
         } catch (TokenInvalidException $e) {
             return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
